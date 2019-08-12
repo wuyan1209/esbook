@@ -77,8 +77,12 @@ WSGI_APPLICATION = 'esbook.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',    #这么选择mysql数据库
+        'NAME': 'esbook',         #数据库的名字
+        'USER': 'root',         #mysql数据库的用户名
+        'PASSWORD': '123456',   #mysql数据库的密码
+        'HOST': 'localhost',    #mysql数据库的主机名
+        'PORT': '3306'          #mysql数据库的端口号（这个可写可不写）
     }
 }
 
