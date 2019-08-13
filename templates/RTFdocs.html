@@ -20,8 +20,30 @@
         #menu_bar {
             border: #C3C3C3 solid 1px;
         }
+
+        {% comment %}#docs_title: {
+            border: 1px solid transparent;
+        }{% endcomment %}
+
+        #docs_title:focus {
+            border: 1px solid #58a6e7;
+            outline: 0;
+        }
+
+        #docs_title{
+            border:none;
+            background-color: #fafafa;
+            color: white;
+            font-family: 新宋体;
+            font-size: 18px;
+            color: black;
+            width: 92px;
+            min-width: 92px;
+            min-height: 28px;
+            color: rgb(0, 0, 0);
+        }
     </style>
-    <link href="/bootstrap-4.3.1-dist/css/bootstrap.min.css" rel="stylesheet">
+    {#    <link href="/bootstrap-4.3.1-dist/css/bootstrap.min.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- chartist CSS -->
     <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
@@ -38,27 +60,7 @@
 <body>
 <header style="background-color: #fafafa;height: 40px;z-index: 0">
     <nav class="navbar top-navbar navbar-toggleable-sm navbar-light">
-        <!-- ============================================================== -->
-        <!-- Logo -->
-        <!-- ============================================================== -->
-        {% comment %}<div class="navbar-header">
 
-            <a class="navbar-brand" href="/index/">
-                <!-- Logo icon --><b>
-                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-
-                <!-- Light Logo icon -->
-                <img src="../static/assets/images/logo-light-icon.png" alt="homepage" class="light-logo">
-            </b>
-                <!--End Logo icon -->
-                <!-- Logo text -->
-
-                <!-- Light Logo text -->
-                esbook </a>
-        </div>
-        <!-- ============================================================== -->
-        <!-- End Logo -->{% endcomment %}
-        <!-- ============================================================== -->
         <div class="navbar-collapse">
             <!-- ============================================================== -->
             <a href="javascript:history.go(-1)" style="margin-left: 30px">
@@ -68,6 +70,11 @@
             </a>
             <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
                  class="light-logo">
+            <a href="#" style="margin-right: 10px">
+                <b>
+                    <img src="../static/assets/images/保存.png" width="26" height="25" alt="goback">
+                </b>
+            </a>
             <!-- toggle and nav items -->
             <!-- ============================================================== -->
             <ul class="navbar-nav mr-auto mt-md-0">
@@ -76,8 +83,10 @@
                                         href="javascript:void(0)"><i class="mdi mdi-menu"></i></a></li>
                 <!-- ============================================================== -->
                 <!-- 文档的标题 -->
-                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">
-                    无标题文档</p>
+                {#                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">#}
+                {#                    无标题文档</p>#}
+                <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档" value="无标题文档"
+                       placeholder="无标题文档">
                 <!-- ============================================================== -->
 
                 <!-- 下拉按钮 -->
@@ -161,6 +170,8 @@
             console.error(error);
         })
 
+    function inputFocus() {
 
+    }
 </script>
 </html>
