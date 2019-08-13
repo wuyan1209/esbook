@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import form
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', form.index_form),
+    path('docs/', form.docs_form)
 ]
