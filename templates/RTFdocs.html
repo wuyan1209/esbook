@@ -61,7 +61,7 @@
         <!-- ============================================================== -->
         <div class="navbar-collapse">
             <!-- ============================================================== -->
-            <a href="/index" style="margin-left: 30px">
+            <a href="javascript:history.go(-1)" style="margin-left: 30px">
                 <b>
                     <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
                 </b>
@@ -79,14 +79,38 @@
                 <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">
                     无标题文档</p>
                 <!-- ============================================================== -->
+
+                <!-- 下拉按钮 -->
             </ul>
             <!-- ============================================================== -->
             <!-- User profile and search -->
             <!-- ============================================================== -->
-            {% comment %}<a style="margin-top: -1px" class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"><span
-                            style="color: black">admin</span></a>{% endcomment %}
+            <div class="dropdown" style="margin-left: 10px">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    智能工具
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">markdown</a>
+                </div>
+            </div>
+            <div class="dropdown" style="margin-left: 10px">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    分享
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">通过链接分享</a>
+                </div>
+            </div>
+
+            <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
+                 class="light-logo">
+
+
+            <img src="../static/assets/images/users/1.jpg" style="height: 30px; width: 30px;border-radius: 15px;"
+                 alt="user" class="profile-pic m-r-10"><span
+                style="color: black;margin-top: 2px;">admin</span>
         </div>
     </nav>
 </header>
@@ -100,10 +124,10 @@
 
 </div>
 </body>
-<!--<script src="https://cdn.ckeditor.com/ckeditor5/12.3.1/classic/ckeditor.js"></script>-->
-
 <script src="/static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
-<script src="/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+<script src="../static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap tether Core JavaScript -->
+<script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script>
     DecoupledEditor
         .create(document.querySelector('#editor'), {
