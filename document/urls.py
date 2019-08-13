@@ -3,4 +3,6 @@ from document import views
 
 urlpatterns = [
     path('index/',views.index),
+    path('mysql/',views.mysql_text),
+    path('first/',views.first),
 ]

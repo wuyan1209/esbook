@@ -23,6 +23,9 @@
     <link href="../static/css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
     <link href="../static/css/colors/blue.css" id="theme" rel="stylesheet">
+
+    <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
+    <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css" />
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -118,7 +121,7 @@
                         </li>
                         <li> <a class="waves-effect waves-dark" href="icon-material.html" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">企业管理</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="map-google.html" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">团队</span></a>
+                        <li> <a class="waves-effect waves-dark" href="#" id="demo" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">团队</span></a>
                         </li>
                         <li> <a class="waves-effect waves-dark" href="pages-blank.html" aria-expanded="false"><i class="mdi mdi-book-open-variant"></i><span class="hide-menu">回收站</span></a>
                         </li>
@@ -162,10 +165,27 @@
                 <!-- Start Page Content -->
                 <!-- ============================================================== -->
                 <!-- Row -->
-              
-                </div>          
             </div>
         </div>
+                       {% comment %}添加团队的弹出窗{% endcomment %}
+                       <div id="LoginBox">
+                            <form action="/index/" method="post">
+                            {% csrf_token %}
+                                <div class="row1">
+                                 登录DIY账号窗口<a href="javascript:void(0)" title="关闭窗口" class="close_btn" id="closeBtn">×</a>
+                                </div>
+                                <div class="row">
+                                    用户名: <span class="inputBox">
+                                    <input type="text" id="txtName" placeholder="账号/邮箱" />
+                                    </span><a href="javascript:void(0)" title="提示" class="warning" id="warn">*</a>
+                                    <br>
+                                    密&nbsp;&nbsp;&nbsp;码: <span class="inputBox">
+                                    <input type="text" id="txtPwd" placeholder="密码" />
+                                    </span><a href="javascript:void(0)" title="提示" class="warning" id="warn2">*</a><br>
+                                    <input type="submit" id="loginbtn" value="登录"/>
+                                </div>
+                            </form>
+                        </div>
         <!-- ============================================================== -->
         <!-- End Page wrapper  -->
         <!-- ============================================================== -->
@@ -201,6 +221,90 @@
     <script src="../static/assets/plugins/c3-master/c3.min.js"></script>
     <!-- Chart JS -->
     <script src="../static/js/dashboard1.js"></script>
+<script type="text/javascript">
+	$(function ($) {
+		//弹出窗口
+		$("#demo").hover(function () {
+			$(this).stop().animate({
+				opacity: '1'
+			}, 600);
+		}, function () {
+			$(this).stop().animate({
+				opacity: '0.6'
+			}, 1000);
+		}).on('click', function () {
+			$("#main-wrapper").append('<div id="mask"></div>');
+			$("#mask").addClass("mask").fadeIn("slow");
+			$("#LoginBox").fadeIn("slow");
+		});
+
+		//按钮的透明度
+		{% comment %}$("#loginbtn").hover(function () {
+			$(this).stop().animate({
+				opacity: '1'
+			}, 600);
+		}, function () {
+			$(this).stop().animate({
+				opacity: '0.8'
+			}, 1000);
+		});{% endcomment %}
+
+		//文本框不允许为空---按钮触发
+		$("#loginbtn").on('click', function () {
+			var txtName = $("#txtName").val();
+			var txtPwd = $("#txtPwd").val();
+			if (txtName == "" || txtName == undefined || txtName == null) {
+				if (txtPwd == "" || txtPwd == undefined || txtPwd == null) {
+					$(".warning").css({ display: 'block' });
+				}
+				else {
+					$("#warn").css({ display: 'block' });
+					$("#warn2").css({ display: 'none' });
+				}
+			}
+			else {
+				if (txtPwd == "" || txtPwd == undefined || txtPwd == null) {
+					$("#warn").css({ display: 'none' });
+					$(".warn2").css({ display: 'block' });
+				}
+				else {
+					$(".warning").css({ display: 'none' });
+				}
+			}
+		});
+		//文本框不允许为空---单个文本触发
+		$("#txtName").on('blur', function () {
+			var txtName = $("#txtName").val();
+			if (txtName == "" || txtName == undefined || txtName == null) {
+				$("#warn").css({ display: 'block' });
+			}
+			else {
+				$("#warn").css({ display: 'none' });
+			}
+		});
+		$("#txtName").on('focus', function () {
+			$("#warn").css({ display: 'none' });
+		});
+		//
+		$("#txtPwd").on('blur', function () {
+			var txtName = $("#txtPwd").val();
+			if (txtName == "" || txtName == undefined || txtName == null) {
+				$("#warn2").css({ display: 'block' });
+			}
+			else {
+				$("#warn2").css({ display: 'none' });
+			}
+		});
+		$("#txtPwd").on('focus', function () {
+			$("#warn2").css({ display: 'none' });
+		});
+		//关闭
+		$(".close_btn").hover(function () { $(this).css({ color: 'black' }) }, function () { $(this).css({ color: '#999' }) }).on('click', function () {
+			$("#LoginBox").fadeOut("fast");
+			$("#mask").css({ display: 'none' });
+		});
+	});
+	</script>
 </body>
 
 </html>
