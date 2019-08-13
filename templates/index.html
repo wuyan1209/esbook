@@ -24,6 +24,9 @@
     <link href="../static/css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
     <link href="../static/css/colors/blue.css" id="theme" rel="stylesheet">
+
+    <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
+    <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css" />
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -100,6 +103,7 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
+                                           <a href="" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i>退出登录</a>
                     </li>
                 </ul>
             </div>
@@ -117,36 +121,17 @@
             <!-- Sidebar navigation-->
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                    <li><a class="waves-effect waves-dark" href="index.html" aria-expanded="false"><i
-                            class="mdi mdi-gauge"></i><span class="hide-menu">工作台</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="pages-profile.html" aria-expanded="false"><i
-                            class="mdi mdi-account-check"></i><span class="hide-menu">我的桌面</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="table-basic.html" aria-expanded="false"><i
-                            class="mdi mdi-table"></i><span class="hide-menu">我的收藏</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="icon-material.html" aria-expanded="false"><i
-                            class="mdi mdi-emoticon"></i><span class="hide-menu">企业管理</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="map-google.html" aria-expanded="false"><i
-                            class="mdi mdi-earth"></i><span class="hide-menu">团队</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="pages-blank.html" aria-expanded="false"><i
-                            class="mdi mdi-book-open-variant"></i><span class="hide-menu">回收站</span></a>
-                    </li>
-                </ul>
+                        <li> <a class="waves-effect waves-dark" href="index.html" aria-expanded="false"><i class="icon-search icon-book-open"></i><span class="hide-menu">我的文档</span></a>
+                        </li>
+                        <li> <a class="waves-effect waves-dark" href="map-google.html" aria-expanded="false"><i class="icon-search icon-home"></i><span class="hide-menu">我的团队</span></a>
+                        </li>
+                    </ul>
             </nav>
             <!-- End Sidebar navigation -->
         </div>
-        <!-- End Sidebar scroll-->
-        <!-- Bottom points-->
         <div class="sidebar-footer">
-            <!-- item--><a href="" class="link" data-toggle="tooltip" title="Settings"><i class="ti-settings"></i></a>
-            <!-- item--><a href="" class="link" data-toggle="tooltip" title="Email"><i class="mdi mdi-gmail"></i></a>
-            <!-- item--><a href="" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i></a>
+            <a href="" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i class="icon-search icon-trash"></i><span>回收站</span></a>
         </div>
-        <!-- End Bottom points-->
     </aside>
     <!-- ============================================================== -->
     <!-- End Left Sidebar - style you can find in sidebar.scss  -->
@@ -158,29 +143,70 @@
         <!-- ============================================================== -->
         <!-- Container fluid  -->
         <!-- ============================================================== -->
-        <div class="container-fluid">
-            <!-- ============================================================== -->
-            <!-- Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            <div class="row page-titles">
-
-                <div class="col-md-7 col-4 align-self-center">
-                    <a href="/RTFdocs" class="btn waves-effect waves-light btn-danger pull-right hidden-sm-down"> 新建</a><br>
-                    <a href="#" class="btn waves-effect waves-light btn-danger pull-right hidden-sm-down"
-                       style="margin-right:30px"> 导入</a>
-                </div>
-            </div>
-            <!-- ============================================================== -->
-            <!-- End Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            <!-- ============================================================== -->
-            <!-- Start Page Content -->
-            <!-- ============================================================== -->
-            <!-- Row -->
-
+     <div id="box">
+        <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+           style="margin-top:10px;padding: 8px 50px">
+          新建
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
+             <a class="dropdown-item" href="/RTFdocs">文档</a>
+             <a class="dropdown-item" href="#">表格</a>
+             <a class="dropdown-item" href="#">幻灯片</a>
         </div>
+        </div>
+         <div  >
+             <div class="custom-file" >
+{#                 <span style="margin-left: 52px"></span>#}
+                 <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none">
+                 <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
+             </div>
+         </div>
     </div>
-</div>
+        <style type="text/css">
+        #box{
+            margin-left: 85%;
+            margin-top: 10px;
+        }
+        #btn2{
+            margin-top: 10px;
+            width: 150px;
+            height: 30px;
+            background-color: snow;
+            text-align: center;
+         }
+       </style>
+      <div id="box2">
+       <span>123<br>456123<br>456123<br>456123<br>456123<br>456123<br>456</span>
+      </div>
+       <style type="text/css">
+          #box2{
+             margin-top: -70px;
+             margin-left: 1%;
+             width:83% ;
+             height:auto ;
+             border: 1px black solid;
+           }
+        </style>
+                       {% comment %}添加团队的弹出窗{% endcomment %}
+                       <div id="LoginBox">
+                            <form action="/index/" method="post">
+                            {% csrf_token %}
+                                <div class="row1">
+                                 登录DIY账号窗口<a href="javascript:void(0)" title="关闭窗口" class="close_btn" id="closeBtn">×</a>
+                                </div>
+                                <div class="row">
+                                    用户名: <span class="inputBox">
+                                    <input type="text" id="txtName" placeholder="账号/邮箱" />
+                                    </span><a href="javascript:void(0)" title="提示" class="warning" id="warn">*</a>
+                                    <br>
+                                    密&nbsp;&nbsp;&nbsp;码: <span class="inputBox">
+                                    <input type="text" id="txtPwd" placeholder="密码" />
+                                    </span><a href="javascript:void(0)" title="提示" class="warning" id="warn2">*</a><br>
+                                    <input type="submit" id="loginbtn" value="登录"/>
+                                </div>
+                            </form>
+                        </div>
 <!-- ============================================================== -->
 <!-- End Page wrapper  -->
 <!-- ============================================================== -->
@@ -216,6 +242,88 @@
 <script src="../static/assets/plugins/c3-master/c3.min.js"></script>
 <!-- Chart JS -->
 <script src="../static/js/dashboard1.js"></script>
+<script type="text/javascript">
+	$(function ($) {
+		//弹出窗口
+		$("#demo").hover(function () {
+			$(this).stop().animate({
+				opacity: '1'
+			}, 600);
+		}, function () {
+			$(this).stop().animate({
+				opacity: '0.6'
+			}, 1000);
+		}).on('click', function () {
+			$("#main-wrapper").append('<div id="mask"></div>');
+			$("#mask").addClass("mask").fadeIn("slow");
+			$("#LoginBox").fadeIn("slow");
+		});
+		//按钮的透明度
+		{% comment %}$("#loginbtn").hover(function () {
+			$(this).stop().animate({
+				opacity: '1'
+			}, 600);
+		}, function () {
+			$(this).stop().animate({
+				opacity: '0.8'
+			}, 1000);
+		});{% endcomment %}
+		//文本框不允许为空---按钮触发
+		$("#loginbtn").on('click', function () {
+			var txtName = $("#txtName").val();
+			var txtPwd = $("#txtPwd").val();
+			if (txtName == "" || txtName == undefined || txtName == null) {
+				if (txtPwd == "" || txtPwd == undefined || txtPwd == null) {
+					$(".warning").css({ display: 'block' });
+				}
+				else {
+					$("#warn").css({ display: 'block' });
+					$("#warn2").css({ display: 'none' });
+				}
+			}
+			else {
+				if (txtPwd == "" || txtPwd == undefined || txtPwd == null) {
+					$("#warn").css({ display: 'none' });
+					$(".warn2").css({ display: 'block' });
+				}
+				else {
+					$(".warning").css({ display: 'none' });
+				}
+			}
+		});
+		//文本框不允许为空---单个文本触发
+		$("#txtName").on('blur', function () {
+			var txtName = $("#txtName").val();
+			if (txtName == "" || txtName == undefined || txtName == null) {
+				$("#warn").css({ display: 'block' });
+			}
+			else {
+				$("#warn").css({ display: 'none' });
+			}
+		});
+		$("#txtName").on('focus', function () {
+			$("#warn").css({ display: 'none' });
+		});
+		//
+		$("#txtPwd").on('blur', function () {
+			var txtName = $("#txtPwd").val();
+			if (txtName == "" || txtName == undefined || txtName == null) {
+				$("#warn2").css({ display: 'block' });
+			}
+			else {
+				$("#warn2").css({ display: 'none' });
+			}
+		});
+		$("#txtPwd").on('focus', function () {
+			$("#warn2").css({ display: 'none' });
+		});
+		//关闭
+		$(".close_btn").hover(function () { $(this).css({ color: 'black' }) }, function () { $(this).css({ color: '#999' }) }).on('click', function () {
+			$("#LoginBox").fadeOut("fast");
+			$("#mask").css({ display: 'none' });
+		});
+	});
+	</script>
 </body>
 
 </html>
