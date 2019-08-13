@@ -9,4 +9,4 @@ def index_form(request):
 
 # 文档编辑页面
 def docs_form(request):
-    return render_to_response('docs.html')
+    return render_to_response('RTFdocs.html')

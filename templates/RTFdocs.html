@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #editor {
+            border: #C3C3C3 solid 1px;
+            width: 210mm;
+        {#height: 297mm;#} margin: 0 auto;
+            margin-top: 20px;
+            box-sizing: border-box;
+            padding: 2.54ch 3.17cm;
+        }
+
+        .ck-editor__editable {
+            min-height: 297mm;
+        }
+
+        #menu_bar {
+            border: #C3C3C3 solid 1px;
+        }
+    </style>
+    <link href="/bootstrap-4.3.1-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- chartist CSS -->
+    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
+          rel="stylesheet">
+    <!--This page css - Morris CSS -->
+    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="../static/css/style.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="../static/css/colors/blue.css" id="theme" rel="stylesheet">
+</head>
+<body>
+<header style="background-color: #fafafa;height: 40px;z-index: 0">
+    <nav class="navbar top-navbar navbar-toggleable-sm navbar-light">
+        <!-- ============================================================== -->
+        <!-- Logo -->
+        <!-- ============================================================== -->
+        {% comment %}<div class="navbar-header">
+
+            <a class="navbar-brand" href="/index/">
+                <!-- Logo icon --><b>
+                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+
+                <!-- Light Logo icon -->
+                <img src="../static/assets/images/logo-light-icon.png" alt="homepage" class="light-logo">
+            </b>
+                <!--End Logo icon -->
+                <!-- Logo text -->
+
+                <!-- Light Logo text -->
+                esbook </a>
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Logo -->{% endcomment %}
+        <!-- ============================================================== -->
+        <div class="navbar-collapse">
+            <!-- ============================================================== -->
+            <a href="/index" style="margin-left: 30px">
+                <b>
+                    <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
+                </b>
+            </a>
+            <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
+                 class="light-logo">
+            <!-- toggle and nav items -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav mr-auto mt-md-0">
+                <!-- This is  -->
+                <li class="nav-item"><a class="nav-link nav-toggler hidden-md-up text-muted waves-effect waves-dark"
+                                        href="javascript:void(0)"><i class="mdi mdi-menu"></i></a></li>
+                <!-- ============================================================== -->
+                <!-- 文档的标题 -->
+                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">
+                    无标题文档</p>
+                <!-- ============================================================== -->
+            </ul>
+            <!-- ============================================================== -->
+            <!-- User profile and search -->
+            <!-- ============================================================== -->
+            {% comment %}<a style="margin-top: -1px" class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"><span
+                            style="color: black">admin</span></a>{% endcomment %}
+        </div>
+    </nav>
+</header>
+{% comment %}<div id="menu_bar">
+    <p>无标题文档</p>
+</div>{% endcomment %}
+<div id="toolbar-container" style="margin-top: 2px"></div>
+
+<!-- This container will become the editable. -->
+<div id="editor">
+
+</div>
+</body>
+<!--<script src="https://cdn.ckeditor.com/ckeditor5/12.3.1/classic/ckeditor.js"></script>-->
+
+<script src="/static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
+<script src="/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+<script>
+    DecoupledEditor
+        .create(document.querySelector('#editor'), {
+                heading: {
+                    options: [
+                        {model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph'},
+                        {model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1'},
+                        {model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2'},
+                        {model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3'},
+                        {model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4'},
+                        {model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5'},
+                        {model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6'}
+                    ]
+                },
+                language: 'zh-cn',
+                ckfinder: {
+                    options: {
+                        resourceType: 'Images'
+                    },
+                    uploadUrl: '/static/upload'
+
+                }
+            }
+        )
+        .then(editor => {
+            const toolbarContainer = document.querySelector('#toolbar-container');
+
+            toolbarContainer.appendChild(editor.ui.view.toolbar.element);
+        })
+        .catch(error => {
+            console.error(error);
+        })
+
+
+</script>
+</html>

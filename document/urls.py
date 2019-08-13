@@ -3,5 +3,5 @@ from document import views
 
 urlpatterns = [
     path('index/',views.index),
-    path('docs/', views.docs)
+    path('RTFdocs/', views.RTFdocs)
 ]
