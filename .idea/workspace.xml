@@ -2,12 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c40cbb84-2fa7-4264-b23d-626abff04049" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/document/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/document/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/document/models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/document/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/document/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/document/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/document/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/esbook/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/esbook/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/esbook/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/esbook/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -104,7 +103,7 @@
       <updated>1565341846705</updated>
       <workItem from="1565341895970" duration="202000" />
       <workItem from="1565577557524" duration="17595000" />
-      <workItem from="1565658591266" duration="2308000" />
+      <workItem from="1565658591266" duration="3138000" />
     </task>
     <servers />
   </component>
