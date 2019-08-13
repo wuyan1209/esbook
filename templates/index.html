@@ -103,6 +103,7 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
+                                           <a href="" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i>退出登录</a>
                     </li>
                 </ul>
             </div>
@@ -120,36 +121,16 @@
             <!-- Sidebar navigation-->
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                    <li><a class="waves-effect waves-dark" href="index.html" aria-expanded="false"><i
-                            class="mdi mdi-gauge"></i><span class="hide-menu">工作台</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="pages-profile.html" aria-expanded="false"><i
-                            class="mdi mdi-account-check"></i><span class="hide-menu">我的桌面</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="table-basic.html" aria-expanded="false"><i
-                            class="mdi mdi-table"></i><span class="hide-menu">我的收藏</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="icon-material.html" aria-expanded="false"><i
-                            class="mdi mdi-emoticon"></i><span class="hide-menu">企业管理</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="map-google.html" aria-expanded="false"><i
-                            class="mdi mdi-earth"></i><span class="hide-menu">团队</span></a>
-                    </li>
-                    <li><a class="waves-effect waves-dark" href="pages-blank.html" aria-expanded="false"><i
-                            class="mdi mdi-book-open-variant"></i><span class="hide-menu">回收站</span></a>
-                    </li>
-                </ul>
+                        <li> <a class="waves-effect waves-dark" href="index.html" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">我的文档</span></a>
+                        </li>
+                        <li> <a class="waves-effect waves-dark" href="map-google.html" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">我的团队</span></a>
+                        </li>
+                        <li> <a class="waves-effect waves-dark" href="" aria-expanded="false"><i class="mdi mdi-book-open-variant"></i><span class="hide-menu">回收站</span></a>
+                        </li>
+                    </ul>
             </nav>
             <!-- End Sidebar navigation -->
         </div>
-        <!-- End Sidebar scroll-->
-        <!-- Bottom points-->
-        <div class="sidebar-footer">
-            <!-- item--><a href="" class="link" data-toggle="tooltip" title="Settings"><i class="ti-settings"></i></a>
-            <!-- item--><a href="" class="link" data-toggle="tooltip" title="Email"><i class="mdi mdi-gmail"></i></a>
-            <!-- item--><a href="" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i></a>
-        </div>
-        <!-- End Bottom points-->
     </aside>
     <!-- ============================================================== -->
     <!-- End Left Sidebar - style you can find in sidebar.scss  -->
@@ -161,27 +142,42 @@
         <!-- ============================================================== -->
         <!-- Container fluid  -->
         <!-- ============================================================== -->
-        <div class="container-fluid">
-            <!-- ============================================================== -->
-            <!-- Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            <div class="row page-titles">
+     <div id="box">
+        <button id="btn1"> 新建</button>
+        <button id="btn2"> 导入</button>
+    </div>
+        <style type="text/css">
+        #box{
+            margin-left: 85%;
+            margin-top: 10px;
+        }
+        #btn1{
+            width: 150px;
+            height: 30px;
+            background-color: #343a40;
+            color: white;
+        }
+        #btn2{
+            margin-top: 20px;
+            width: 150px;
+            height: 30px;
+            background-color: snow;
+         }
 
-                <div class="col-md-7 col-4 align-self-center">
-                    <a href="/docs" class="btn waves-effect waves-light btn-danger pull-right hidden-sm-down"> 新建</a><br>
-                    <a href="#" class="btn waves-effect waves-light btn-danger pull-right hidden-sm-down"
-                       style="margin-right:30px"> 导入</a>
-                </div>
-            </div>
-            <!-- ============================================================== -->
-            <!-- End Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            <!-- ============================================================== -->
-            <!-- Start Page Content -->
-            <!-- ============================================================== -->
-            <!-- Row -->
+       </style>
+      <div id="box2">
+       <span>123<br>456123<br>456123<br>456123<br>456123<br>456123<br>456</span>
+      </div>
+       <style type="text/css">
+          #box2{
+             margin-top: -70px;
+             margin-left: 1%;
+             width:83% ;
+             height:auto ;
+             border: 1px black solid;
 
-        </div>
+           }
+        </style>
                        {% comment %}添加团队的弹出窗{% endcomment %}
                        <div id="LoginBox">
                             <form action="/index/" method="post">
