@@ -1,6 +1,5 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-from django.db import connection
 from django.db import connection, transaction
 from django.views.decorators.csrf import csrf_exempt
 from document.models import Permission, User
@@ -62,6 +61,7 @@ def addTeam(request):
         userId = User.objects.get(user_name=username).user_id
         # 添加协作空间
         cursor.execute('insert into Team(team_name,user_id) value(%s,%s)', [teamName, userId])
+
         # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
         cursor.execute('select team_id from team  order by team_id desc limit 1')
         row = cursor.fetchall()
@@ -87,41 +87,6 @@ def getAllTeam(request):
         result = cursor.fetchall()
         cursor.close()
         return JsonResponse({'status': 200, 'message': result})
-        cursor.close()
-        return JsonResponse({'status': 200, 'message': '添加成功'})
-
-
-
-
-# Ajax异步保存富文本文档内容
-@transaction.atomic
-def RTFdocs_save(request):
-    doc_content = request.POST.get('doc_content', 0)  # 文档内容
-    doc_title = request.POST.get('doc_title', 0)  # 文档标题
-    localTime = time.localtime(time.time())  # 获取当前时间
-    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
-    return_param = {}
-    sid = transaction.savepoint()
-    try:
-        # 数据库更新
-        cursor = connection.cursor()
-        cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
-                       [doc_title, doc_content, formatTime])
-        print("hai dui de ")
-        cursor.execute("select file_id from file where file_name = %s", [doc_title])
-        file_id = cursor.fetchone()
-        print(file_id)
-        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [2, file_id])
-        return_param['saveStatus'] = "success"
-        transaction.savepoint_commit(sid)
-    except Exception as e:
-        # 数据库更新失败
-        return_param['saveStatus'] = "fail"
-        transaction.savepoint_rollback(sid)
-    return HttpResponse(json.dumps(return_param))
-
-def first(request):
-    return render(request, 'first.html')
 
 
 # Ajax异步保存富文本文档内容
