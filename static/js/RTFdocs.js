@@ -34,30 +34,43 @@ DecoupledEditor
 $(function () {
     // 使用Ajax技术将文档名称和文档内容保存到数据库中
     $("#CKEditor_data_save").on("click", function () {
-        var doc_content = document.getElementById("editor"); //取得纯文本
-        doc_content = doc_content.innerHTML;    //取得html格式的内容
-        var doc_title = $("#docs_title").val();  //取得文档标题
+        saveDocs()
+    });
 
-        $.ajax({
-            type: 'POST',
-            url: '/saveDocTest/',
-            dataType: "json",
-            data: {
-                doc_content: doc_content,
-                doc_title: doc_title
-            },
-            success: function (data) {
-                if (data.saveStatus == "success") {
-                    // 保存成功
-                    alert("保存成功了");
-                } else {
-                    // 保存失败
-                    alert("保存失败了");
-                }
+    // ctrl+s 保存
+    $("#editor").keydown(function (e) {
+            if (e.keyCode == 83 && e.ctrlKey ){
+                e.preventDefault();
+                saveDocs();
             }
         })
-    });
 
     //使用ajax将文档从数据库中读取出来
 
 })
+
+// 保存文档
+function saveDocs() {
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //取得html格式的内容
+    var doc_title = $("#docs_title").val();  //取得文档标题
+
+    $.ajax({
+        type: 'POST',
+        url: '/saveDocTest/',
+        dataType: "json",
+        data: {
+            doc_content: doc_content,
+            doc_title: doc_title
+        },
+        success: function (data) {
+            if (data.saveStatus == "success") {
+                // 保存成功
+                alert("保存成功了");
+            } else {
+                // 保存失败
+                alert("保存失败了");
+            }
+        }
+    })
+}
