@@ -2,9 +2,9 @@ from django.urls import path
 from document import views
 
 urlpatterns = [
-    path('index/',views.index),
+    path('index/', views.index),
     path('RTFdocs/', views.RTFdocs),
-    path('mysql/',views.mysql_text),
-	path('mysql/',views.mysql_text),
-
+    path('mysql/', views.mysql_text),
+    path('mysql/', views.mysql_text),
+    path('saveDocTest/', views.RTFdocs_save),
 ]
