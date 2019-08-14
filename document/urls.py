@@ -6,6 +6,5 @@ urlpatterns = [
     path('RTFdocs/', views.RTFdocs),
     path('mysql/',views.mysql_text),
     path('addTeam/', views.addTeam),
-
-    path('select/', views.select),
+	path('select/', views.select),
 ]

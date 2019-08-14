@@ -51,3 +51,4 @@ def select(request):
     cursor.close()
     return HttpResponse(row)
 
+

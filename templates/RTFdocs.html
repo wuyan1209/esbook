@@ -30,8 +30,8 @@
             outline: 0;
         }
 
-        #docs_title{
-            border:none;
+        #docs_title {
+            border: none;
             background-color: #fafafa;
             color: white;
             font-family: 新宋体;
@@ -68,9 +68,13 @@
                     <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
                 </b>
             </a>
+
+            <!-- 分割线 -->
             <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
                  class="light-logo">
-            <a href="#" style="margin-right: 10px">
+
+            <!-- 保存按钮 -->
+            <a id="CKEditor_data_save" href="#" style="margin-right: 10px">
                 <b>
                     <img src="../static/assets/images/保存.png" width="26" height="25" alt="goback">
                 </b>
@@ -85,7 +89,8 @@
                 <!-- 文档的标题 -->
                 {#                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">#}
                 {#                    无标题文档</p>#}
-                <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档" value="无标题文档"
+                <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档"
+                       value="无标题文档"
                        placeholder="无标题文档">
                 <!-- ============================================================== -->
 
@@ -170,8 +175,16 @@
             console.error(error);
         })
 
-    function inputFocus() {
-
-    }
+    window.editor = editor;
+    $(function () {
+        $("#CKEditor_data_save").on("click", function () {
+            {% comment %}alert("1111111");
+            alert(editor.getData()){% endcomment %}
+            var a = document.getElementById("editor"); //取得纯文本
+            var docName = $("#docs_title").val()//取得文档标题
+            alert(a.innerHTML);
+            alert(docName);
+        });
+    })
 </script>
 </html>
