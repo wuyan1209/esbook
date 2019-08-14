@@ -20,6 +20,3 @@ def mysql_text(request):
     content={'list':list}
     return render(request,'demo.html',content)
 
-def first(request):
-    return render(request,'first.html')
-
