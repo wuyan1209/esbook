@@ -5,6 +5,7 @@ urlpatterns = [
     path('index/',views.index),
     path('RTFdocs/', views.RTFdocs),
     path('mysql/',views.mysql_text),
-	path('mysql/',views.mysql_text),
+    path('addTeam/', views.addTeam),
 
+    path('select/', views.select),
 ]

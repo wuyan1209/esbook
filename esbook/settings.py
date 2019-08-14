@@ -127,12 +127,3 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR,"static"),
 ]
-
-'''
-STATIC_URL = '/static/'
-HERE = os.path.dirname(os.path.abspath(__file__))
-HERE = os.path.join(HERE, '../')
-STATICFILES_DIRS = (
-    os.path.join(HERE, 'static/'),
-)
-'''
