@@ -19,13 +19,17 @@ def RTFdocs(request):
     return render(request, 'RTFdocs.html')
 
 
+<<<<<<< HEAD
 
 # 测试
+=======
+>>>>>>> 909fd1cde1313924aeb0d07fc47d5fcd1b66d50c
 def mysql_text(request):
     # 查新语句
     list = Permission.objects.raw('select * from Permission')
     content = {'list': list}
     return render(request, 'demo.html', content)
+<<<<<<< HEAD
 def select(request):
     cursor = connection.cursor()
     '''
@@ -44,6 +48,11 @@ def select(request):
 
 
 # 添加协作空间
+=======
+
+
+# 添加写作空间（团队）
+>>>>>>> 909fd1cde1313924aeb0d07fc47d5fcd1b66d50c
 @csrf_exempt
 def addTeam(request):
     if request.is_ajax():
@@ -52,8 +61,13 @@ def addTeam(request):
         teamName = request.POST['teamName']
         # 空间名是唯一的，查询是否在数据库里存在
         cursor.execute('select team_id from Team where team_name=%s', [teamName])
+<<<<<<< HEAD
         tid = cursor.fetchone()
         if tid:
+=======
+        row = cursor.fetchone()
+        if row:
+>>>>>>> 909fd1cde1313924aeb0d07fc47d5fcd1b66d50c
             return JsonResponse({'status': 10023, 'message': '协作空间名字已存在，请换个名字'})
         # 从session里获取当前登录用户
         username = request.session.get('username')
@@ -61,6 +75,7 @@ def addTeam(request):
         userId = User.objects.get(user_name=username).user_id
         # 添加协作空间
         cursor.execute('insert into Team(team_name,user_id) value(%s,%s)', [teamName, userId])
+<<<<<<< HEAD
 
         # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
         cursor.execute('select team_id from team  order by team_id desc limit 1')
@@ -73,6 +88,20 @@ def addTeam(request):
         cursor.close()
         return JsonResponse({'status': 200, 'message': '添加成功'})
 
+=======
+        cursor.close()
+        return JsonResponse({'status': 200, 'message': '添加成功'})
+
+
+def select(request):
+    cursor = connection.cursor()
+    cursor.execute('select user_name,team_name from User,Team where User.user_id=Team.user_id')
+    row = cursor.fetchall()
+    for i in row:
+        print(i[0] + "  " + i[1])
+    cursor.close()
+    return HttpResponse(row)
+>>>>>>> 909fd1cde1313924aeb0d07fc47d5fcd1b66d50c
 
 # 主页面查询该成员加入的协作空间
 @csrf_exempt
@@ -88,6 +117,12 @@ def getAllTeam(request):
         cursor.close()
         return JsonResponse({'status': 200, 'message': result})
 
+<<<<<<< HEAD
+=======
+def first(request):
+    return render(request, 'first.html')
+
+>>>>>>> 909fd1cde1313924aeb0d07fc47d5fcd1b66d50c
 
 # Ajax异步保存富文本文档内容
 @transaction.atomic

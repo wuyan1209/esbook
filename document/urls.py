@@ -2,6 +2,7 @@ from django.urls import path
 from document import views
 
 urlpatterns = [
+<<<<<<< HEAD
 
     # 主页面
     path('index/', views.index),
@@ -19,4 +20,12 @@ urlpatterns = [
     # 保存docs
     path('saveDocTest/', views.RTFdocs_save),
 
+=======
+    path('index/', views.index),
+    path('RTFdocs/', views.RTFdocs),
+    path('mysql/', views.mysql_text),
+    path('addTeam/', views.addTeam),
+    path('select/', views.select),
+    path('saveDocTest/', views.RTFdocs_save),
+>>>>>>> 909fd1cde1313924aeb0d07fc47d5fcd1b66d50c
 ]
