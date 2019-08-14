@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'bk06$c2e2*)ieq&-zfija+albt5p!tuer@6!-72z2&$&p)+y@0'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -71,21 +69,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'esbook.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',    #这么选择mysql数据库
-        'NAME': 'esbook',         #数据库的名字
-        'USER': 'root',         #mysql数据库的用户名
-        'PASSWORD': '123456',   #mysql数据库的密码
-        'HOST': '172.16.84.62',    #mysql数据库的主机名
-        'PORT': '3306'          #mysql数据库的端口号（这个可写可不写）
+        'ENGINE': 'django.db.backends.mysql',  # 这么选择mysql数据库
+        'NAME': 'esbook',  # 数据库的名字
+        'USER': 'root',  # mysql数据库的用户名
+        'PASSWORD': '123456',  # mysql数据库的密码
+        'HOST': '172.16.84.62',  # mysql数据库的主机名
+        'PORT': '3306',  # mysql数据库的端口号（这个可写可不写）
+        'ATOMIC_REQUESTS': True
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -105,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -119,11 +115,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS=[
-    os.path.join(BASE_DIR,"static"),
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
 ]
