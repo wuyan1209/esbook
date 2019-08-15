@@ -114,3 +114,15 @@ def RTFdocs_save(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+
+#查询文件
+def fileList(request):
+    cursor = connection.cursor()
+    # 获取session里存放的username
+    username = request.session.get('username')
+    cursor.execute('select f.file_name,u.user_name,f.cre_date '
+                   'from user u,file f,user_file uf '
+                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name="'+username+'"')
+    row = cursor.fetchall()
+    cursor.close()
+    return render(request,'filelist.html',{"list": row})
