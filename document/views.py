@@ -141,7 +141,7 @@ def fileList(request):
     cursor = connection.cursor()
     # 获取session里存放的username
     username = request.session.get('username')
-    cursor.execute('select f.file_name,u.user_name,f.cre_date '
+    cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id '
                    'from user u,file f,user_file uf '
                    'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="'+username+'" ')
     row = cursor.fetchall()
