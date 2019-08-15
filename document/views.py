@@ -115,14 +115,23 @@ def RTFdocs_save(request):
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
 
-#查询文件
-def fileList(request):
+
+# 判断文档名称是否重复
+def docNameExist(request):
+
+    docName = request.POST.get('docsName')  # 获取文档标题
+    return_param = {}
+    # 从数据库中查询文档标题
     cursor = connection.cursor()
-    # 获取session里存放的username
-    username = request.session.get('username')
-    cursor.execute('select f.file_name,u.user_name,f.cre_date '
-                   'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name="'+username+'"')
-    row = cursor.fetchall()
-    cursor.close()
-    return render(request,'filelist.html',{"list": row})
+    cursor.execute('select file_name from file f where f.file_id in'
+                   ' (select file_id from user_file where user_id = 2)')
+    fileNamas = cursor.fetchall()
+    for fileName in fileNamas:
+        print(docName)
+        if str(fileName[0]) == docName:
+            print("111111111111111")
+            return_param['Exist'] = "YES"
+            break
+        else:
+            return_param['Exist'] = "No"
+    return HttpResponse(json.dumps(return_param))

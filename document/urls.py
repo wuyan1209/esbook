@@ -17,6 +17,5 @@ urlpatterns = [
     path('addTeam/', views.addTeam),
     # 保存docs
     path('saveDocTest/', views.RTFdocs_save),
-    #私人文件列表
-    path('filelist/',views.fileList),
+    path('docNameExist/', views.docNameExist)
 ]
