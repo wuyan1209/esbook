@@ -17,6 +17,7 @@ urlpatterns = [
     path('addTeam/', views.addTeam),
     # 保存docs
     path('saveDocTest/', views.RTFdocs_save),
+    # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
     #私人文件列表
     path('filelist/', views.fileList)
