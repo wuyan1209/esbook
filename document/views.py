@@ -87,3 +87,24 @@ def RTFdocs_save(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+
+
+# 判断文档名称是否重复
+def docNameExist(request):
+
+    docName = request.POST.get('docsName')  # 获取文档标题
+    return_param = {}
+    # 从数据库中查询文档标题
+    cursor = connection.cursor()
+    cursor.execute('select file_name from file f where f.file_id in'
+                   ' (select file_id from user_file where user_id = 2)')
+    fileNamas = cursor.fetchall()
+    for fileName in fileNamas:
+        print(docName)
+        if str(fileName[0]) == docName:
+            print("111111111111111")
+            return_param['Exist'] = "YES"
+            break
+        else:
+            return_param['Exist'] = "No"
+    return HttpResponse(json.dumps(return_param))

@@ -8,4 +8,5 @@ urlpatterns = [
     path('addTeam/', views.addTeam),
     path('select/', views.select),
     path('saveDocTest/', views.RTFdocs_save),
+    path('docNameExist/', views.docNameExist)
 ]

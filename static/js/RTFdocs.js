@@ -12,14 +12,14 @@ DecoupledEditor
                     {model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6'}
                 ]
             },
-            language: 'zh-cn',
-            ckfinder: {
-                options: {
-                    resourceType: 'Images'
-                },
-                uploadUrl: '/static/upload'
+            editorConfig: {
+                language: 'zh-cn'
+            },
+            extraPlugins: [MyCustomUploadAdapterPlugin],
+            /*ckfinder: {
+                uploadUrl: '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json'
 
-            }
+            }*/
         }
     )
     .then(editor => {
@@ -32,18 +32,35 @@ DecoupledEditor
     })
 
 $(function () {
-    // 使用Ajax技术将文档名称和文档内容保存到数据库中
+    // 文档名称不能重复
+    $("#docs_title").change(function () {
+        var docsName = $(this).val();
+
+        $.ajax({
+            url: '/docNameExist/',
+            type: 'post',
+            data: {docsName: docsName},
+            dataType: 'json',
+            success: function (data) {
+                if (data.Exist == "YES") {
+                    alert("文档名字不能重复，请重新填写")
+                }
+            }
+        })
+    });
+
+    // 点击保存按钮保存
     $("#CKEditor_data_save").on("click", function () {
         saveDocs()
     });
 
     // ctrl+s 保存
     $("#editor").keydown(function (e) {
-            if (e.keyCode == 83 && e.ctrlKey ){
-                e.preventDefault();
-                saveDocs();
-            }
-        })
+        if (e.keyCode == 83 && e.ctrlKey) {
+            e.preventDefault();
+            saveDocs();
+        }
+    })
 
     //使用ajax将文档从数据库中读取出来
 
