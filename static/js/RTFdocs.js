@@ -49,12 +49,12 @@ $(function () {
         })
     });
 
-// 点击保存按钮吧保存
+    // 点击保存按钮吧保存
     $("#CKEditor_data_save").on("click", function () {
         saveDocs()
     });
 
-// ctrl+s 保存
+    // ctrl+s 保存
     $("#editor").keydown(function (e) {
         if (e.keyCode == 83 && e.ctrlKey) {
             e.preventDefault();
