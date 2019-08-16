@@ -170,11 +170,9 @@ def RTFdocs_save(request):
         cursor = connection.cursor()
         cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
                        [doc_title, doc_content, formatTime])
-        print("hai dui de ")
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
         file_id = cursor.fetchone()
-        print(file_id)
-        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [2, file_id])
+        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [1, file_id])
         return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
     except Exception as e:
@@ -209,7 +207,7 @@ def fileList(request):
     username = request.session.get('username')
     cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id '
                    'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" ')
+                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
     row = cursor.fetchall()
     cursor.close()
     return render(request, 'filelist.html', {"list": row})
