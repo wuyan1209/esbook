@@ -26,7 +26,7 @@
     <link href="../static/css/colors/blue.css" id="theme" rel="stylesheet">
 
     <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
-    <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css" />
+    <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -103,259 +103,472 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
-                        <a href="" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i>退出登录</a>
                     </li>
                 </ul>
             </div>
         </nav>
     </header>
-    <!-- ============================================================== -->
-    <!-- End Topbar header -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Left Sidebar - style you can find in sidebar.scss  -->
-    <!-- ============================================================== -->
     <aside class="left-sidebar">
         <!-- Sidebar scroll-->
         <div class="scroll-sidebar">
             <!-- Sidebar navigation-->
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                   <li data-id="center" class="waves-effect waves-dark" ><i class="icon-search icon-book-open"></i><span>我的文档</span></li>
-                   <li class="waves-effect waves-dark" style="margin-left: 19px"><span >协作空间</span><span id="demo" style="margin-left: 90px"><i class="icon-search icon-plus"></i></span></li>
+                    <li data-id="center" class="waves-effect waves-dark"><i
+                            class="icon-search icon-book-open"></i><span>我的文档</span></li>
                 </ul>
-{#                <div class="team">#}
-{#                    <!--协作空间列表-->#}
-{#                    <a href="/filelist/" class="aaaaa">#}
-{#                        <span class="span1"><i class="icon-search icon-home"></i></span>#}
-{#                        <span class="span2" title= "123" style="word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">123555</span>#}
-{#                        </a>#}
-{#                        <span class="span3"><i  class="ti-settings" ></i></span>#}
-{#                        <div class="teamset" style="display: none">#}
-{#                                <a class="dropdown-item" href="#">协作</a>#}
-{#                                <a class="dropdown-item" href="#">设置</a>#}
-{#                                <div class="dropdown-divider"></div>#}
-{#                                <a class="dropdown-item" href="#">删除</a>#}
-{#                        </div>#}
-{#                </div>#}
+                <ul id="side">
+                    <!--协作空间列表-->
 
-               <script>
-                   //获取该成员的协作空间
-                   $.ajax({
-                       url: "/getAllTeam/",
-                       type: "POST",
-                       dataType: "json",
-                       success: function (data) {
-                           if (data.status == 200) {
-                               //给ul动态添加li
-                               var num=1;
-                               for (i = 0; i < data.message.length; i++) {
-                                   html = " <div class=\"team\">\n" +
-                                       " <a href=\"/filelist/\" class=\"aaaaa\">\n" +
-                                       "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
-                                       " <span class=\"span2\" title=' " + data.message[i] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.message[i] + "</span></a>\n" +
-                                       " <span class=\"span3\" type=\"button\" class=\"btn btn-primary\" data-toggle=\"collapse\" \n" +
-                                       "\t\tdata-target=\".teamset\"><i  class=\"ti-settings\" ></i></span>\n" +
-                                       "<div class=\"teamset collapse\" >\n" +
-                                       "<a class=\"dropdown-item\" href=\"#\">协作</a>\n" +
-                                       "<a class=\"dropdown-item\" href=\"#\">设置</a>\n" +
-                                       "<div class=\"dropdown-divider\"></div>\n" +
-                                       "<a class=\"dropdown-item\" href=\"#\">删除</a>\n" +
-                                       "</div>"
-                                   $(".sidebar-nav").append(html);
-                               }
-                           }
-                       },
-                   })
-                   {# 点击显示div#}
+                    <li class="waves-effect waves-dark" style="margin-left: 19px"><span>协作空间</span><span id="demo"
+                                                                                                         style="margin-left: 90px"><i
+                            class="icon-search icon-plus"></i></span></li>
 
-                    $(function () { $('.teamset').collapse('show')});
-               </script>
+                </ul>
+                <script>
+                    //获取该成员的协作空间
+                    $.ajax({
+                        url: "/getAllTeam/",
+                        type: "POST",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.status == 200) {
+                                //给ul动态添加li
+                                var num = 1;
+                                for (i = 0; i < data.list.length; i++) {
+                                    html = " <div class=\"team\">\n" +
+                                        " <a href=\"/filelist/\" class=\"aaaaa\">\n" +
+                                        "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
+                                        " <span class=\"span2\" title=' " + data.list[i][1] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.list[i][1] + "</span></a>\n" +
+                                        " <span class=\"span3\"><i class=\"ti-settings\" ></i></span></div>\n" +
+                                        "<div class=\"teamset\" id=\"drop_down" + (i + 1) + "\">\n" +
+                                        "<a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\" onclick=\"motaikuang('"+ data.list[i][1] +"')\" href=\"javascript:void(0)\">协作</a>\n" +
+                                        "<a class=\"dropdown-item\" href=\"#\">设置</a>\n" +
+                                        "<div class=\"dropdown-divider\"></div>\n" +
+                                        "<a class=\"dropdown-item\" style=\'color:red\' href=\"#\">删除</a>\n" +
+                                        "</div>"
+                                    $(".sidebar-nav").append(html);
+                                }
+                            }
+                        },
+                    })
+                    {# 点击显示div#}
+                    {#给模态框传参#}
+                    function motaikuang(team_name) {
+                        $("#tName").text(team_name)
+                    }
+                </script>
             </nav>
 
             <style type="text/css">
-                .team{
+                .team {
                     width: 220px;
                     height: 40px;
-                    position:relative;
-                    margin-left:6.5%;
+                    position: relative;
+                    margin-left: 6.5%;
                 }
-                .span1{
+                .span1 {
                     margin-left: 13%;
                 }
-                .span2{
+                .span2 {
                     margin-left: 3%;
                 }
-                .span3{
-                    position:absolute;
-                    {#left:32%;#}
-                    {#top: 1%;#}
+                .span3 {
+                    position: absolute;
                     margin-left: 27%;
                     background-color: white;
                     border: none;
                 }
-                .aaaaa{
+                .aaaaa {
                     background-color: white;
                     color: #7a7d81;
                     display: inline-block;
                     width: 50%;
                 }
-                .aaaaa:hover { color:black; }
-                .teamset{
+                .aaaaa:hover {
+                    color: black;
+                }
+                .teamset {
                     width: 150px;
                     height: 140px;
-                    position: absolute;
                     margin-left: 10%;
-                    border: 1px black solid;
-                    float: right;
+                    background-color: white;
                 }
-
             </style>
 
             <style type="text/css">
-                #sidebarnav>li{
-                     width: 200px;
-                     height: 55px;
-                     margin-left: 30px;
-                     margin-bottom: 0;
+                #sidebarnav > li {
+                    width: 200px;
+                    height: 55px;
+                    margin-left: 30px;
+                    margin-bottom: 0;
                 }
-                #sidebarnav>li>span{
+                #sidebarnav > li > span {
+                    margin-left: 10px;
+                }
+                #side > li {
+                    width: 200px;
+                    height: 55px;
+                    margin-left: 30px;
+                    margin-bottom: 0;
+                }
+                #side > li > span {
                     margin-left: 10px;
                 }
             </style>
             <!-- End Sidebar navigation -->
         </div>
-        <div class="sidebar-footer" style="height: 70px">
-            <a href="" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i class="icon-search icon-trash"></i><span>回收站</span></a>
+        <div class="sidebar-footer">
+            <a href="" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
+                    class="icon-search icon-trash"></i><span>回收站</span></a>
         </div>
         <script>
-         {#  点击回收站，查询所有状态为1的文件，显示到id为box2的div#}
+            {#  点击回收站，查询所有状态为1的文件，显示到id为box2的div#}
         </script>
     </aside>
-    <div class="page-wrapper" style="padding-bottom: 55px;height: 373px">
+    <!-- ============================================================== -->
+    <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- Page wrapper  -->
+    <!-- ============================================================== -->
+    <div class="page-wrapper">
         <!-- ============================================================== -->
         <!-- Container fluid  -->
         <!-- ============================================================== -->
         <div id="box">
-          <div id="box1">
-             <div class="dropdown">
-               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                 style="margin-top:5px;padding: 8px 50px">新建</button>
-               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                 <a class="dropdown-item" href="/RTFdocs/">文档</a>
-                 <a class="dropdown-item" href="#">表格</a>
-                 <a class="dropdown-item" href="#">幻灯片</a>
+            <div id="box1">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        style="margin-top:5px;padding: 8px 50px">新建
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
+                    <a class="dropdown-item" href="/RTFdocs/">文档</a>
+                    <a class="dropdown-item" href="#">表格</a>
+                    <a class="dropdown-item" href="#">幻灯片</a>
                 </div>
-             </div>
-             <div>
-               <div class="custom-file" >
-                 <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none">
-                 <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
-               </div>
-             </div>
-          </div>
-          <div id="box2"></div>
-              <script>
-             $(function() {
-               $("#sidebarnav").on("click", "li", function() {
-                var sId = $(this).data("id"); //获取data-id的值
-                window.location.hash = sId; //设置锚点
+            </div>
+            <div>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none">
+                    <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
+                </div>
+            </div>
+        </div>
+            <div id="box2"></div>
+        </div>
+        <script>
+            $(function () {
+                $("#sidebarnav").on("click", "li", function () {
+                    var sId = $(this).data("id"); //获取data-id的值
+                    window.location.hash = sId; //设置锚点
+                    loadInner(sId);
+                });
+                function loadInner(sId) {
+                    var sId = window.location.hash;
+                    var pathn, i;
+                    switch (sId) {
+                        case "#center":
+                            pathn = "/filelist/";
+                            i = 0;
+                            break;
+                    }
+                    $("#box2").load(pathn); //加载相对应的内容
+                    $("#sidebarnav li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
+                }
+                var sId = window.location.hash;
                 loadInner(sId);
             });
-            function loadInner(sId) {
-                var sId = window.location.hash;
-                var pathn, i;
-                switch(sId) {
-                    case "#center":
-                        pathn = "/filelist/";
-                        i = 0;
-                        break;　　　　　　　　　　
-                }
-                $("#box2").load(pathn); //加载相对应的内容
-                $("#sidebarnav li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
-            }
-            var sId = window.location.hash;
-            loadInner(sId);
-           });
             {# 点击协作空间名和设置出现不同的操作#}
         </script>
-              <style type="text/css">
-                  #box{
-                      position:relative;
-                  }
-                  #box1{
-                      position:absolute;
-                      top:70px;
-                      left:10px;
-                      margin-left: 85%;
-                      margin-top: 10px;
-                  }
-                  #btn2{
-                      margin-top: 10px;
-                      width: 150px;
-                      height: 30px;
-                      background-color: snow;
-                      text-align: center;
-                  }
-                  #box2{
-                      margin-top: -70px;
-                      margin-left: 1%;
-                      width:83% ;
-                      height:auto ;
-                  }
+        <style type="text/css">
+            #box {
+                position: relative;
+            }
+            #box1 {
+                position: absolute;
+                top: 70px;
+                left: 10px;
+                margin-left: 85%;
+                margin-top: 10px;
+            }
+            #btn2 {
+                margin-top: 10px;
+                width: 150px;
+                height: 30px;
+                background-color: snow;
+                text-align: center;
+            }
+            #box2 {
+                margin-top: -70px;
+                margin-left: 1%;
+                width: 83%;
+                height: auto;
+            }
         </style>
-          </div>
-          <!--添加团队的弹出窗 font-size:x-large;height:77px;line-height:77px;-->
-          <div id="LoginBox">
-             <form action="#" method="POST" onsubmit="return false">
-                  <div class="row1">
-                       新建协作空间<a href="javascript:void(0)" title="关闭窗口" class="close_btn cancel" id="closeBtn">×</a>
-                  </div><br><br>
-                  <div class="row">
-                      空间名称:<br><br>
-                      <input type="text" id="teamName" name="teamName" class="name" placeholder="请输入" style="width: 100%;height: 40px"
-                             onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"autocomplete="off"/>
-                      <input type="submit" id="loginbtn" value="添加" style="width: 120px"/><input type="button" class="del cancel" value="取消" style="width: 120px"/>
-                  </div>
-             </form>
-        </div>
-         {# 添加设置弹出框 #}
-{#        <div id="teamset">#}
-{#            <div class="dropdown-menu">#}
-{#                <a class="dropdown-item" href="#">协作</a>#}
-{#                <a class="dropdown-item" href="#">设置</a>#}
-{#                <div class="dropdown-divider"></div>#}
-{#                <a class="dropdown-item" href="#">删除</a>#}
-{#            </div>#}
-{#        </div>#}
-{#        <script>#}
-{#                //弹出窗口#}
-{#                $(".span3").hover(function () {#}
-{#                    $(this).stop().animate({#}
-{#                        opacity: '1'#}
-{#                    }, 600);#}
-{#                }, function () {#}
-{#                    $(this).stop().animate({#}
-{#                        opacity: '0.6'#}
-{#                    }, 1000);#}
-{#                }).on('click', function () {#}
-{#                    $("#main-wrapper").append('<div id="mask"></div>');#}
-{#                    $("#mask").addClass("mask").fadeIn("slow");#}
-{#                    $("#teamset").fadeIn("slow");#}
-{#                });#}
-{##}
-{#                //关闭弹窗#}
-{#                $(".cancel").hover(function () {#}
-{#                    $(this).css({color: 'black'})#}
-{#                }, function () {#}
-{#                    $(this).css({color: '#999'})#}
-{#                }).on('click', function () {#}
-{#                    $("#LoginBox").fadeOut("fast");#}
-{#                    $("#mask").css({display: 'none'});#}
-{#                });#}
-{##}
-{#        </script>#}
     </div>
+
+    <!--添加团队的弹出窗-->
+    <div id="LoginBox">
+        <form action="#" method="POST" onsubmit="return false">
+            <div class="row1">
+                新建协作空间<a href="javascript:void(0)" title="关闭窗口" class="close_btn cancel" id="closeBtn">×</a>
+            </div>
+            <br><br>
+            <div class="row">
+                空间名称:<br><br>
+                <input type="text" id="teamName" name="teamName" class="name" placeholder="请输入"
+                       style="width: 100%;height: 40px"
+                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
+                       autocomplete="off"/>
+                <input type="submit" id="loginbtn" value="添加" style="width: 120px"/><input type="button"
+                                                                                           class="del cancel"
+                                                                                           value="取消"
+                                                                                           style="width: 120px"/>
+            </div>
+        </form>
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true" style="margin-left: 5%">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width: 600px;height: 600px">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="width: 80%;word-break:break-all">
+                        协作空间 &nbsp;&nbsp;&nbsp;&nbsp; <span id="tName">1234</span>
+                    </h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 5%;margin-top: 3%">
+                        <input type="text" id="userName" class="name" placeholder="请输入用户名 添加协作者"
+                               style="width: 85%;height: 40px"
+                               onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
+                               autocomplete="off"/>
+                        <button onclick="serachUser()" class="btn  btn-info" style="margin-left: 2%">搜索</button>
+                        <table class="table" id="table1" style="table-layout: fixed">
+                            <!--查找的用户-->
+                            <span style="display: none" id="username"></span>
+                        </table>
+                    </div>
+                    <script>
+                        //查找成员 通过用户名
+                        function serachUser() {
+                            //点击查询清空之前的数据
+                            $("#table1  tr").html("");
+                            var userName = $("#userName").val();
+                            var teamName = $("#tName").text();
+                            if (userName == "" || userName == null) {
+                                alert("请输入要查找的用户！")
+                                return false;
+                            }
+                            if (userName.length > 50) {
+                                alert("用户名最长50字符！")
+                                return false;
+                            }
+                            $.ajax({
+                                url: "/serachUser/",
+                                type: "POST",
+                                dataType: "json",
+                                data: {
+                                    "userName": userName,
+                                    "teamName": teamName
+                                },
+                                success: function (data) {
+                                    if (data.status == 200) {
+                                        html = '<tr>\n' +
+                                            '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
+                                            '  <img src="../static/assets/images/users/1.jpg"\n' +
+                                            '  style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
+                                            '  <span style="font-size: medium;" title="' + data.message[1] + '" id="name">\n' + data.message[1] +
+                                            ' </span>\n' +
+                                            ' </td><td>' +
+                                            ' <div class="dropdown">\n' +
+                                            '<button class="btn btn-secondary dropdown-toggle" type="button"\n' +
+                                            ' id="dropdownMenuButton" data-toggle="dropdown"\n' +
+                                            ' aria-haspopup="true"\n' +
+                                            ' aria-expanded="false">\n' +
+                                            '添加角色\n' +
+                                            ' </button>\n' +
+                                            '<div id="select" class="dropdown-menu"\n' +
+                                            'aria-labelledby="dropdownMenuButton">\n' +
+                                            '<a class="dropdown-item" href="javascript:void(0)"><span  id="readOnly">只读</span></a>\n' +
+                                            '<a class="dropdown-item" href="javascript:void(0)"><span  id="edit">可编辑</span></a>\n' +
+                                            '<a class="dropdown-item" href="javascript:void(0)"><span  id="admin">管理员</span></a>\n' +
+                                            '</div>\n' +
+                                            '</div>\n' +
+                                            '</td>\n' +
+                                            '</tr>'
+                                        $("#table1").append(html)
+                                        $("#username").text(data.message[1])
+                                    } else {
+                                        alert(data.message)
+                                    }
+                                },
+                            });
+                        }
+                        //添加角色
+                        $("#readOnly").live("click", function () {
+                            //获取角色名
+                            var roleName = $("#readOnly").text();
+                            ajax(roleName)
+                        });
+                        $("#edit").live("click", function () {
+                            //获取角色名
+                            var roleName = $("#edit").text();
+                            ajax(roleName)
+                        });
+                        $("#admin").live("click", function () {
+                            //获取角色名
+                            var roleName = $("#admin").text();
+                            ajax(roleName)
+                        });
+                        function ajax(roleName) {
+                            //获取用户名、协作空间名
+                            var userName = $("#username").text()
+                            var teamName = $("#tName").text()
+                            $.ajax({
+                                url: "/addMember/",
+                                type: "POST",
+                                dataType: "json",
+                                data: {
+                                    "userName": userName,
+                                    "teamName": teamName,
+                                    "roleName": roleName,
+                                },
+                                success: function (data) {
+                                    //清空表格和input搜索框的值
+                                    $("#table1  tr").html("");
+                                    $("#userName").val("")
+                                    alert(data.message)
+                                },
+                            });
+                        }
+                    </script>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab"
+                               aria-controls="home" aria-selected="true">协作者</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
+                               aria-controls="profile" aria-selected="false">管理员</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent" style="margin-top: 5%">
+                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab"
+                             style="height:300px;overflow-y: auto">
+                            <!--团队的协作者 表格-->
+                            <table class="table" style="table-layout: fixed">
+                                <tr>
+                                    <td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        <img src="../static/assets/images/users/1.jpg"
+                                             style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>
+                                        &nbsp;&nbsp;<span style="font-size: medium;"
+                                                          title="吴炎sdgseafwseczxcasefreswdcxzccccccccc">吴炎sdgseafwseczxcasefreswdcxzccccccccc</span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton" data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                添加角色
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" onclick="alert(123)">只读</a>
+                                                <a class="dropdown-item" href="#">可编辑</a>
+                                                <a class="dropdown-item" href="#">管理员</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        <img src="../static/assets/images/users/1.jpg"
+                                             style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>
+                                        &nbsp;&nbsp;<span style="font-size: medium;"
+                                                          title="吴炎sdgseafwseczxcasefreswdcxzccccccccc">绝对是佛奥欸的v很难受的开发扣税的女哦怕的司法解释贷款承诺</span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton" data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                添加角色
+                                            </button>
+                                            <select class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <option class="dropdown-item" href="#">只读</option>
+                                                <option class="dropdown-item" href="#">可编辑</option>
+                                                <option class="dropdown-item" href="#">管理员</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <!--团队的管理员 表格-->
+                            <table class="table">
+                                <tr>
+                                    <td style="width: 70%;word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        <img src="../static/assets/images/users/1.jpg"
+                                             style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>
+                                        &nbsp;&nbsp;<span style="font-size: medium;"
+                                                          title="吴炎sdgseafwseczxcasefreswdcxzccccccccc">吴炎sdgseafwseczxcasefreswdcxzccccccccc</span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton" data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                添加角色
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#">只读</a>
+                                                <a class="dropdown-item" href="#">可编辑</a>
+                                                <a class="dropdown-item" href="#">管理员</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 70%;word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                        <img src="../static/assets/images/users/1.jpg"
+                                             style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>
+                                        &nbsp;&nbsp;<span style="font-size: medium;"
+                                                          title="吴炎sdgseafwseczxcasefreswdcxzccccccccc">吴炎sdgseafwseczxcasefreswdcxzccccccccc</span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton" data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                添加角色
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#">只读</a>
+                                                <a class="dropdown-item" href="#">可编辑</a>
+                                                <a class="dropdown-item" href="#">管理员</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+</div>
 <!-- ============================================================== -->
 <!-- End Page wrapper  -->
 <!-- ============================================================== -->
@@ -395,6 +608,3 @@
 <script src="../static/js/addTeam.js"></script>
 </body>
 </html>
-
-
-
