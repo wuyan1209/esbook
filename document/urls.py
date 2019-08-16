@@ -9,12 +9,16 @@ urlpatterns = [
     # 添加协作空间
     path('addTeam/', views.addTeam),
     # 测试
-    path('mysql/', views.mysql_text),
+    path('demo/', views.demo),
     path('select/', views.select),
     # 主页面查询该成员加入的协作空间
     path('getAllTeam/', views.getAllTeam),
-    # 增加协作空间
-    path('addTeam/', views.addTeam),
+
     # 保存docs
     path('saveDocTest/', views.RTFdocs_save),
+    # 查找用户
+    path('serachUser/', views.serachUser),
+    # 添加协作成员
+    path('addMember/',views.addMember)
+
 ]
