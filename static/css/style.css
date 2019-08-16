@@ -2214,7 +2214,7 @@ ul.list-style-none li a:hover {
 dropdown-item
 ******************/
 .dropdown-item {
-    padding: 8px 1rem;
+    /*padding: 8px 1rem;*/
     color: #67757c;
 }
 

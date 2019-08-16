@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+   <div>
+       <div>
+           <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">我的文档</li>
+              </ol>
+           </nav>
+       </div>
+       <div>
+           <table id="tab">
+               <tr>
+                   <th style="width: 60%">文档标题</th>
+                   <th style="width: 10%">创建者</th>
+                   <th style="width: 30%">时间</th>
+               </tr>
+               {% for v in list %}
+                   <tr class="fileList">
+                       <td><a href="javascript:void(0);" onclick="docs_modify('{{v.0}}',{{v.3}})" fileName="{{ v.0 }}" userId="{{ v.3 }}">{{ v.0 }}</a></td>
+                       <td>{{ v.1 }}</td>
+                       <td>{{ v.2 }}</td>
+                   </tr>
+               {% endfor %}
+           </table>
+       </div>
+       <div id="fenye">
+           <nav aria-label="Page navigation example">
+               <ul class="pagination">
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">Previous</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
+               </ul>
+           </nav>
+       </div>
+   </div>
+
+</body>
+<style type="text/css">
+    #tab{
+        margin-left: 10px;
+        width: 95%;
+        border:0px;
+        cellpadding:0px;
+        cellspacing:0px;
+    }
+    #tab td,th{
+        padding-left: 20px;
+        border-bottom: gray 1px solid;
+        height: 40px;
+    }
+    #fenye{
+        margin-left:65% ;
+        margin-top: 10px;
+    }
+</style>
+<script src="../static/js/modify_RTFdocs.js"></script>
+</html>

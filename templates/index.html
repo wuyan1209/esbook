@@ -110,12 +110,6 @@
             </div>
         </nav>
     </header>
-    <!-- ============================================================== -->
-    <!-- End Topbar header -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Left Sidebar - style you can find in sidebar.scss  -->
-    <!-- ============================================================== -->
     <aside class="left-sidebar">
         <!-- Sidebar scroll-->
         <div class="scroll-sidebar">
@@ -130,8 +124,93 @@
                                                                                                          style="margin-left: 90px">
                         <i class="icon-search icon-plus"></i></span></li>
                     <!--协作空间列表-->
+
+                    <li class="waves-effect waves-dark" style="margin-left: 19px"><span>协作空间</span><span id="demo"
+                                                                                                         style="margin-left: 90px"><i
+                            class="icon-search icon-plus"></i></span></li>
+
                 </ul>
+                <script>
+                    //获取该成员的协作空间
+                    $.ajax({
+                        url: "/getAllTeam/",
+                        type: "POST",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.status == 200) {
+                                //给ul动态添加li
+                                var num = 1;
+                                for (i = 0; i < data.message.length; i++) {
+                                    html = " <div class=\"team\">\n" +
+                                        " <a href=\"/filelist/\" class=\"aaaaa\">\n" +
+                                        "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
+                                        " <span class=\"span2\" title=' " + data.message[i] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.message[i] + "</span></a>\n" +
+                                        " <span class=\"span3\" type=\"button\" class=\"btn btn-primary\" data-toggle=\"collapse\" \n" +
+                                        "\t\tdata-target=\".teamset\"><i  class=\"ti-settings\" ></i></span>\n" +
+                                        "<div class=\"teamset collapse\" id=\"drop_down"+(i+1)+"\">\n" +
+                                        "<a class=\"dropdown-item\" href=\"#\">协作</a>\n" +
+                                        "<a class=\"dropdown-item\" href=\"#\">设置</a>\n" +
+                                        "<div class=\"dropdown-divider\"></div>\n" +
+                                        "<a class=\"dropdown-item\" style=\'color:red\' href=\"#\">删除</a>\n" +
+                                        "</div>"
+                                    $(".sidebar-nav").append(html);
+                                }
+                            }
+                        },
+                    })
+                    {# 点击显示div#}
+
+                    $(function () {
+                        $('.team').collapse('show')
+                    });
+                </script>
             </nav>
+
+            <style type="text/css">
+                .team {
+                    width: 220px;
+                    height: 40px;
+                    position: relative;
+                    margin-left: 6.5%;
+                }
+
+                .span1 {
+                    margin-left: 13%;
+                }
+
+                .span2 {
+                    margin-left: 3%;
+                }
+
+                .span3 {
+                    position: absolute;
+                    margin-left: 27%;
+                    background-color: white;
+                    border: none;
+                }
+
+                .aaaaa {
+                    background-color: white;
+                    color: #7a7d81;
+                    display: inline-block;
+                    width: 50%;
+                }
+
+                .aaaaa:hover {
+                    color: black;
+                }
+
+                .teamset {
+                    width: 150px;
+                    height: 140px;
+                    position: absolute;
+                    margin-left: 10%;
+                    z-index: 100;
+                    background-color: white;
+                }
+
+            </style>
+
             <style type="text/css">
                 #sidebarnav > li {
                     width: 200px;
@@ -249,6 +328,84 @@
             }
         </style>
         <!--添加团队的弹出窗-->
+
+            <div id="box1">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            style="margin-top:5px;padding: 8px 50px">新建
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
+                        <a class="dropdown-item" href="/RTFdocs/">文档</a>
+                        <a class="dropdown-item" href="#">表格</a>
+                        <a class="dropdown-item" href="#">幻灯片</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none">
+                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
+                    </div>
+                </div>
+            </div>
+            <div id="box2"></div>
+            <script>
+                $(function () {
+                    $("#sidebarnav").on("click", "li", function () {
+                        var sId = $(this).data("id"); //获取data-id的值
+                        window.location.hash = sId; //设置锚点
+                        loadInner(sId);
+                    });
+
+                    function loadInner(sId) {
+                        var sId = window.location.hash;
+                        var pathn, i;
+                        switch (sId) {
+                            case "#center":
+                                pathn = "/filelist/";
+                                i = 0;
+                                break;
+                        }
+                        $("#box2").load(pathn); //加载相对应的内容
+                        $("#sidebarnav li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
+                    }
+
+                    var sId = window.location.hash;
+                    loadInner(sId);
+                });
+                {# 点击协作空间名和设置出现不同的操作#}
+            </script>
+            <style type="text/css">
+                #box {
+                    position: relative;
+                }
+
+                #box1 {
+                    position: absolute;
+                    top: 70px;
+                    left: 10px;
+                    margin-left: 85%;
+                    margin-top: 10px;
+                }
+
+                #btn2 {
+                    margin-top: 10px;
+                    width: 150px;
+                    height: 30px;
+                    background-color: snow;
+                    text-align: center;
+                }
+
+                #box2 {
+                    margin-top: -70px;
+                    margin-left: 1%;
+                    width: 83%;
+                    height: auto;
+                }
+            </style>
+        </div>
+        <!--添加团队的弹出窗 font-size:x-large;height:77px;line-height:77px;-->
+
         <div id="LoginBox">
             <form action="#" method="POST" onsubmit="return false">
                 <div class="row1">
@@ -267,6 +424,7 @@
                                                                                                style="width: 120px"/>
                 </div>
             </form>
+
         </div>
 
         <button class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">
@@ -512,6 +670,7 @@
                 </div><!-- /.modal-content -->
             </div><!-- /.modal -->
         </div>
+
     </div>
     <!-- ============================================================== -->
     <!-- End Page wrapper  -->

@@ -46,8 +46,8 @@
     {#    <link href="/bootstrap-4.3.1-dist/css/bootstrap.min.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- chartist CSS -->
-{#    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">#}
-{#    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">#}
+    {#    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">#}
+    {#    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
           rel="stylesheet">
     <!--This page css - Morris CSS -->
@@ -74,7 +74,7 @@
                  class="light-logo">
 
             <!-- 保存按钮 -->
-            <a id="CKEditor_data_save" href="javascript:void(0);" style="margin-right: 10px">
+            <a id="CKEditor_data_modify" href="javascript:void(0);" style="margin-right: 10px">
                 <b>
                     <img src="../static/assets/images/保存.png" width="26" height="25" alt="goback">
                 </b>
@@ -90,7 +90,7 @@
                 {#                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">#}
                 {#                    无标题文档</p>#}
                 <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档"
-                       value=""
+                       value="{{ request.session.file_name }}"
                        placeholder="无标题文档">
                 <!-- ============================================================== -->
 
@@ -128,19 +128,20 @@
         </div>
     </nav>
 </header>
-{% comment %}<div id="menu_bar">
-    <p>无标题文档</p>
-</div>{% endcomment %}
 <div id="toolbar-container" style="margin-top: 2px"></div>
 
 <!-- This container will become the editable. -->
+{% comment %}<div id="get_doc_content" style="display: none">
+    value="{{ request.session.doc_content }}"
+</div>{% endcomment %}
+<input type="hidden" id="get_doc_content" value="{{ request.session.doc_content }}">
 <div id="editor">
-    <span></span>
+
 </div>
 </body>
 <script src="/static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
 <script src="../static/assets/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap tether Core JavaScript -->
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="../static/js/RTFdocs.js"></script>
+<script src="../static/js/modify_RTFdocs.js"></script>
 </html>
