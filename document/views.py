@@ -11,7 +11,7 @@ import json  # 引入json模块
 def index(request):
     # 模拟登录时把用户名存取在session里
     request.session['username'] = "吴炎"
-    return render(request, 'index(test).html')
+    return render(request, 'index.html')
 
 
 # 新建docs
