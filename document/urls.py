@@ -19,7 +19,7 @@ urlpatterns = [
     # 查找用户
     path('serachUser/', views.serachUser),
     # 添加协作成员
-    path('addMember/',views.addMember)
+    path('addMember/',views.addMember),
 
     # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
