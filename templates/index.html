@@ -134,7 +134,6 @@
                         type: "POST",
                         dataType: "json",
                         success: function (data) {
-                            console.log(data)
                             if (data.status == 200) {
                                 //给ul动态添加li
                                 var num = 1;
@@ -146,7 +145,7 @@
                                         " <span class=\"span3\"><i class=\"ti-settings\" ></i></span></div>\n" +
 
                                         "<div class=\"teamset\" id=\"drop_down" + (i + 1) + "\">\n" +
-                                        "<a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\">协作</a>\n" +
+                                        "<a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\" onclick=\"motaikuang('"+ data.list[i][1] +"')\" href=\"javascript:void(0)\">协作</a>\n" +
                                         "<a class=\"dropdown-item\" href=\"#\">设置</a>\n" +
                                         "<div class=\"dropdown-divider\"></div>\n" +
                                         "<a class=\"dropdown-item\" style=\'color:red\' href=\"#\">删除</a>\n" +
@@ -157,6 +156,12 @@
                         },
                     })
                     {# 点击显示div#}
+
+                    {#给模态框传参#}
+                    function motaikuang(team_name) {
+                        $("#tName").text(team_name)
+                    }
+
                 </script>
             </nav>
 

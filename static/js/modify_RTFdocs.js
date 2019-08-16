@@ -99,7 +99,6 @@ function modifyDocs(old_doc_title) {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
     var now_doc_title = $("#docs_title").val();  //取得文档标题
-    alert("1111")
 
     $.ajax({
         type: 'POST',
