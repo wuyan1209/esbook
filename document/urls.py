@@ -19,6 +19,12 @@ urlpatterns = [
     path('saveDocTest/', views.RTFdocs_save),
     # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
-    #私人文件列表
-    path('filelist/', views.fileList)
+    # 修改doc文档
+    path('docsModify/', views.doc_modify),
+    # 私人文件列表
+    path('filelist/', views.fileList),
+    # 打开修改文档
+    path('modify_RTFdocs/', views.modify_RTFdocs),
+    # 保存修改文档
+    path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc)
 ]

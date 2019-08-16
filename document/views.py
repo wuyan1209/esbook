@@ -25,6 +25,8 @@ def mysql_text(request):
     list = Permission.objects.raw('select * from Permission')
     content = {'list': list}
     return render(request, 'demo.html', content)
+
+
 def select(request):
     cursor = connection.cursor()
     '''
@@ -35,7 +37,7 @@ def select(request):
     '''
     cursor.execute('select team_name from team, team_member, user '
                    'where team.team_id = team_member.team_id and team_member.user_id = user.user_id '
-                   'and user.user_name = "吴炎"' )
+                   'and user.user_name = "吴炎"')
     result = cursor.fetchall()
     print(result)
     cursor.close()
@@ -78,11 +80,11 @@ def addTeam(request):
 def getAllTeam(request):
     if request.is_ajax():
         cursor = connection.cursor()
-        #获取session里存放的username
+        # 获取session里存放的username
         username = request.session.get('username')
         cursor.execute('select team_name from team, team_member, user '
                        'where team.team_id = team_member.team_id and team_member.user_id = user.user_id '
-                       'and user.user_name ="'+username+'" ')
+                       'and user.user_name ="' + username + '" ')
         result = cursor.fetchall()
         cursor.close()
         return JsonResponse({'status': 200, 'message': result})
@@ -118,7 +120,6 @@ def RTFdocs_save(request):
 
 # 判断文档名称是否重复
 def docNameExist(request):
-
     docName = request.POST.get('docsName')  # 获取文档标题
     return_param = {}
     # 从数据库中查询文档标题
@@ -127,23 +128,63 @@ def docNameExist(request):
                    ' (select file_id from user_file where user_id = 2)')
     fileNamas = cursor.fetchall()
     for fileName in fileNamas:
-        print(docName)
         if str(fileName[0]) == docName:
-            print("111111111111111")
             return_param['Exist'] = "YES"
             break
         else:
             return_param['Exist'] = "No"
     return HttpResponse(json.dumps(return_param))
 
-#查询文件
+
+# 查询文件
 def fileList(request):
     cursor = connection.cursor()
     # 获取session里存放的username
     username = request.session.get('username')
     cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id '
                    'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="'+username+'" ')
+                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" ')
     row = cursor.fetchall()
     cursor.close()
-    return render(request,'filelist.html',{"list": row})
+    return render(request, 'filelist.html', {"list": row})
+
+
+# 修改doc文档
+def doc_modify(request):
+    file_name = request.POST.get("file_name")  # 获取文件名称
+    user_id = request.POST.get("user_id")  # 获取文件作者
+
+    cursor = connection.cursor()
+    cursor.execute('select content from file f , user_file uf '
+                   'where f.file_id = uf.file_id and f.file_name = %s and uf.user_id = %s',
+                   [file_name, user_id])
+    request.session['doc_content'] = cursor.fetchone()[0]
+    request.session['file_name'] = file_name
+    return HttpResponse(json.dumps({'data': 'success'}))
+
+# 修改页面
+def modify_RTFdocs(request):
+    return render(request,"modify_RTFdocs.html")
+
+# 修改文档
+@transaction.atomic
+def ajax_modify_RTFdoc(request):
+    doc_content = request.POST.get('doc_content')  # 文档内容
+    now_doc_title = request.POST.get('now_doc_title')  # 当前文档标题
+    old_doc_title = request.POST.get('old_doc_title')  # 原来文档标题
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    return_param = {}
+    sid = transaction.savepoint()
+    try:
+        cursor = connection.cursor()
+        # 数据库更新
+        cursor.execute("update file set file_name = %s , content = %s, cre_date = %s where file_name = %s",
+                           [now_doc_title, doc_content, formatTime, old_doc_title])
+        return_param['saveStatus'] = "success"
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))

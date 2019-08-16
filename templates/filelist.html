@@ -22,8 +22,8 @@
                    <th style="width: 30%">时间</th>
                </tr>
                {% for v in list %}
-                   <tr>
-                       <td><a href="#" filename="{{ v.0 }}" userid="{{ v.3 }}">{{ v.0 }}</a></td>
+                   <tr class="fileList">
+                       <td><a href="javascript:void(0);" onclick="docs_modify('{{v.0}}',{{v.3}})" fileName="{{ v.0 }}" userId="{{ v.3 }}">{{ v.0 }}</a></td>
                        <td>{{ v.1 }}</td>
                        <td>{{ v.2 }}</td>
                    </tr>
@@ -33,11 +33,11 @@
        <div id="fenye">
            <nav aria-label="Page navigation example">
                <ul class="pagination">
-                   <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                   <li class="page-item"><a class="page-link" href="#">1</a></li>
-                   <li class="page-item"><a class="page-link" href="#">2</a></li>
-                   <li class="page-item"><a class="page-link" href="#">3</a></li>
-                   <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">Previous</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
+                   <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
                </ul>
            </nav>
        </div>
@@ -62,4 +62,5 @@
         margin-top: 10px;
     }
 </style>
+<script src="../static/js/modify_RTFdocs.js"></script>
 </html>
