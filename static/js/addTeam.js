@@ -1,24 +1,6 @@
 $(function ($) {
 
-    //获取该成员的协作空间
-    $.ajax({
-        url: "/getAllTeam/",
-        type: "POST",
-        dataType: "json",
-        success: function (data) {
-            if (data.status == 200) {
-                //给ul动态添加li
-                for (i = 0; i < data.message.length; i++) {
-                    html = "<li data-id=\"aaa\" class=\"waves-effect waves-dark\" >\n" +
-                        " <span title=' "+data.message[i]+" 'style=\"margin-left: 0px;width: 65%;display: inline-block;word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">\n" +
-                        " <i class=\"icon-search icon-home\"></i>&nbsp;&nbsp;" +data.message[i]+ "</span>\n" +
-                        " <span style=\"margin-left: 18px;width: 20%;display: inline-block\"><i class=\"ti-settings\"></i></span>\n" +
-                        "</li>"
-                    $("#sidebarnav").append(html);
-                }
-            }
-        },
-    });
+
 
 
     //弹出窗口
