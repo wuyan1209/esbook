@@ -11,7 +11,7 @@ import json  # 引入json模块
 def index(request):
     # 模拟登录时把用户名存取在session里
     request.session['username'] = "吴炎"
-    return render(request, 'index.html')
+    return render(request, 'index(test).html')
 
 
 # 新建docs
@@ -78,16 +78,19 @@ def addTeam(request):
 # 主页面查询该成员加入的协作空间
 @csrf_exempt
 def getAllTeam(request):
+    return_param = {}
+    team_id = []
+    team_name = []
     if request.is_ajax():
         cursor = connection.cursor()
         # 获取session里存放的username
         username = request.session.get('username')
-        cursor.execute('select team_name from team, team_member, user '
+        cursor.execute('select team.team_id, team_name from team, team_member, user '
                        'where team.team_id = team_member.team_id and team_member.user_id = user.user_id '
                        'and user.user_name ="' + username + '" ')
         result = cursor.fetchall()
         cursor.close()
-        return JsonResponse({'status': 200, 'message': result})
+        return JsonResponse({"status": 200, "list": result})
 
 
 # Ajax异步保存富文本文档内容
@@ -162,9 +165,11 @@ def doc_modify(request):
     request.session['file_name'] = file_name
     return HttpResponse(json.dumps({'data': 'success'}))
 
+
 # 修改页面
 def modify_RTFdocs(request):
-    return render(request,"modify_RTFdocs.html")
+    return render(request, "modify_RTFdocs.html")
+
 
 # 修改文档
 @transaction.atomic
@@ -180,7 +185,7 @@ def ajax_modify_RTFdoc(request):
         cursor = connection.cursor()
         # 数据库更新
         cursor.execute("update file set file_name = %s , content = %s, cre_date = %s where file_name = %s",
-                           [now_doc_title, doc_content, formatTime, old_doc_title])
+                       [now_doc_title, doc_content, formatTime, old_doc_title])
         return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
     except Exception as e:
