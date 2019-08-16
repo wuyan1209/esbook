@@ -9,14 +9,18 @@ urlpatterns = [
     # 添加协作空间
     path('addTeam/', views.addTeam),
     # 测试
-    path('mysql/', views.mysql_text),
+    path('demo/', views.demo),
     path('select/', views.select),
     # 主页面查询该成员加入的协作空间
     path('getAllTeam/', views.getAllTeam),
-    # 增加协作空间
-    path('addTeam/', views.addTeam),
+
     # 保存docs
     path('saveDocTest/', views.RTFdocs_save),
+    # 查找用户
+    path('serachUser/', views.serachUser),
+    # 添加协作成员
+    path('addMember/',views.addMember)
+
     # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
     # 修改doc文档
@@ -27,4 +31,5 @@ urlpatterns = [
     path('modify_RTFdocs/', views.modify_RTFdocs),
     # 保存修改文档
     path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc)
+
 ]
