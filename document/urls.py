@@ -30,6 +30,9 @@ urlpatterns = [
     # 打开修改文档
     path('modify_RTFdocs/', views.modify_RTFdocs),
     # 保存修改文档
-    path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc)
+    path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc),
+    #团队文件
+    path('teamfile/',views.teamfile),
+    #path('fenye/',views.paginator_view),
 
 ]
