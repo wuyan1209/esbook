@@ -63,7 +63,7 @@
 
         <div class="navbar-collapse">
             <!-- ============================================================== -->
-            <a href="/index/#center" style="margin-left: 30px">
+            <a href="javascript:history.go(-1)" style="margin-left: 30px">
                 <b>
                     <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
                 </b>
@@ -135,7 +135,7 @@
     value="{{ request.session.doc_content }}"
 </div>{% endcomment %}
 <input type="hidden" id="get_doc_content" value="{{ request.session.doc_content }}">
-<div id="editor" name="echo">
+<div id="editor">
 
 </div>
 </body>

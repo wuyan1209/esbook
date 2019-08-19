@@ -256,7 +256,8 @@ def doc_modify(request):
     cursor.execute('select content from file f , user_file uf '
                    'where f.file_id = uf.file_id and f.file_name = %s and uf.user_id = %s',
                    [file_name, user_id])
-    request.session['doc_content'] = cursor.fetchone()[0]
+    doc_content = cursor.fetchone()[0]
+    request.session['doc_content'] = doc_content
     request.session['file_name'] = file_name
     return HttpResponse(json.dumps({'data': 'success'}))
 

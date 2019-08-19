@@ -140,7 +140,7 @@
                                 var num = 1;
                                 for (i = 0; i < data.list.length; i++) {
                                     html = " <div class=\"team\">\n" +
-                                        " <a href=\"javascript:void(0)\" onclick=\"team_file('" + data.list[i][1] + "')\" class=\"aaaaa\">\n" +
+                                        " <a href=\"javascript:void(0)\"  onclick=\"changeSaveState('" + data.list[i][0] + "','" + data.list[i][1] + "')\" class=\"aaaaa\">\n" +
                                         "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
                                         " <span class=\"span2\" title=' " + data.list[i][1] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.list[i][1] + "</span></a>\n" +
                                         " <span class=\"span3\" onclick=\"divShow('" + data.list[i][1] + "')\"><i class=\"ti-settings\" ></i></span></div>\n" +
@@ -165,6 +165,12 @@
                     // 给模态框传参
                     function motaikuang(team_name) {
                         $("#tName").text(team_name)
+                    }
+
+                    // 改变保存状态的值
+                    function changeSaveState(teamId, teamName) {
+                        saveState = teamId;
+                        team_file(teamName);
                     }
                 </script>
             </nav>
@@ -263,7 +269,7 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a class="dropdown-item" href="/RTFdocs/">文档</a>
+                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)">文档</a>
                         <a class="dropdown-item" href="#">表格</a>
                         <a class="dropdown-item" href="#">幻灯片</a>
                     </div>
@@ -302,49 +308,58 @@
             </div>
         </div>
         <script>
+            $(function () {
+                saveState = "my_doc";
+                // 设置保存状态
+                $("#sidebarnav").on("click", function () {
+                    saveState = "my_doc";
+                })
+
+                {#点击我的文档显示个人文档列表#}
+                $("#sidebarnav").on("click", function () {
+                    my_doc_file()
+                })
+
+                my_doc_file()
+            });
+
             var tableTitle = "<tr>\n" +
                 "<th style=\"width: 60%\">文档标题</th>\n" +
                 "<th style=\"width: 10%\">创建者</th>\n" +
                 "<th style=\"width: 30%\">时间</th>\n" +
                 "</tr>";
-
-            {#点击我的文档显示个人文档列表#}
-            $("#sidebarnav").on("click",function () {
-                my_doc_file()
-            })
-
-            my_doc_file()
-
             {#显示我的文档列表#}
+
             function my_doc_file() {
                 $.ajax({
-                url: "/filelist/",
-                type: "POST",
-                dataType: "json",
-                success: function (data) {
-                    $("#tab").html("");
-                    $("#tab").append(tableTitle)
-                    for (i = 0; i < data.list.length; i++) {
-                        html = '<tr class=\"tr1\'">\n' +
-                            '<td><a href="javascript:void(0);"' + 'onclick="docs_modify("' + data.list[i][0] + '","' + data.list[i][3] + '")"' + 'fileName="' + data.list[i][1] + '" userId="' + data.list[i][3] + '">' + data.list[i][0] + '</td>' +
-                            '<td>' + data.list[i][1] + '</td>' +
-                            '<td>' + data.list[i][2] + '</td>' +
-                            '</tr>'
-                        $("#tab").append(html)
-                    }
-                },
-            })
+                    url: "/filelist/",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (data) {
+                        $("#tab").html("");
+                        $("#tab").append(tableTitle)
+                        for (i = 0; i < data.list.length; i++) {
+                            html = '<tr class=\"tr1\'">\n' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\')\"' +
+                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
+                                '<td>' + data.list[i][1] + '</td>' +
+                                '<td>' + data.list[i][2] + '</td>' +
+                                '</tr>'
+                            $("#tab").append(html)
+                        }
+                    },
+                })
             }
 
             {#团队文档列表#}
-            function team_file() {
-                //获取当前协作空间名称
 
+            function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
                 $.ajax({
                     url: "/teamfile/",
                     type: "POST",
+                    data: {"teamName": teamName},
                     dataType: "json",
                     success: function (data) {
                         $("#tab").append(tableTitle);
@@ -359,6 +374,11 @@
                     },
                 })
             }
+
+            // 新建doc文档
+            $("#toDocs").on("click", function () {
+                window.location.href = "/RTFdocs/?saveState=" + saveState
+            });
         </script>
         <style type="text/css">
             #box {
