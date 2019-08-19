@@ -244,7 +244,7 @@ def fileList(request):
                    'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
     row = cursor.fetchall()
     cursor.close()
-    return render(request, 'filelist.html', {"list": row})
+    return JsonResponse({"list": row})
 
 
 # 修改doc文档
