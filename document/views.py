@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.db import connection, transaction
@@ -246,7 +247,6 @@ def fileList(request):
     cursor.close()
     return JsonResponse({"list": row})
 
-
 # 修改doc文档
 def doc_modify(request):
     file_name = request.POST.get("file_name")  # 获取文件名称
@@ -288,3 +288,36 @@ def ajax_modify_RTFdoc(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+#分页
+# def paginator_view(request):
+#     cursor = connection.cursor()
+#     cursor.execute('select * from Permission ')
+#     list = cursor.fetchall()
+#     # 将数据按照规定每页显示 10 条, 进行分割
+#     paginator = Paginator(list, 3)
+#     if request.method == "GET":
+#         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+#         page = request.GET.get('page')
+#         try:
+#             books = paginator.page(page)
+#         except PageNotAnInteger:
+#             # 如果请求的页数不是整数, 返回第一页。
+#             books = paginator.page(1)
+#         except InvalidPage:
+#             # 如果请求的页数不存在, 重定向页面
+#             return HttpResponse('找不到页面的内容')
+#         except EmptyPage:
+#             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+#             books = paginator.page(paginator.num_pages)
+#     return render(request, "fenye.html", {'books': list})
+#查询团队文件
+def teamfile(request):
+    teamname=request.POST.get("teamName")
+    cursor = connection.cursor()
+    cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date '
+                   'from team t,team_member tm,member_file mf,file f ,user u where t.team_id=tm.team_id'
+                   ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
+                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc')
+    list = cursor.fetchall()
+    cursor.close()
+    return JsonResponse({"list": list})

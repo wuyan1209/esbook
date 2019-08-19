@@ -140,7 +140,7 @@
                                 var num = 1;
                                 for (i = 0; i < data.list.length; i++) {
                                     html = " <div class=\"team\">\n" +
-                                        " <a href=\"javascript:void(0)\" onclick=\"team_file_list('" + data.list[i][1] + "')\" class=\"aaaaa\">\n" +
+                                        " <a href=\"javascript:void(0)\" onclick=\"team_file('" + data.list[i][1] + "')\" class=\"aaaaa\">\n" +
                                         "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
                                         " <span class=\"span2\" title=' " + data.list[i][1] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.list[i][1] + "</span></a>\n" +
                                         " <span class=\"span3\" onclick=\"divShow('" + data.list[i][1] + "')\"><i class=\"ti-settings\" ></i></span></div>\n" +
@@ -156,10 +156,12 @@
                             }
                         },
                     });
+
                     // 协作空间点击显示
                     function divShow(teamName) {
                         $("#" + teamName).toggle()
                     }
+
                     // 给模态框传参
                     function motaikuang(team_name) {
                         $("#tName").text(team_name)
@@ -174,27 +176,33 @@
                     position: relative;
                     margin-left: 6.5%;
                 }
+
                 .span1 {
                     margin-left: 13%;
                 }
+
                 .span2 {
                     margin-left: 3%;
                 }
+
                 .span3 {
                     position: absolute;
                     margin-left: 27%;
                     background-color: white;
                     border: none;
                 }
+
                 .aaaaa {
                     background-color: white;
                     color: #7a7d81;
                     display: inline-block;
                     width: 50%;
                 }
+
                 .aaaaa:hover {
                     color: black;
                 }
+
                 .teamset {
                     width: 150px;
                     height: 140px;
@@ -268,20 +276,15 @@
                 </div>
             </div>
             <div id="box2">
-                 <div>
-           <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item active" aria-current="page">我的文档</li>
-              </ol>
-           </nav>
-       </div>
                 <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active" aria-current="page">我的文档</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div style="margin-top: 2%">
                     <table id="tab">
-                        <tr>
-                            <th style="width: 60%">文档标题</th>
-                            <th style="width: 10%">创建者</th>
-                            <th style="width: 30%">时间</th>
-                        </tr>
 
                     </table>
                 </div>
@@ -299,19 +302,63 @@
             </div>
         </div>
         <script>
-            $.ajax({
-                 url: "/filelist/",
-                 type: "POST",
-                 dataType: "json",
-                 success: function (data) {
-                     html= '<tr>\n' +
-                           '<td><a href="javascript:void(0);"'+'onclick="docs_modify("'+data.list[i][0]+'","'+data.list[i][3]+'")"'+'fileName="'+data.list[i][1]+'" userId="'+data.list[i][3]+'">'+data.list[i][0]+'</td>'+
-                           '<td>'+data.list[i][1]+'</td>'+
-                           '<td>'+data.list[i][2]+'</td>'+
-                           '</tr>'
-                     $("#tab").append(html)
-                 },
+            var tableTitle = "<tr>\n" +
+                "<th style=\"width: 60%\">文档标题</th>\n" +
+                "<th style=\"width: 10%\">创建者</th>\n" +
+                "<th style=\"width: 30%\">时间</th>\n" +
+                "</tr>";
+
+            {#点击我的文档显示个人文档列表#}
+            $("#sidebarnav").on("click",function () {
+                my_doc_file()
             })
+
+            my_doc_file()
+
+            {#显示我的文档列表#}
+            function my_doc_file() {
+                $.ajax({
+                url: "/filelist/",
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    $("#tab").html("");
+                    $("#tab").append(tableTitle)
+                    for (i = 0; i < data.list.length; i++) {
+                        html = '<tr class=\"tr1\'">\n' +
+                            '<td><a href="javascript:void(0);"' + 'onclick="docs_modify("' + data.list[i][0] + '","' + data.list[i][3] + '")"' + 'fileName="' + data.list[i][1] + '" userId="' + data.list[i][3] + '">' + data.list[i][0] + '</td>' +
+                            '<td>' + data.list[i][1] + '</td>' +
+                            '<td>' + data.list[i][2] + '</td>' +
+                            '</tr>'
+                        $("#tab").append(html)
+                    }
+                },
+            })
+            }
+
+            {#团队文档列表#}
+            function team_file() {
+                //获取当前协作空间名称
+
+                //点击查询清空之前的数据
+                $("#tab").html("");
+                $.ajax({
+                    url: "/teamfile/",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (data) {
+                        $("#tab").append(tableTitle);
+                        for (i = 0; i < data.list.length; i++) {
+                            html = '<tr>\n' +
+                                '<td><a href="javascript:void(0);"' + 'onclick="docs_modify("' + data.list[i][0] + '","' + data.list[i][3] + '")"' + 'fileName="' + data.list[i][1] + '" userId="' + data.list[i][3] + '">' + data.list[i][5] + '</td>' +
+                                '<td>' + data.list[i][3] + '</td>' +
+                                '<td>' + data.list[i][6] + '</td>' +
+                                '</tr>'
+                            $("#tab").append(html)
+                        }
+                    },
+                })
+            }
         </script>
         <style type="text/css">
             #box {
@@ -340,20 +387,23 @@
                 width: 83%;
                 height: auto;
             }
-            #tab{
+
+            #tab {
                 margin-left: 10px;
                 width: 95%;
-                border:0px;
-                cellpadding:0px;
-                cellspacing:0px;
+                border: 0px;
+                cellpadding: 0px;
+                cellspacing: 0px;
             }
-            #tab td,th{
+
+            #tab td, th {
                 padding-left: 20px;
                 border-bottom: gray 1px solid;
                 height: 40px;
             }
-            #fenye{
-                margin-left:65% ;
+
+            #fenye {
+                margin-left: 65%;
                 margin-top: 10px;
             }
         </style>
