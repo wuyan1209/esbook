@@ -121,7 +121,6 @@
                 </ul>
                 <ul id="side">
                     <!--协作空间列表-->
-
                     <li class="waves-effect waves-dark" style="margin-left: 19px">
                         <span>协作空间</span>
                         <span id="demo" style="margin-left: 90px">
@@ -157,12 +156,10 @@
                             }
                         },
                     });
-
                     // 协作空间点击显示
                     function divShow(teamName) {
                         $("#" + teamName).toggle()
                     }
-
                     // 给模态框传参
                     function motaikuang(team_name) {
                         $("#tName").text(team_name)
@@ -177,33 +174,27 @@
                     position: relative;
                     margin-left: 6.5%;
                 }
-
                 .span1 {
                     margin-left: 13%;
                 }
-
                 .span2 {
                     margin-left: 3%;
                 }
-
                 .span3 {
                     position: absolute;
                     margin-left: 27%;
                     background-color: white;
                     border: none;
                 }
-
                 .aaaaa {
                     background-color: white;
                     color: #7a7d81;
                     display: inline-block;
                     width: 50%;
                 }
-
                 .aaaaa:hover {
                     color: black;
                 }
-
                 .teamset {
                     width: 150px;
                     height: 140px;
@@ -211,7 +202,6 @@
                     background-color: white;
                     display: none;
                 }
-
             </style>
 
             <style type="text/css">
@@ -277,30 +267,51 @@
                     </div>
                 </div>
             </div>
-            <div id="box2"></div>
+            <div id="box2">
+                 <div>
+           <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">我的文档</li>
+              </ol>
+           </nav>
+       </div>
+                <div>
+                    <table id="tab">
+                        <tr>
+                            <th style="width: 60%">文档标题</th>
+                            <th style="width: 10%">创建者</th>
+                            <th style="width: 30%">时间</th>
+                        </tr>
+
+                    </table>
+                </div>
+                <div id="fenye">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="javascript:void(0);">Previous</a></li>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
+                            <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
         <script>
-            $(function () {
-                $("#sidebarnav").on("click", "li", function () {
-                    var sId = $(this).data("id"); //获取data-id的值
-                    window.location.hash = sId; //设置锚点
-                    loadInner(sId);
-                });
-
-                function loadInner(sId) {
-                    var sId = window.location.hash;
-                    var pathn, i;
-                    switch (sId) {
-                        case "#center":
-                            pathn = "/filelist/";
-                            i = 0;
-                            break;
-                    }
-                    $("#box2").load(pathn); //加载相对应的内容
-                    $("#sidebarnav li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
-                }
-            });
-            {# 点击协作空间名和设置出现不同的操作#}
+            $.ajax({
+                 url: "/filelist/",
+                 type: "POST",
+                 dataType: "json",
+                 success: function (data) {
+                     html= '<tr>\n' +
+                           '<td><a href="javascript:void(0);"'+'onclick="docs_modify("'+data.list[i][0]+'","'+data.list[i][3]+'")"'+'fileName="'+data.list[i][1]+'" userId="'+data.list[i][3]+'">'+data.list[i][0]+'</td>'+
+                           '<td>'+data.list[i][1]+'</td>'+
+                           '<td>'+data.list[i][2]+'</td>'+
+                           '</tr>'
+                     $("#tab").append(html)
+                 },
+            })
         </script>
         <style type="text/css">
             #box {
@@ -328,6 +339,22 @@
                 margin-left: 1%;
                 width: 83%;
                 height: auto;
+            }
+            #tab{
+                margin-left: 10px;
+                width: 95%;
+                border:0px;
+                cellpadding:0px;
+                cellspacing:0px;
+            }
+            #tab td,th{
+                padding-left: 20px;
+                border-bottom: gray 1px solid;
+                height: 40px;
+            }
+            #fenye{
+                margin-left:65% ;
+                margin-top: 10px;
             }
         </style>
     </div>
@@ -632,6 +659,7 @@
 <script src="../static/js/dashboard1.js"></script>
 <!--添加协作空间-->
 <script src="../static/js/addTeam.js"></script>
+<script src="../static/js/modify_RTFdocs.js"></script>
 </body>
 </html>
 
