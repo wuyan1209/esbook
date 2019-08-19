@@ -141,7 +141,7 @@
                                 var num = 1;
                                 for (i = 0; i < data.list.length; i++) {
                                     html = " <div class=\"team\">\n" +
-                                        " <a href=\"javascript:void(0)\" onclick=\"team_file_list('" + data.list[i][1] + "')\" class=\"aaaaa\">\n" +
+                                        " <a href=\"javascript:void(0)\" onclick=\"changeSaveState('" + data.list[i][0] + "')\" class=\"aaaaa\">\n" +
                                         "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
                                         " <span class=\"span2\" title=' " + data.list[i][1] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.list[i][1] + "</span></a>\n" +
                                         " <span class=\"span3\" onclick=\"divShow('" + data.list[i][1] + "')\"><i class=\"ti-settings\" ></i></span></div>\n" +
@@ -166,6 +166,11 @@
                     // 给模态框传参
                     function motaikuang(team_name) {
                         $("#tName").text(team_name)
+                    }
+
+                    // 改变保存状态的值
+                    function changeSaveState(teamId) {
+                        saveState = teamId
                     }
                 </script>
             </nav>
@@ -265,7 +270,7 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a class="dropdown-item" href="/RTFdocs/">文档</a>
+                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)">文档</a>
                         <a class="dropdown-item" href="#">表格</a>
                         <a class="dropdown-item" href="#">幻灯片</a>
                     </div>
@@ -281,6 +286,12 @@
         </div>
         <script>
             $(function () {
+                saveState = "my_doc";
+                // 设置保存状态
+                $("#sidebarnav").on("click", function () {
+                    saveState = "my_doc";
+                })
+
                 $("#sidebarnav").on("click", "li", function () {
                     var sId = $(this).data("id"); //获取data-id的值
                     window.location.hash = sId; //设置锚点
@@ -299,6 +310,16 @@
                     $("#box2").load(pathn); //加载相对应的内容
                     $("#sidebarnav li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
                 }
+
+                // 新建doc文档
+                $("#toDocs").on("click", function () {
+                   {% comment %} $.ajax({
+                        url: "/RTFdocs/",
+                        type: "get",
+                        data: {"saveState": saveState}
+                    }){% endcomment %}
+                    window.location.href = "/RTFdocs/?saveState="+ saveState +""
+                })
             });
             {# 点击协作空间名和设置出现不同的操作#}
         </script>
@@ -632,6 +653,7 @@
 <script src="../static/js/dashboard1.js"></script>
 <!--添加协作空间-->
 <script src="../static/js/addTeam.js"></script>
+<script src="../static/js/RTFdocs.js"></script>
 </body>
 </html>
 

@@ -16,7 +16,8 @@ def index(request):
 
 # 新建docs
 def RTFdocs(request):
-    return render(request, 'RTFdocs.html')
+    saveState = request.GET.get("saveState")
+    return render(request, 'RTFdocs.html', {'saveState': saveState})
 
 
 # 测试
@@ -68,11 +69,11 @@ def addTeam(request):
             tmid = cursor.fetchall()
             cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], 4])
             cursor.close()
-            #成功的话保存
+            # 成功的话保存
             transaction.savepoint_commit(save_id)
             return JsonResponse({'status': 200, 'message': '添加成功'})
         except:
-            #失败的时候回滚到保存点
+            # 失败的时候回滚到保存点
             transaction.savepoint_rollback(save_id)
             return JsonResponse({'status': 4001, 'message': '添加失败'})
 
@@ -98,17 +99,17 @@ def getAllTeam(request):
 def serachUser(request):
     # 获取用户名和协作空间名
     userName = request.POST['userName']
-    teamName=request.POST['teamName']
-    cursor=connection.cursor()
-    #查询用户是否是该协作空间的协作者
-    cursor.execute('select u.user_id from user u,team t,team_member tm '+
-                   'where u.user_id=tm.user_id and tm.team_id=t.team_id and u.user_name="'+userName+'" and t.team_name="'+teamName+'"')
-    userId=cursor.fetchone()
+    teamName = request.POST['teamName']
+    cursor = connection.cursor()
+    # 查询用户是否是该协作空间的协作者
+    cursor.execute('select u.user_id from user u,team t,team_member tm ' +
+                   'where u.user_id=tm.user_id and tm.team_id=t.team_id and u.user_name="' + userName + '" and t.team_name="' + teamName + '"')
+    userId = cursor.fetchone()
     if userId:
         cursor.close()
         return JsonResponse({'status': 1002, 'message': '该用户已经添加过了'})
     else:
-        #查询该用户的信息
+        # 查询该用户的信息
         cursor.execute('select user_id,user_name,icon from user where user_name="' + userName + '" ')
         result = cursor.fetchone()
         cursor.close()
@@ -117,20 +118,21 @@ def serachUser(request):
         else:
             return JsonResponse({'status': 1002, 'message': '用户不存在'})
 
+
 # 将成员加入到协作空间并设置角色
 @transaction.atomic
 def addMember(request):
-    #获取用户名、协作空间名、角色名
+    # 获取用户名、协作空间名、角色名
     userName = request.POST['userName']
     teamName = request.POST['teamName']
     roleName = request.POST['roleName']
     try:
         cursor = connection.cursor()
-        #查询用户id和协作空间id
-        cursor.execute('select user_id from user where user_name="'+userName+'"')
-        userId=cursor.fetchall()
-        cursor.execute('select team_id from team where team_name="'+teamName+'"')
-        teamId=cursor.fetchall()
+        # 查询用户id和协作空间id
+        cursor.execute('select user_id from user where user_name="' + userName + '"')
+        userId = cursor.fetchall()
+        cursor.execute('select team_id from team where team_name="' + teamName + '"')
+        teamId = cursor.fetchall()
         # 创建保存点
         save_id = transaction.savepoint()
         # 把用户添加到协作空间里
@@ -139,10 +141,10 @@ def addMember(request):
         cursor.execute('select team_mem_id from team_member order by team_mem_id desc limit 1')
         tmid = cursor.fetchall()
         # 通过角色名查询角色id
-        cursor.execute('select role_id from role where role_name="'+roleName+'"')
-        roleId=cursor.fetchall()
+        cursor.execute('select role_id from role where role_name="' + roleName + '"')
+        roleId = cursor.fetchall()
         # 把人员与角色绑定
-        cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0],roleId[0]])
+        cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], roleId[0]])
         cursor.close()
         # 成功的话保存
         status = 200
@@ -153,10 +155,10 @@ def addMember(request):
         status = 4001
         message = '添加失败'
         transaction.savepoint_rollback(save_id)
-    return JsonResponse({'status': status, 'message':message})
+    return JsonResponse({'status': status, 'message': message})
 
 
-# Ajax异步保存富文本文档内容
+# 保存个人空间的docs
 @transaction.atomic
 def RTFdocs_save(request):
     doc_content = request.POST.get('doc_content', 0)  # 文档内容
@@ -173,6 +175,38 @@ def RTFdocs_save(request):
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
         file_id = cursor.fetchone()
         cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [1, file_id])
+        return_param['saveStatus'] = "success"
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))
+
+
+# 保存协作空间的docs
+def saveTeamDoc(request):
+    doc_content = request.POST.get('doc_content', 0)  # 文档内容
+    doc_title = request.POST.get('doc_title', 0)  # 文档标题
+    teamId = request.POST.get('teamId')  # 团队ID
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    return_param = {}
+    sid = transaction.savepoint()
+    try:
+        # 数据库更新
+        cursor = connection.cursor()
+        # 向file表中插入文件数据
+        cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
+                       [doc_title, doc_content, formatTime])
+        # 获取文件id
+        cursor.execute("select file_id from file where file_name = %s", [doc_title])
+        file_id = cursor.fetchone()
+        # 获取团队成员id
+        cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [1, teamId])
+        team_mem_id = cursor.fetchone()
+        # 保存团队文件
+        cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
         return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
     except Exception as e:

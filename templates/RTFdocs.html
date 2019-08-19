@@ -128,14 +128,12 @@
         </div>
     </nav>
 </header>
-{% comment %}<div id="menu_bar">
-    <p>无标题文档</p>
-</div>{% endcomment %}
+
 <div id="toolbar-container" style="margin-top: 2px"></div>
 
 <!-- This container will become the editable. -->
+<input type="hidden" id="docSaveState" value="{{ saveState }}">
 <div id="editor">
-    <span></span>
 </div>
 </body>
 <script src="/static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
