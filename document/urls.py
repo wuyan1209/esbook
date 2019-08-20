@@ -1,6 +1,6 @@
-from django.urls import path
+from django.urls import path, re_path
 from document import views
-
+app_name = "esbook"
 urlpatterns = [
     # 主页面
     path('index/', views.index),
@@ -11,12 +11,14 @@ urlpatterns = [
     # 主页面查询该成员加入的协作空间
     path('getAllTeam/', views.getAllTeam),
 
-    # 保存docs
+    # 保存个人空间的docs
     path('saveDocTest/', views.RTFdocs_save),
+    # 保存协作空间的docs
+    path('saveTeamDoc/', views.saveTeamDoc),
     # 查找用户
     path('serachUser/', views.serachUser),
     # 添加协作成员
-    path('addMember/',views.addMember),
+    path('addMember/', views.addMember),
 
     # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
@@ -25,7 +27,7 @@ urlpatterns = [
     # 私人文件列表
     path('filelist/', views.fileList),
     # 打开修改文档
-    path('modify_RTFdocs/', views.modify_RTFdocs),
+    path('modifyRTFdocs/', views.modifyRTFdocs),
     # 保存修改文档
     path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc),
     # 查找协作空间的普通协作者
@@ -42,4 +44,9 @@ urlpatterns = [
     path('delAdminRole/', views.delAdminRole),
     # 删除协作空间，放到回收站
     path('delTeam/',views.delTeam),
+    #团队文件
+    path('teamfile/',views.teamfile),
+    #path('fenye/',views.paginator_view),
+
+
 ]

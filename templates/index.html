@@ -170,27 +170,76 @@
         </div>
         <script>
             $(function () {
-                $("#sidebarnav").on("click", "li", function () {
-                    var sId = $(this).data("id"); //获取data-id的值
-                    window.location.hash = sId; //设置锚点
-                    loadInner(sId);
-                });
+                saveState = "my_doc";
+                // 设置保存状态
+                $("#sidebarnav").on("click", function () {
+                    saveState = "my_doc";
+                })
 
-                function loadInner(sId) {
-                    var sId = window.location.hash;
-                    var pathn, i;
-                    switch (sId) {
-                        case "#center":
-                            pathn = "/filelist/";
-                            i = 0;
-                            break;
-                    }
-                    $("#box2").load(pathn); //加载相对应的内容
-                    $("#sidebarnav li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
-                }
+                {#点击我的文档显示个人文档列表#}
+                $("#sidebarnav").on("click", function () {
+                    my_doc_file()
+                })
 
-                var sId = window.location.hash;
-                loadInner(sId);
+                my_doc_file()
+            });
+
+            var tableTitle = "<tr>\n" +
+                "<th style=\"width: 60%\">文档标题</th>\n" +
+                "<th style=\"width: 10%\">创建者</th>\n" +
+                "<th style=\"width: 30%\">时间</th>\n" +
+                "</tr>";
+            {#显示我的文档列表#}
+
+            function my_doc_file() {
+                $.ajax({
+                    url: "/filelist/",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (data) {
+                        $("#tab").html("");
+                        $("#tab").append(tableTitle)
+                        for (i = 0; i < data.list.length; i++) {
+                            html = '<tr class=\"tr1\'">\n' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\')\"' +
+                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
+                                '<td>' + data.list[i][1] + '</td>' +
+                                '<td>' + data.list[i][2] + '</td>' +
+                                '</tr>'
+                            $("#tab").append(html)
+                        }
+                    },
+                })
+            }
+
+            {#团队文档列表#}
+
+            function team_file(teamName) {
+                //点击查询清空之前的数据
+                $("#tab").html("");
+                $.ajax({
+                    url: "/teamfile/",
+                    type: "POST",
+                    data: {"teamName": teamName},
+                    dataType: "json",
+                    success: function (data) {
+                        $("#tab").append(tableTitle);
+                        for (i = 0; i < data.list.length; i++) {
+                            html = '<tr>\n' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\')\"' +
+                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
+                                '<td>' + data.list[i][3] + '</td>' +
+                                '<td>' + data.list[i][6] + '</td>' +
+                                '</tr>'
+                            $("#tab").append(html)
+                        }
+                    },
+                })
+            }
+
+            // 新建doc文档
+            $("#toDocs").on("click", function () {
+                window.location.href = "/RTFdocs/?saveState=" + saveState
             });
             {# 点击协作空间名和设置出现不同的操作#}
         </script>
@@ -613,6 +662,7 @@
 <script src="../static/js/dashboard1.js"></script>
 <!--添加协作空间-->
 <script src="../static/js/addTeam.js"></script>
+<script src="../static/js/modifyRTFdocs.js"></script>
 </body>
 </html>
 

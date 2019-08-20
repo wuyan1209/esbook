@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection, transaction
@@ -15,7 +16,8 @@ def index(request):
 
 # 新建docs
 def RTFdocs(request):
-    return render(request, 'RTFdocs.html')
+    saveState = request.GET.get("saveState")
+    return render(request, 'RTFdocs.html', {'saveState': saveState})
 
 
 # 添加协作空间
@@ -144,7 +146,8 @@ def addMember(request):
         return JsonResponse({'status': 2002, 'message': '抱歉，您没有权限'})
 
 
-# Ajax异步保存富文本文档内容
+
+# 保存个人空间的docs
 @transaction.atomic
 def RTFdocs_save(request):
     doc_content = request.POST.get('doc_content', 0)  # 文档内容
@@ -160,7 +163,41 @@ def RTFdocs_save(request):
                        [doc_title, doc_content, formatTime])
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
         file_id = cursor.fetchone()
-        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [2, file_id])
+       
+        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [1, file_id])
+        return_param['saveStatus'] = "success"
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))
+
+
+# 保存协作空间的docs
+def saveTeamDoc(request):
+    doc_content = request.POST.get('doc_content', 0)  # 文档内容
+    doc_title = request.POST.get('doc_title', 0)  # 文档标题
+    teamId = request.POST.get('teamId')  # 团队ID
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    return_param = {}
+    sid = transaction.savepoint()
+    try:
+        # 数据库更新
+        cursor = connection.cursor()
+        # 向file表中插入文件数据
+        cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
+                       [doc_title, doc_content, formatTime])
+        # 获取文件id
+        cursor.execute("select file_id from file where file_name = %s", [doc_title])
+        file_id = cursor.fetchone()
+        # 获取团队成员id
+        cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [1, teamId])
+        team_mem_id = cursor.fetchone()
+        # 保存团队文件
+        cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
+>>>>>>> 269cd0ee26e8d09df39dabbf35f99442d71919ff
         return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
     except Exception as e:
@@ -177,7 +214,7 @@ def docNameExist(request):
     # 从数据库中查询文档标题
     cursor = connection.cursor()
     cursor.execute('select file_name from file f where f.file_id in'
-                   ' (select file_id from user_file where user_id = 2)')
+                   ' (select file_id from user_file where user_id = %s)', [1])
     fileNamas = cursor.fetchall()
     for fileName in fileNamas:
         if str(fileName[0]) == docName:
@@ -195,11 +232,10 @@ def fileList(request):
     username = request.session.get('username')
     cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id '
                    'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" ')
+                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
     row = cursor.fetchall()
     cursor.close()
-    return render(request, 'filelist.html', {"list": row})
-
+    return JsonResponse({"list": row})
 
 # 修改doc文档
 def doc_modify(request):
@@ -210,8 +246,10 @@ def doc_modify(request):
     cursor.execute('select content from file f , user_file uf '
                    'where f.file_id = uf.file_id and f.file_name = %s and uf.user_id = %s',
                    [file_name, user_id])
-    request.session['doc_content'] = cursor.fetchone()[0]
-    request.session['file_name'] = file_name
+    doc_content = cursor.fetchone()[0]
+    request.session["file_name"] = file_name
+    request.session["doc_content"] = doc_content
+
     return HttpResponse(json.dumps({'data': 'success'}))
 
 
@@ -416,3 +454,37 @@ def delTeam(request):
         status = 4001
         message = '删除失败'
     return JsonResponse({'status': status, 'message': message})
+
+#分页
+# def paginator_view(request):
+#     cursor = connection.cursor()
+#     cursor.execute('select * from Permission ')
+#     list = cursor.fetchall()
+#     # 将数据按照规定每页显示 10 条, 进行分割
+#     paginator = Paginator(list, 3)
+#     if request.method == "GET":
+#         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+#         page = request.GET.get('page')
+#         try:
+#             books = paginator.page(page)
+#         except PageNotAnInteger:
+#             # 如果请求的页数不是整数, 返回第一页。
+#             books = paginator.page(1)
+#         except InvalidPage:
+#             # 如果请求的页数不存在, 重定向页面
+#             return HttpResponse('找不到页面的内容')
+#         except EmptyPage:
+#             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+#             books = paginator.page(paginator.num_pages)
+#     return render(request, "fenye.html", {'books': list})
+#查询团队文件
+def teamfile(request):
+    teamname=request.POST.get("teamName")
+    cursor = connection.cursor()
+    cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date '
+                   'from team t,team_member tm,member_file mf,file f ,user u where t.team_id=tm.team_id'
+                   ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
+                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc')
+    list = cursor.fetchall()
+    cursor.close()
+    return JsonResponse({"list": list})

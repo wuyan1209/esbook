@@ -88,7 +88,9 @@ function docs_modify(name, id) {
         dataType: 'json',
         success: function (data) {
             if (data.data == "success") {
-                window.location.href = "/modify_RTFdocs/";
+                alert("跳转链接")
+                window.location.href = "/modifyRTFdocs/";
+                //?file_name=" + data.file_name + "doc_content=" + data.doc_content;
             }
         }
     });

@@ -49,42 +49,69 @@ $(function () {
         });
     });
 
+    var saveState = $("#docSaveState").val();
+
     // 点击保存按钮吧保存
     $("#CKEditor_data_save").on("click", function () {
-        saveDocs()
+        saveDocs(saveState);
     });
 
     // ctrl+s 保存
     $("#editor").keydown(function (e) {
         if (e.keyCode == 83 && e.ctrlKey) {
             e.preventDefault();
-            saveDocs();
+            saveDocs(saveState);
         }
     });
 });
 
 // 保存文档
-function saveDocs() {
+function saveDocs(saveState) {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
     var doc_title = $("#docs_title").val();  //取得文档标题
 
-    $.ajax({
-        type: 'POST',
-        url: '/saveDocTest/',
-        dataType: "json",
-        data: {
-            doc_content: doc_content,
-            doc_title: doc_title
-        },
-        success: function (data) {
-            if (data.saveStatus == "success") {
-                // 保存成功
-                alert("保存成功了");
-            } else {
-                // 保存失败
-                alert("保存失败了");
+    if (saveState == "my_doc") {
+        //保存个人文档
+        $.ajax({
+            type: 'POST',
+            url: '/saveDocTest/',
+            dataType: "json",
+            data: {
+                doc_content: doc_content,
+                doc_title: doc_title
+            },
+            success: function (data) {
+                if (data.saveStatus == "success") {
+                    // 保存成功
+                    alert("保存成功了");
+                } else {
+                    // 保存失败
+                    alert("保存失败了");
+                }
             }
-        }
-    })
+        });
+    } else {
+        // 保存团队文档
+        $.ajax({
+            type: 'POST',
+            url: '/saveTeamDoc/',
+            dataType: "json",
+            data: {
+                doc_content: doc_content,
+                doc_title: doc_title,
+                teamId: saveState
+            },
+            success: function (data) {
+                if (data.saveStatus == "success") {
+                    // 保存成功
+                    alert("保存成功了");
+                } else {
+                    // 保存失败
+                    alert("保存失败了");
+                }
+            }
+        });
+    }
+
 }

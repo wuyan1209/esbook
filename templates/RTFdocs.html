@@ -63,7 +63,7 @@
 
         <div class="navbar-collapse">
             <!-- ============================================================== -->
-            <a href="javascript:history.go(-1)" style="margin-left: 30px">
+            <a href="javascript:history.back(-1)" style="margin-left: 30px">
                 <b>
                     <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
                 </b>
@@ -128,14 +128,12 @@
         </div>
     </nav>
 </header>
-{% comment %}<div id="menu_bar">
-    <p>无标题文档</p>
-</div>{% endcomment %}
+
 <div id="toolbar-container" style="margin-top: 2px"></div>
 
 <!-- This container will become the editable. -->
+<input type="hidden" id="docSaveState" value="{{ saveState }}">
 <div id="editor">
-    <span></span>
 </div>
 </body>
 <script src="/static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
