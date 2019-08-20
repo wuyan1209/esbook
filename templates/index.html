@@ -365,7 +365,8 @@
                         $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);"' + 'onclick="docs_modify("' + data.list[i][0] + '","' + data.list[i][3] + '")"' + 'fileName="' + data.list[i][1] + '" userId="' + data.list[i][3] + '">' + data.list[i][5] + '</td>' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\')\"' +
+                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
                                 '<td>' + data.list[i][6] + '</td>' +
                                 '</tr>'
@@ -729,7 +730,7 @@
 <script src="../static/js/dashboard1.js"></script>
 <!--添加协作空间-->
 <script src="../static/js/addTeam.js"></script>
-<script src="../static/js/modify_RTFdocs.js"></script>
+<script src="../static/js/modifyRTFdocs.js"></script>
 </body>
 </html>
 

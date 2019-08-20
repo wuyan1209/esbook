@@ -224,7 +224,7 @@ def docNameExist(request):
     # 从数据库中查询文档标题
     cursor = connection.cursor()
     cursor.execute('select file_name from file f where f.file_id in'
-                   ' (select file_id from user_file where user_id = 2)')
+                   ' (select file_id from user_file where user_id = %s)', [1])
     fileNamas = cursor.fetchall()
     for fileName in fileNamas:
         if str(fileName[0]) == docName:
@@ -257,13 +257,17 @@ def doc_modify(request):
                    'where f.file_id = uf.file_id and f.file_name = %s and uf.user_id = %s',
                    [file_name, user_id])
     doc_content = cursor.fetchone()[0]
-    request.session['doc_content'] = doc_content
-    request.session['file_name'] = file_name
+    request.session["file_name"] = file_name
+    request.session["doc_content"] = doc_content
+
     return HttpResponse(json.dumps({'data': 'success'}))
 
 
 # 修改页面
-def modify_RTFdocs(request):
+def modifyRTFdocs(request):
+    print("wo jin lai le ma ")
+    # file_name = request.GET.get("file_name")
+    # doc_content = request.GET.get("doc_content")
     return render(request, "modify_RTFdocs.html")
 
 
