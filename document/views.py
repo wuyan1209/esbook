@@ -1,8 +1,7 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.db import connection, transaction
-from django.views.decorators.csrf import csrf_exempt
-from document.models import Permission, User
+from document.models import  User
 import time  # 引入time模块
 import json  # 引入json模块
 
@@ -17,25 +16,6 @@ def index(request):
 # 新建docs
 def RTFdocs(request):
     return render(request, 'RTFdocs.html')
-
-
-# 测试
-def demo(request):
-    # 查新语句
-    list = Permission.objects.raw('select * from Permission')
-    content = {'list': list}
-    return render(request, 'demo.html', content)
-
-
-def select(request):
-    cursor = connection.cursor()
-    cursor.execute('select team_name from team, team_member, user '
-                   'where team.team_id = team_member.team_id and team_member.user_id = user.user_id '
-                   'and user.user_name = "吴炎"')
-    result = cursor.fetchall()
-    print(result)
-    cursor.close()
-    return HttpResponse(result)
 
 
 # 添加协作空间
@@ -68,27 +48,24 @@ def addTeam(request):
             tmid = cursor.fetchall()
             cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], 4])
             cursor.close()
-            #成功的话保存
+            # 成功的话保存
             transaction.savepoint_commit(save_id)
             return JsonResponse({'status': 200, 'message': '添加成功'})
         except:
-            #失败的时候回滚到保存点
+            # 失败的时候回滚到保存点
             transaction.savepoint_rollback(save_id)
             return JsonResponse({'status': 4001, 'message': '添加失败'})
 
 
 # 主页面查询该成员加入的协作空间
 def getAllTeam(request):
-    return_param = {}
-    team_id = []
-    team_name = []
     if request.is_ajax():
         cursor = connection.cursor()
         # 获取session里存放的username
         username = request.session.get('username')
         cursor.execute('select team.team_id, team_name from team, team_member, user '
                        'where team.team_id = team_member.team_id and team_member.user_id = user.user_id '
-                       'and user.user_name ="' + username + '" ')
+                       'and team_state=0 and user.user_name ="' + username + '" ')
         result = cursor.fetchall()
         cursor.close()
         return JsonResponse({"status": 200, "list": result})
@@ -98,17 +75,17 @@ def getAllTeam(request):
 def serachUser(request):
     # 获取用户名和协作空间名
     userName = request.POST['userName']
-    teamName=request.POST['teamName']
-    cursor=connection.cursor()
-    #查询用户是否是该协作空间的协作者
-    cursor.execute('select u.user_id from user u,team t,team_member tm '+
-                   'where u.user_id=tm.user_id and tm.team_id=t.team_id and u.user_name="'+userName+'" and t.team_name="'+teamName+'"')
-    userId=cursor.fetchone()
+    teamName = request.POST['teamName']
+    cursor = connection.cursor()
+    # 查询用户是否是该协作空间的协作者
+    cursor.execute('select u.user_id from user u,team t,team_member tm ' +
+                   'where u.user_id=tm.user_id and tm.team_id=t.team_id and u.user_name="' + userName + '" and t.team_name="' + teamName + '"')
+    userId = cursor.fetchone()
     if userId:
         cursor.close()
         return JsonResponse({'status': 1002, 'message': '该用户已经添加过了'})
     else:
-        #查询该用户的信息
+        # 查询该用户的信息
         cursor.execute('select user_id,user_name,icon from user where user_name="' + userName + '" ')
         result = cursor.fetchone()
         cursor.close()
@@ -117,43 +94,54 @@ def serachUser(request):
         else:
             return JsonResponse({'status': 1002, 'message': '用户不存在'})
 
+
 # 将成员加入到协作空间并设置角色
 @transaction.atomic
 def addMember(request):
-    #获取用户名、协作空间名、角色名
+    # 获取用户名、协作空间名、角色名
     userName = request.POST['userName']
     teamName = request.POST['teamName']
     roleName = request.POST['roleName']
-    try:
-        cursor = connection.cursor()
-        #查询用户id和协作空间id
-        cursor.execute('select user_id from user where user_name="'+userName+'"')
-        userId=cursor.fetchall()
-        cursor.execute('select team_id from team where team_name="'+teamName+'"')
-        teamId=cursor.fetchall()
-        # 创建保存点
-        save_id = transaction.savepoint()
-        # 把用户添加到协作空间里
-        cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [teamId[0], userId[0]])
-        # 查询插入的协作空间成员的id
-        cursor.execute('select team_mem_id from team_member order by team_mem_id desc limit 1')
-        tmid = cursor.fetchall()
-        # 通过角色名查询角色id
-        cursor.execute('select role_id from role where role_name="'+roleName+'"')
-        roleId=cursor.fetchall()
-        # 把人员与角色绑定
-        cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0],roleId[0]])
-        cursor.close()
-        # 成功的话保存
-        status = 200
-        message = '添加成功'
-        transaction.savepoint_commit(save_id)
-    except:
-        # 失败的时候回滚到保存点
-        status = 4001
-        message = '添加失败'
-        transaction.savepoint_rollback(save_id)
-    return JsonResponse({'status': status, 'message':message})
+    # 获取session里存放的username
+    username = request.session.get('username')
+    # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限添加
+    cursor = connection.cursor()
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
+                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    result = cursor.fetchone()
+    if result[0] == '管理员' or result[0] == '超级管理员':
+        try:
+            cursor = connection.cursor()
+            # 查询用户id和协作空间id
+            cursor.execute('select user_id from user where user_name="' + userName + '"')
+            userId = cursor.fetchall()
+            cursor.execute('select team_id from team where team_name="' + teamName + '"')
+            teamId = cursor.fetchall()
+            # 创建保存点
+            save_id = transaction.savepoint()
+            # 把用户添加到协作空间里
+            cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [teamId[0], userId[0]])
+            # 查询插入的协作空间成员的id
+            cursor.execute('select team_mem_id from team_member order by team_mem_id desc limit 1')
+            tmid = cursor.fetchall()
+            # 通过角色名查询角色id
+            cursor.execute('select role_id from role where role_name="' + roleName + '"')
+            roleId = cursor.fetchall()
+            # 把人员与角色绑定
+            cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], roleId[0]])
+            cursor.close()
+            # 成功的话保存
+            status = 200
+            message = '添加成功'
+            transaction.savepoint_commit(save_id)
+        except:
+            # 失败的时候回滚到保存点
+            status = 4001
+            message = '添加失败'
+            transaction.savepoint_rollback(save_id)
+        return JsonResponse({'status': status, 'message': message})
+    else:
+        return JsonResponse({'status': 2002, 'message': '抱歉，您没有权限'})
 
 
 # Ajax异步保存富文本文档内容
@@ -170,10 +158,8 @@ def RTFdocs_save(request):
         cursor = connection.cursor()
         cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
                        [doc_title, doc_content, formatTime])
-        print("hai dui de ")
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
         file_id = cursor.fetchone()
-        print(file_id)
         cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [2, file_id])
         return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
@@ -256,3 +242,177 @@ def ajax_modify_RTFdoc(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+
+
+# 查询协作空间普通成员
+def serachTeamUser(request):
+    # 协作空间名
+    teamName = request.POST['teamName']
+    cursor = connection.cursor()
+    # 查询协作空间普通成员
+    cursor.execute(
+        'select mr.mem_role_id,u.user_name,u.icon,r.role_name from user u,team t,team_member tm,member_role mr,role r ' +
+        'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mr.team_mem_id ' +
+        'and mr.role_id=r.role_id and t.team_name="' + teamName + '"and r.role_id in(1,2)')
+    result = cursor.fetchall()
+    cursor.close()
+    return JsonResponse({'status': 200, 'message': result})
+
+
+# 查询协作空间管理员和超管
+def serachTeamAdmin(request):
+    # 协作空间名
+    teamName = request.POST['teamName']
+    cursor = connection.cursor()
+    # 查询协作空间普通成员
+    cursor.execute(
+        'select mr.mem_role_id,u.user_name,u.icon,r.role_name from user u,team t,team_member tm,member_role mr,role r ' +
+        'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mr.team_mem_id ' +
+        'and mr.role_id=r.role_id and t.team_name="' + teamName + '"and r.role_id in(3,4)')
+    result = cursor.fetchall()
+    cursor.close()
+    return JsonResponse({'status': 200, 'message': result})
+
+
+# 修改协作者的角色
+@transaction.atomic
+def editMemberRole(request):
+    roleName = request.POST.get('roleName')  # 角色名
+    memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    # 获取session里存放的username
+    username = request.session.get('username')
+    # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
+    cursor=connection.cursor()
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u '+
+                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="'+username+'"')
+    result=cursor.fetchone()
+    if result[0]=='管理员' or result[0]=='超级管理员':
+        # 创建保存点
+        saveId = transaction.savepoint()
+        try:
+            # 修改角色
+            cursor.execute('update member_role set role_id=(select role_id from role where role_name="'+roleName+'") where mem_role_id='+memRoleId)
+            cursor.close()
+            # 成功的话保存
+            status = 200
+            message = '修改成功'
+            transaction.savepoint_commit(saveId)
+        except:
+            # 失败的时候回滚到保存点
+            status = 4001
+            message = '修改失败'
+            transaction.savepoint_rollback(saveId)
+        return JsonResponse({'status': status, 'message': message})
+    else:
+        return JsonResponse({'status': 2002, 'message': '抱歉，您没有权限'})
+
+# 修改协作者为超管
+@transaction.atomic
+def editAdminRole(request):
+    roleName = request.POST.get('roleName')  # 角色名
+    memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    # 获取session里存放的username
+    username = request.session.get('username')
+    # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
+    cursor=connection.cursor()
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u '+
+                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="'+username+'"')
+    result=cursor.fetchone()
+    if result[0]=='超级管理员':
+        # 创建保存点
+        saveId = transaction.savepoint()
+        try:
+            # 修改角色
+            cursor.execute('update member_role set role_id=(select role_id from role where role_name="'+roleName+'") where mem_role_id='+memRoleId)
+            cursor.close()
+            # 成功的话保存
+            status = 200
+            message = '修改成功'
+            transaction.savepoint_commit(saveId)
+        except:
+            # 失败的时候回滚到保存点
+            status = 4001
+            message = '修改失败'
+            transaction.savepoint_rollback(saveId)
+        return JsonResponse({'status': status, 'message': message})
+    else:
+        return JsonResponse({'status': 2002, 'message': '抱歉，您没有权限'})
+
+# 移除协作者的角色
+@transaction.atomic
+def delMemberRole(request):
+    memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    # 获取session里存放的username
+    username = request.session.get('username')
+    # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
+    cursor=connection.cursor()
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u '+
+                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="'+username+'"')
+    result=cursor.fetchone()
+    if result[0]=='管理员' or result[0]=='超级管理员':
+        # 创建保存点
+        saveId = transaction.savepoint()
+        try:
+            # 移除角色
+            cursor.execute('delete tm,mr from team_member tm,member_role mr where tm.team_mem_id=mr.team_mem_id and mr.mem_role_id='+memRoleId)
+            cursor.close()
+            # 成功的话保存
+            status = 200
+            message = '移除成功'
+            transaction.savepoint_commit(saveId)
+        except:
+            # 失败的时候回滚到保存点
+            status = 4001
+            message = '移除失败'
+            transaction.savepoint_rollback(saveId)
+        return JsonResponse({'status': status, 'message': message})
+    else:
+        return JsonResponse({'status': 2002, 'message': '抱歉，您没有权限'})
+
+# 移除协作者管理员角色，改为可编辑
+@transaction.atomic
+def delAdminRole(request):
+    memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    # 获取session里存放的username
+    username = request.session.get('username')
+    # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
+    cursor=connection.cursor()
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u '+
+                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="'+username+'"')
+    result=cursor.fetchone()
+    if result[0]=='超级管理员':
+        # 创建保存点
+        saveId = transaction.savepoint()
+        try:
+            # 角色修改为可编辑
+            cursor.execute('update member_role set role_id=(select role_id from role where role_name="可编辑") where mem_role_id='+memRoleId)
+            cursor.close()
+            # 成功的话保存
+            status = 200
+            message = '移除成功'
+            transaction.savepoint_commit(saveId)
+        except:
+            # 失败的时候回滚到保存点
+            status = 4001
+            message = '移除失败'
+            transaction.savepoint_rollback(saveId)
+        return JsonResponse({'status': status, 'message': message})
+    else:
+        return JsonResponse({'status': 2002, 'message': '抱歉，您没有权限'})
+
+# 把协作空间移到回收站
+def delTeam(request):
+    # 协作空间的id
+    teamId=request.POST.get("teamId")
+    try:
+        cursor = connection.cursor()
+        cursor.execute('update team set team_state=1 where team_id=' + teamId)
+        cursor.close()
+        # 成功的话保存
+        status = 200
+        message = '删除成功'
+    except:
+        # 失败
+        status = 4001
+        message = '删除失败'
+    return JsonResponse({'status': status, 'message': message})
