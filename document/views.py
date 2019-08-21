@@ -279,16 +279,13 @@ def doc_modify(request):
 
 
 # 修改页面
-<<<<<<< .merge_file_a06056
 def modifyRTFdocs(request):
     # file_name = request.GET.get("file_name")
     # doc_content = request.GET.get("doc_content")
     saveState = request.GET.get("saveState")
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
-=======
-def modify_RTFdocs(request):
-    return render(request, "modify_RTFdocs.html")
->>>>>>> .merge_file_a09788
+
+
 
 
 # 修改文档
@@ -331,9 +328,6 @@ def ajax_modify_RTFdoc(request):
     return HttpResponse(json.dumps(return_param))
 
 
-<<<<<<< .merge_file_a06056
-# 分页
-=======
 # 查询协作空间普通成员
 def serachTeamUser(request):
     # 协作空间名
@@ -508,7 +502,6 @@ def delTeam(request):
     return JsonResponse({'status': status, 'message': message})
 
 #分页
->>>>>>> .merge_file_a09788
 # def paginator_view(request):
 #     cursor = connection.cursor()
 #     cursor.execute('select * from Permission ')
