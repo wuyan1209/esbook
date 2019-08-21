@@ -48,7 +48,7 @@ $(function () {
                 var num = 1;
                 for (i = 0; i < data.list.length; i++) {
                     html = " <div class=\"team dropdown\">\n"+
-                        " <a href=\"/filelist/\" class=\"aaaaa\">\n"+
+                        "<a href= \"javascript:void (0)\"  onclick=\"changeSaveState('" + data.list[i][0] + "','" + data.list[i][1] + "')\" class=\"aaaaa\">\n" +
                         "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n"+
                         " <span class=\"span2\" title=' " + data.list[i][1] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.list[i][1] + "</span></a>\n" +
                         " <span class=\"span3\" id=\"dropdownMenu1\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><i class=\"ti-settings\" ></i></span>\n" +
@@ -97,3 +97,5 @@ function delTeam(teamId) {
      }
 
 }
+
+

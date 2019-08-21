@@ -26,7 +26,7 @@ urlpatterns = [
     # 私人文件列表
     path('filelist/', views.fileList),
     # 打开修改文档
-    path('modify_RTFdocs/', views.modify_RTFdocs),
+    path('modifyRTFdocs/', views.modify_RTFdocs),
     # 保存修改文档
     path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc),
     # 查找协作空间的普通协作者
