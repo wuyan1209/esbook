@@ -197,7 +197,6 @@ def saveTeamDoc(request):
         team_mem_id = cursor.fetchone()
         # 保存团队文件
         cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
->>>>>>> 269cd0ee26e8d09df39dabbf35f99442d71919ff
         return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
     except Exception as e:

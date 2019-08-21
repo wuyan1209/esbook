@@ -1,6 +1,5 @@
-from django.urls import path, re_path
+from django.urls import path
 from document import views
-app_name = "esbook"
 urlpatterns = [
     # 主页面
     path('index/', views.index),
@@ -27,7 +26,7 @@ urlpatterns = [
     # 私人文件列表
     path('filelist/', views.fileList),
     # 打开修改文档
-    path('modifyRTFdocs/', views.modifyRTFdocs),
+    path('modify_RTFdocs/', views.modify_RTFdocs),
     # 保存修改文档
     path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc),
     # 查找协作空间的普通协作者
