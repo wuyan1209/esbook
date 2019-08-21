@@ -39,6 +39,10 @@ $(function () {
     $("#CKEditor_data_modify").on("click", function () {
         modifyDocs(old_doc_title);
     });
+    //点击保存版本
+    $("#saveedi").on("click", function () {
+        saveEdition(old_doc_title);
+    });
 
     // ctrl+s 保存
     $("#editor").keydown(function (e) {
@@ -113,6 +117,32 @@ function modifyDocs(old_doc_title) {
         },
         success: function (data) {
             if (data.saveStatus == "success") {
+                // 保存成功
+                alert("保存成功了");
+            } else {
+                // 保存失败
+                alert("保存失败了");
+            }
+        }
+    })
+}
+
+// 保存版本
+function saveEdition(old_doc_title) {
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //取得html格式的内容
+    var now_doc_title = $("#docs_title").val();  //取得文档标题
+
+    $.ajax({
+        type: 'POST',
+        url: '/saveEdition/',
+        dataType: "json",
+        data: {
+            content: doc_content,
+            filename:now_doc_title
+        },
+        success: function (data) {
+            if (data.status==200) {
                 // 保存成功
                 alert("保存成功了");
             } else {

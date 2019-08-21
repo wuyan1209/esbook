@@ -47,6 +47,11 @@ urlpatterns = [
     #团队文件
     path('teamfile/',views.teamfile),
     #path('fenye/',views.paginator_view),
+    # 查看版本
+    path('getuseredition/', views.getuseredition),
+    # 保存版本
+    path('saveEdition/', views.saveEdition),
+
 
 
 ]
