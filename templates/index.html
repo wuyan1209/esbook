@@ -340,7 +340,7 @@
                         $("#tab").append(tableTitle)
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr class=\"tr1\'">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\''+ saveState +'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
                                 '<td>' + data.list[i][2] + '</td>' +
@@ -365,7 +365,7 @@
                         $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\''+ saveState +'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
                                 '<td>' + data.list[i][6] + '</td>' +

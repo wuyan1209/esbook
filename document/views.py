@@ -220,20 +220,36 @@ def saveTeamDoc(request):
 # 判断文档名称是否重复
 def docNameExist(request):
     docName = request.POST.get('docsName')  # 获取文档标题
+    saveState = request.POST.get('saveState')  # 获取文档状态
+    userId = request.POST.get('userId')  # 获取用户Id
+    teamId = request.POST.get('teamId')  # 获取团队Id
     return_param = {}
     # 从数据库中查询文档标题
     cursor = connection.cursor()
-    cursor.execute('select file_name from file f where f.file_id in'
-                   ' (select file_id from user_file where user_id = %s)', [1])
-    fileNamas = cursor.fetchall()
-    for fileName in fileNamas:
-        if str(fileName[0]) == docName:
-            return_param['Exist'] = "YES"
-            break
-        else:
-            return_param['Exist'] = "No"
+    if saveState == "my_doc":
+        # 个人文档的名称是否重复
+        cursor.execute('select file_name from file f where f.file_id in'
+                       ' (select file_id from user_file where user_id = %s)', [userId])
+        fileNamas = cursor.fetchall()
+        for fileName in fileNamas:
+            if str(fileName[0]) == docName:
+                return_param['Exist'] = "YES"
+                break
+            else:
+                return_param['Exist'] = "No"
+    else:
+        # 团队文档的名称是否重复
+        cursor.execute("select file_name from file f, member_file mf "
+                       "where f.file_id = mf.file_id and mf.team_mem_id in "
+                       "(select team_mem_id from team_member where team_id = %s)", [teamId])
+        fileNamas = cursor.fetchall()
+        for fileName in fileNamas:
+            if str(fileName[0]) == docName:
+                return_param['Exist'] = "YES"
+                break
+            else:
+                return_param['Exist'] = "No"
     return HttpResponse(json.dumps(return_param))
-
 
 # 查询文件
 def fileList(request):
@@ -247,28 +263,38 @@ def fileList(request):
     cursor.close()
     return JsonResponse({"list": row})
 
+
 # 修改doc文档
 def doc_modify(request):
     file_name = request.POST.get("file_name")  # 获取文件名称
-    user_id = request.POST.get("user_id")  # 获取文件作者
+    user_id = request.POST.get("user_id")  # 获取文件作者或团队的id
+    saveState = request.POST.get("saveState")  # 获取文件状态
 
     cursor = connection.cursor()
-    cursor.execute('select content from file f , user_file uf '
-                   'where f.file_id = uf.file_id and f.file_name = %s and uf.user_id = %s',
-                   [file_name, user_id])
-    doc_content = cursor.fetchone()[0]
-    request.session["file_name"] = file_name
-    request.session["doc_content"] = doc_content
-
+    if saveState == "my_doc":
+        cursor.execute('select content from file f , user_file uf '
+                       'where f.file_id = uf.file_id and f.file_name = %s and uf.user_id = %s',
+                       [file_name, user_id])
+        doc_content = cursor.fetchone()[0]
+        request.session["file_name"] = file_name
+        request.session["doc_content"] = doc_content
+    else:
+        cursor.execute("select content "
+                       "from file f,member_file mf "
+                       "where f.file_id = mf.file_id and f.file_name = %s and mf.team_mem_id in (select team_mem_id from team_member where team_id = %s)",
+                       [file_name, user_id])
+        doc_content = cursor.fetchone()[0]
+        request.session["file_name"] = file_name
+        request.session["doc_content"] = doc_content
     return HttpResponse(json.dumps({'data': 'success'}))
 
 
 # 修改页面
 def modifyRTFdocs(request):
-    print("wo jin lai le ma ")
     # file_name = request.GET.get("file_name")
     # doc_content = request.GET.get("doc_content")
-    return render(request, "modify_RTFdocs.html")
+    saveState = request.GET.get("saveState")
+    return render(request, "modify_RTFdocs.html", {"saveState": saveState})
 
 
 # 修改文档
@@ -277,23 +303,41 @@ def ajax_modify_RTFdoc(request):
     doc_content = request.POST.get('doc_content')  # 文档内容
     now_doc_title = request.POST.get('now_doc_title')  # 当前文档标题
     old_doc_title = request.POST.get('old_doc_title')  # 原来文档标题
+    doc_save_state = request.POST.get('doc_save_state')  # 获取保存状态
+    userId = request.POST.get('userId')  # 获取用户id
+    teamId = request.POST.get('teamId')  # 获取团队id
+
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
     return_param = {}
     sid = transaction.savepoint()
+    cursor = connection.cursor()
+
     try:
-        cursor = connection.cursor()
-        # 数据库更新
-        cursor.execute("update file set file_name = %s , content = %s, cre_date = %s where file_name = %s",
-                       [now_doc_title, doc_content, formatTime, old_doc_title])
-        return_param['saveStatus'] = "success"
+        if doc_save_state == "my_doc":
+            # 数据库更新
+            cursor.execute(
+                "update file f,user_file uf set f.file_name = %s , f.content = %s, f.cre_date = %s "
+                "where file_name = %s and uf.file_id = f.file_id and uf.user_id = %s",
+                [now_doc_title, doc_content, formatTime, old_doc_title, userId]
+            )
+            return_param['saveStatus'] = "success"
+        else:
+            cursor.execute(
+                "update file f,member_file mf set f.file_name = %s , f.content = %s, f.cre_date = %s "
+                "where file_name = %s and mf.team_mem_id in (select team_mem_id from team_member where team_id = %s)",
+                [now_doc_title, doc_content, formatTime, old_doc_title, teamId]
+            )
+            return_param['saveStatus'] = "success"
         transaction.savepoint_commit(sid)
     except Exception as e:
         # 数据库更新失败
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
-#分页
+
+
+# 分页
 # def paginator_view(request):
 #     cursor = connection.cursor()
 #     cursor.execute('select * from Permission ')
@@ -315,9 +359,9 @@ def ajax_modify_RTFdoc(request):
 #             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
 #             books = paginator.page(paginator.num_pages)
 #     return render(request, "fenye.html", {'books': list})
-#查询团队文件
+# 查询团队文件
 def teamfile(request):
-    teamname=request.POST.get("teamName")
+    teamname = request.POST.get("teamName")
     cursor = connection.cursor()
     cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date '
                    'from team t,team_member tm,member_file mf,file f ,user u where t.team_id=tm.team_id'
