@@ -32,6 +32,8 @@ DecoupledEditor
     })
 
 $(function () {
+    var userId = $("#userId").val();
+    var teamId = $("#teamId").val();
     // 文档名称不能重复
     $("#docs_title").change(function () {
         var docsName = $(this).val();
@@ -39,10 +41,16 @@ $(function () {
         $.ajax({
             url: '/docNameExist/',
             type: 'post',
-            data: {docsName: docsName},
+            data: {
+                docsName: docsName,
+                saveState: saveState,
+                userId: userId,
+                teamId: teamId
+            },
             dataType: 'json',
             success: function (data) {
                 if (data.Exist == "YES") {
+                    $("#docs_title").val("");
                     alert("文档名字不能重复，请重新填写")
                 }
             }
@@ -70,6 +78,10 @@ function saveDocs(saveState) {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
     var doc_title = $("#docs_title").val();  //取得文档标题
+    if (doc_title == null || doc_title == "") {
+        alert("请输入文档名称");
+        return;
+    }
 
     if (saveState == "my_doc") {
         //保存个人文档
