@@ -487,3 +487,53 @@ def teamfile(request):
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({"list": list})
+# 保存个人文件版本
+@transaction.atomic
+def saveEdition(request):
+    # 获取用户名,版本内容,获取文件名称
+    username = request.session.get('username')
+    content = request.POST.get('content')
+    filename = request.POST.get('filename')
+    # 获取当前时间
+    localTime = time.localtime(time.time())
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
+    sid = transaction.savepoint()
+    try:
+        cursor = connection.cursor()
+        # 获取用户名、id
+        userid = int(cursor.execute('select user_id from user where user_name="' + username + '"'))
+        cursor.execute("select file_id from file where file_name = %s", [filename])
+        fileId = cursor.fetchone()
+        # 保存版本
+        cursor.execute('insert into edition (save_date,content) values(% s, % s)', [formatTime, content])
+        cursor.execute('select edi_id from edition order by edi_id desc limit 1')
+        edi_id = cursor.fetchone()
+        # 获取个人文件表id
+        cursor.execute('select user_file_id from user_file where file_id=%s', [fileId])
+        userfileid = cursor.fetchone()
+        # user_edition
+        cursor.execute('insert into user_edition (user_file_id,edi_id) values(% s, % s)', [userfileid, edi_id])  # 2 6 2
+        cursor.close()
+        # 事务提交
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        transaction.savepoint_rollback(sid)
+    return JsonResponse({'status': 200})
+
+
+# 查看版本
+def getuseredition(request):
+    cursor = connection.cursor()
+    # 获取用户名
+    username = request.session.get('username')
+    # 获取文件名称、id、内容
+    filename = request.POST.get('filename')
+    fileid = int(cursor.execute('select file_id from file where file_name="' + filename + '"'))
+    cursor.execute('select  u.user_name,f.file_name,e.save_date, e.content '
+                   'from user u,file f,user_edition ue,user_file uf,edition e where u.user_id=uf.user_id and uf.file_id=f.file_id and ue.edi_id=e.edi_id '
+                   'and u.user_name = %s and f.file_id = %s', [username, fileid])
+    list = cursor.fetchall()
+    cursor.close()
+    for l in list:
+        print(l)
+    return JsonResponse({"list": list})
