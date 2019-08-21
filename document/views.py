@@ -253,7 +253,7 @@ def doc_modify(request):
 
 
 # 修改页面
-def modifyRTFdocs(request):
+def modify_RTFdocs(request):
     return render(request, "modify_RTFdocs.html")
 
 
