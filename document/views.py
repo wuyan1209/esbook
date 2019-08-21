@@ -524,6 +524,7 @@ def delTeam(request):
 #             books = paginator.page(paginator.num_pages)
 #     return render(request, "fenye.html", {'books': list})
 # 查询团队文件
+# 查询团队文档
 def teamfile(request):
     teamname = request.POST.get("teamName")
     cursor = connection.cursor()
