@@ -170,14 +170,12 @@
         </div>
         <script>
             $(function () {
-                saveState = "my_doc";
-                // 设置保存状态
-                $("#sidebarnav").on("click", function () {
-                    saveState = "my_doc";
-                })
+                var saveState = "my_doc";
 
                 {#点击我的文档显示个人文档列表#}
                 $("#sidebarnav").on("click", function () {
+                    // 设置保存状态
+                    saveState = "my_doc";
                     my_doc_file()
                 })
 

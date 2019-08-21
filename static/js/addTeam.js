@@ -47,18 +47,19 @@ $(function () {
                 //给ul动态添加li
                 var num = 1;
                 for (i = 0; i < data.list.length; i++) {
-                    html = " <div class=\"team\">\n" +
-                        " <a href=\"/filelist/\" class=\"aaaaa\">\n" +
-                        "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n" +
+                    html = " <div class=\"team dropdown\">\n"+
+                        " <a href=\"/filelist/\" class=\"aaaaa\">\n"+
+                        "<span class=\"span1\"><i class=\"icon-search icon-home\"></i></span> \n"+
                         " <span class=\"span2\" title=' " + data.list[i][1] + " 'style=\"word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + data.list[i][1] + "</span></a>\n" +
-                        " <span class=\"span3\"><i class=\"ti-settings\" ></i></span></div>\n" +
+                        " <span class=\"span3\" id=\"dropdownMenu1\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><i class=\"ti-settings\" ></i></span>\n" +
 
-                        "<div class=\"teamset\" id=\"drop_down" + (i + 1) + "\">\n" +
-                        "<a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\" onclick=\"passName('" + data.list[i][1] + "')\" href=\"javascript:void(0)\">协作</a>\n" +
-                        "<a class=\"dropdown-item\" href=\"#\">设置</a>\n" +
-                        "<div class=\"dropdown-divider\"></div>\n" +
-                        "<a class=\"dropdown-item\" style=\'color:red\' id='del'  onclick='delTeam(" + data.list[i][0] + ")'>删除</a>\n" +
-                        "</div>"
+                        "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu1\">\n"+
+                        "<li><a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\" onclick=\"passName('" + data.list[i][1] + "')\" href=\"javascript:void(0)\">协作</a></li>\n" +
+                        "<li><a class=\"dropdown-item\" href=\"#\">设置</a></li>\n"+
+                        "<hr style='margin-top: 0;margin-bottom: 0'/>"+
+                        "<li><a class=\"dropdown-item\" style=\'color:red\' id='del'  onclick='delTeam(" + data.list[i][0] + ")'>删除</a></li>\n" +
+                        "</ul>"+
+                        "</div>";
                     $(".sidebar-nav").append(html);
                 }
             }
