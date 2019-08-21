@@ -1,6 +1,5 @@
-from django.urls import path, re_path
+from django.urls import path
 from document import views
-app_name = "esbook"
 urlpatterns = [
     # 主页面
     path('index/', views.index),
@@ -8,9 +7,6 @@ urlpatterns = [
     path('RTFdocs/', views.RTFdocs),
     # 添加协作空间
     path('addTeam/', views.addTeam),
-    # 测试
-    path('demo/', views.demo),
-    path('select/', views.select),
     # 主页面查询该成员加入的协作空间
     path('getAllTeam/', views.getAllTeam),
 
@@ -30,12 +26,31 @@ urlpatterns = [
     # 私人文件列表
     path('filelist/', views.fileList),
     # 打开修改文档
-    path('modifyRTFdocs/', views.modifyRTFdocs),
+    path('modify_RTFdocs/', views.modify_RTFdocs),
     # 保存修改文档
     path('ajax_modify_RTFdoc/', views.ajax_modify_RTFdoc),
+    # 查找协作空间的普通协作者
+    path('serachTeamUser/', views.serachTeamUser),
+    # 查找协作空间的管理者
+    path('serachTeamAdmin/', views.serachTeamAdmin),
+    #修改协作者的角色
+    path('editMemberRole/', views.editMemberRole),
+    # 修改协作者为超管
+    path('editAdminRole/', views.editAdminRole),
+    # 协作者角色移除
+    path('delMemberRole/', views.delMemberRole),
+    # 协作者管理员角色移除，改为可编辑
+    path('delAdminRole/', views.delAdminRole),
+    # 删除协作空间，放到回收站
+    path('delTeam/',views.delTeam),
     #团队文件
     path('teamfile/',views.teamfile),
     #path('fenye/',views.paginator_view),
+    # 查看版本
+    path('getuseredition/', views.getuseredition),
+    # 保存版本
+    path('saveEdition/', views.saveEdition),
+
 
 
 ]

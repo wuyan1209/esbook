@@ -1,0 +1,88 @@
+.team {
+    width: 220px;
+    height: 40px;
+    position: relative;
+    margin-left: 6.5%;
+}
+
+.span1 {
+    margin-left: 13%;
+}
+
+.span2 {
+    margin-left: 3%;
+}
+
+.span3 {
+    position: absolute;
+    margin-left: 27%;
+    background-color: white;
+    border: none;
+}
+
+.aaaaa {
+    background-color: white;
+    color: #7a7d81;
+    display: inline-block;
+    width: 50%;
+}
+
+.aaaaa:hover {
+    color: black;
+}
+
+.teamset {
+    width: 150px;
+    height: 140px;
+    margin-left: 10%;
+    background-color: white;
+}
+
+#sidebarnav > li {
+    width: 200px;
+    height: 55px;
+    margin-left: 30px;
+    margin-bottom: 0;
+}
+
+#sidebarnav > li > span {
+    margin-left: 10px;
+}
+
+#side > li {
+    width: 200px;
+    height: 55px;
+    margin-left: 30px;
+    margin-bottom: 0;
+}
+
+#side > li > span {
+    margin-left: 10px;
+}
+
+#box {
+    position: relative;
+}
+
+#box1 {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    margin-left: 85%;
+    margin-top: 10px;
+}
+
+#btn2 {
+    margin-top: 10px;
+    width: 150px;
+    height: 30px;
+    background-color: snow;
+    text-align: center;
+}
+
+#box2 {
+    margin-top: -70px;
+    margin-left: 1%;
+    width: 83%;
+    height: auto;
+}
