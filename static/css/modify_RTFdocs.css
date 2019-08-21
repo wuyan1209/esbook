@@ -1,0 +1,46 @@
+#editor {
+    border: #C3C3C3 solid 1px;
+    width: 210mm;
+    margin: 0 auto;
+    margin-top: 20px;
+    box-sizing: border-box;
+    padding: 2.54ch 3.17cm;
+    display: inline-block;
+    margin-left: 20%;
+}
+
+.ck-editor__editable {
+    min-height: 297mm;
+}
+
+#menu_bar {
+    border: #C3C3C3 solid 1px;
+}
+
+#docs_title:focus {
+    border: 1px solid #58a6e7;
+    outline: 0;
+}
+
+#docs_title {
+    border: none;
+    background-color: #fafafa;
+    color: white;
+    font-family: 新宋体;
+    font-size: 18px;
+    color: black;
+    width: 92px;
+    min-width: 92px;
+    min-height: 28px;
+    color: rgb(0, 0, 0);
+}
+
+#myEditor{
+    margin: 20px 40px 0 0px ;
+    display: inline-block;
+    border: black 1px solid;
+    /*position: fixed;*/
+    float: right;
+    height: 670px;
+    width: 18%;
+}

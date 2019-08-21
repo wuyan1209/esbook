@@ -77,6 +77,21 @@ $(function () {
             }
         });
     });
+
+    $(".close").click(function () {
+        $("#myEditor").alert();
+    });
+
+    // 点击查看版本
+    $("#showEditor").on("click", function () {
+       $("#myEditor").show()
+    });
+
+    // 关闭版本框
+    $("#closeEditor").click(function () {
+        $("#myEditor").hide()
+    })
+    $("#myEditor").hide()
 });
 
 // 回显文档数据
@@ -157,10 +172,10 @@ function saveEdition(old_doc_title) {
         dataType: "json",
         data: {
             content: doc_content,
-            filename:now_doc_title
+            filename: now_doc_title
         },
         success: function (data) {
-            if (data.status==200) {
+            if (data.status == 200) {
                 // 保存成功
                 alert("保存成功了");
             } else {
