@@ -4,46 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <style>
-        #editor {
-            border: #C3C3C3 solid 1px;
-            width: 210mm;
-        {#height: 297mm;#} margin: 0 auto;
-            margin-top: 20px;
-            box-sizing: border-box;
-            padding: 2.54ch 3.17cm;
-        }
-
-        .ck-editor__editable {
-            min-height: 297mm;
-        }
-
-        #menu_bar {
-            border: #C3C3C3 solid 1px;
-        }
-
-        {% comment %}#docs_title: {
-            border: 1px solid transparent;
-        }{% endcomment %}
-
-        #docs_title:focus {
-            border: 1px solid #58a6e7;
-            outline: 0;
-        }
-
-        #docs_title {
-            border: none;
-            background-color: #fafafa;
-            color: white;
-            font-family: 新宋体;
-            font-size: 18px;
-            color: black;
-            width: 92px;
-            min-width: 92px;
-            min-height: 28px;
-            color: rgb(0, 0, 0);
-        }
-    </style>
     {#    <link href="/bootstrap-4.3.1-dist/css/bootstrap.min.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- chartist CSS -->
@@ -51,6 +11,7 @@
     {#    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
           rel="stylesheet">
+    <link href="../static/css/modify_RTFdocs.css" rel="stylesheet">
     <!--This page css - Morris CSS -->
     <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -97,12 +58,17 @@
 
                 <!-- 下拉按钮 -->
             </ul>
-            <!-- 保存版本-->
-            <a id="saveedi" href="javascript:void(0);" style="margin-right: 10px">
-               <b>
-                    <img src="../static/assets/images/2.jpg" width="30" height="30" alt="保存版本" title="保存版本">
-                </b>
-            </a>
+            <div class="dropdown" style="margin-left: 10px">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    版本
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a id="saveedi" class="dropdown-item" href="javascript:void(0);">保存</a>
+                    <a id="showEditor" class="dropdown-item" href="javascript:void(0);">查看</a>
+                </div>
+            </div>
+
             <div class="dropdown" style="margin-left: 10px">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -137,7 +103,11 @@
 <input type="hidden" id="doc_save_state" value="{{ saveState }}">
 <input type="hidden" id="userId" value="{{ 1 }}">
 <input type="hidden" id="teamId" value="{{ saveState }}">
-<div id="editor">
+<div id="editor" style="height: 100px">
+</div>
+<div id="myEditor" class="alert">
+    <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
+    <strong>成功！</strong>结果是成功的。
 </div>
 </body>
 <script src="../static/ckeditor5-build-decoupled-document/ckeditor.js"></script>

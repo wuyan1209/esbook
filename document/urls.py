@@ -52,6 +52,10 @@ urlpatterns = [
     path('getuseredition/', views.getuseredition),
     # 保存版本
     path('saveEdition/', views.saveEdition),
+    # 查看团队版本
+    path('getTeamEdition/', views.getTeamEdition),
+    # 保存团队版本
+    path('saveTeamEdition/', views.saveTeamEdition),
 
 
 
