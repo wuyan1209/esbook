@@ -159,7 +159,7 @@ def RTFdocs_save(request):
     try:
         # 数据库更新
         cursor = connection.cursor()
-        cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
+        cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,0)",
                        [doc_title, doc_content, formatTime])
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
         file_id = cursor.fetchone()
@@ -585,3 +585,7 @@ def getuseredition(request):
     for l in list:
         print(l)
     return JsonResponse({"list": list})
+
+# 登录页面
+def login(requset):
+    return render(requset,"login.html")

@@ -91,7 +91,11 @@
                         <form class="app-search">
                             <input type="text" class="form-control" placeholder="搜索文件名、文件内容"> <a class="srh-btn"><i
                                 class="ti-close"></i></a></form>
+
                     </li>
+                    <div id="search-results">
+
+                    </div>
                 </ul>
                 <!-- ============================================================== -->
                 <!-- User profile and search -->
@@ -123,7 +127,8 @@
                 <ul id="side">
                     <!--协作空间列表-->
                     <li class="waves-effect waves-dark" style="margin-left: 19px"><span>协作空间</span>
-                        <span  style="margin-left: 90px" data-toggle="modal" data-target="#teamModal"><i class="icon-search icon-plus"></i></span></li>
+                        <span style="margin-left: 90px" data-toggle="modal" data-target="#teamModal"><i
+                                class="icon-search icon-plus"></i></span></li>
                 </ul>
             </nav>
             <!-- End Sidebar navigation -->
@@ -245,7 +250,7 @@
                         $("#tab").append(tableTitle)
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr class=\"tr1\'">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\''+ saveState +'\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
                                 '<td>' + data.list[i][2] + '</td>' +
@@ -270,7 +275,7 @@
                         $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\''+ saveState +'\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
                                 '<td>' + data.list[i][6] + '</td>' +
@@ -295,7 +300,8 @@
         </script>
     </div>
     <!-- 添加团队模态框（Modal） -->
-    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -310,8 +316,12 @@
                            autocomplete="off"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" onclick="addTeam()" style="width: 120px;height: 48px">添加</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">关闭</button>
+                    <button type="button" class="btn btn-info" onclick="addTeam()" style="width: 120px;height: 48px">
+                        添加
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            style="width: 120px;height: 48px">关闭
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
@@ -414,6 +424,7 @@
                             var roleName = $("#admin").text();
                             ajax(roleName)
                         });
+
                         function ajax(roleName) {
                             //获取用户名、协作空间名
                             var userName = $("#username").text();
@@ -473,7 +484,7 @@
                                     success: function (data) {
                                         if (data.status == 200 && data.message != null) {
                                             for (var i = 0; i < data.message.length; i++) {
-                                                if(data.message[i][3]=='只读'){
+                                                if (data.message[i][3] == '只读') {
                                                     var html = ''
                                                     html = '<tr>\n' +
                                                         '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
@@ -519,16 +530,18 @@
                                     },
                                 });
                             }
+
                             //select值改变时调用函数 参数：option的值、成员角色的id
-                            function Change1(value,memRoleId){
-                                if (value=="移除"){
+                            function Change1(value, memRoleId) {
+                                if (value == "移除") {
                                     del(memRoleId);
-                                }else{
-                                    editMemberRole(value,memRoleId);
+                                } else {
+                                    editMemberRole(value, memRoleId);
                                 }
                             }
+
                             //角色修改
-                            function editMemberRole(value,memRoleId) {
+                            function editMemberRole(value, memRoleId) {
                                 $.ajax({
                                     url: "/editMemberRole/",
                                     type: "POST",
@@ -545,6 +558,7 @@
                                     },
                                 });
                             }
+
                             //角色移除
                             function del(memRoleId) {
                                 if (confirm("确认要删除？")) {
@@ -587,37 +601,37 @@
                                     success: function (data) {
                                         if (data.status == 200 && data.message != null) {
                                             for (var i = 0; i < data.message.length; i++) {
-                                                if(data.message[i][3]=='超级管理员'){
+                                                if (data.message[i][3] == '超级管理员') {
                                                     var html = '<tr>\n' +
-                                                    '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
-                                                    '<img src="../static/assets/images/users/1.jpg"\n' +
-                                                    'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
-                                                    '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
-                                                    '</span>\n' +
-                                                    '</td>' +
-                                                    '<td>\n' +
-                                                    '<select class="btn btn-secondary dropdown-toggle" style="width:150px;">' +
-                                                    '<option value="超级管理员">超级管理员</option>\n' +
-                                                    '</select>\n' +
-                                                    '</td>\n' +
-                                                    '</tr>';
+                                                        '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
+                                                        '<img src="../static/assets/images/users/1.jpg"\n' +
+                                                        'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
+                                                        '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
+                                                        '</span>\n' +
+                                                        '</td>' +
+                                                        '<td>\n' +
+                                                        '<select class="btn btn-secondary dropdown-toggle" style="width:150px;">' +
+                                                        '<option value="超级管理员">超级管理员</option>\n' +
+                                                        '</select>\n' +
+                                                        '</td>\n' +
+                                                        '</tr>';
                                                     $("#table3").append(html);
-                                                }else{
-                                                     var html = '<tr>\n' +
-                                                    '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
-                                                    '<img src="../static/assets/images/users/1.jpg"\n' +
-                                                    'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
-                                                    '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
-                                                    '</span>\n' +
-                                                    '</td>' +
-                                                    '<td>\n' +
-                                                    '<select class="btn btn-secondary dropdown-toggle" style="width:150px;" id="test2" onchange="Change2(this.options[this.options.selectedIndex].value,'+data.message[i][0]+')">' +
-                                                    '<option value="管理员">管理员</option>\n' +
-                                                    '<option value="超级管理员">超级管理员</option>\n' +
-                                                    '<option value="移除">移除管理员角色</option>\n' +
-                                                    '</select>\n' +
-                                                    '</td>\n' +
-                                                    '</tr>';
+                                                } else {
+                                                    var html = '<tr>\n' +
+                                                        '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
+                                                        '<img src="../static/assets/images/users/1.jpg"\n' +
+                                                        'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
+                                                        '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
+                                                        '</span>\n' +
+                                                        '</td>' +
+                                                        '<td>\n' +
+                                                        '<select class="btn btn-secondary dropdown-toggle" style="width:150px;" id="test2" onchange="Change2(this.options[this.options.selectedIndex].value,' + data.message[i][0] + ')">' +
+                                                        '<option value="管理员">管理员</option>\n' +
+                                                        '<option value="超级管理员">超级管理员</option>\n' +
+                                                        '<option value="移除">移除管理员角色</option>\n' +
+                                                        '</select>\n' +
+                                                        '</td>\n' +
+                                                        '</tr>';
                                                     $("#table3").append(html);
                                                     $("#test2 option[value='" + data.message[i][3] + "']").attr("selected", true);
                                                 }
@@ -626,14 +640,16 @@
                                     },
                                 });
                             }
+
                             //select值改变时调用函数 参数：option的值、成员角色的id
-                            function Change2(value,memRoleId){
-                                if (value=="移除"){
+                            function Change2(value, memRoleId) {
+                                if (value == "移除") {
                                     delAdminRole(memRoleId)
-                                }else{
-                                    editAdminRole(value,memRoleId);
+                                } else {
+                                    editAdminRole(value, memRoleId);
                                 }
                             }
+
                             //管理员角色移除，改为可编辑
                             function delAdminRole(memRoleId) {
                                 $.ajax({
@@ -651,8 +667,9 @@
                                     },
                                 });
                             }
+
                             //角色修改为超管
-                            function editAdminRole(value,memRoleId) {
+                            function editAdminRole(value, memRoleId) {
                                 $.ajax({
                                     url: "/editAdminRole/",
                                     type: "POST",

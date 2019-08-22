@@ -50,7 +50,8 @@ urlpatterns = [
     path('getuseredition/', views.getuseredition),
     # 保存版本
     path('saveEdition/', views.saveEdition),
-
+    # 登录页面
+    path('login', views.login)
 
 
 ]

@@ -86,3 +86,10 @@
     width: 83%;
     height: auto;
 }
+
+#search-results {
+    width: 100%;
+    background-color: white;
+    z-index: 100;
+    float: contour;
+}
