@@ -129,12 +129,9 @@
             <!-- End Sidebar navigation -->
         </div>
         <div class="sidebar-footer">
-            <a href="" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
+            <a href="javascript:bin()" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
                     class="icon-search icon-trash"></i><span>回收站</span></a>
         </div>
-        <script>
-            {#  点击回收站，查询所有状态为1的文件，显示到id为box2的div#}
-        </script>
     </aside>
     <!-- ============================================================== -->
     <!-- End Left Sidebar - style you can find in sidebar.scss  -->
@@ -214,9 +211,7 @@
             }
         </style>
         <script>
-
             $(function () {
-
                 saveState = "my_doc";
                 {#点击我的文档显示个人文档列表#}
                 $("#sidebarnav").on("click", function () {
@@ -231,10 +226,9 @@
             var tableTitle = "<tr>\n" +
                 "<th style=\"width: 60%\">文档标题</th>\n" +
                 "<th style=\"width: 10%\">创建者</th>\n" +
-                "<th style=\"width: 30%\">时间</th>\n" +
+                "<th style=\"width: 30%\">更新时间</th>\n" +
                 "</tr>";
             {#显示我的文档列表#}
-
             function my_doc_file() {
                 $.ajax({
                     url: "/filelist/",
@@ -242,13 +236,15 @@
                     dataType: "json",
                     success: function (data) {
                         $("#tab").html("");
-                        $("#tab").append(tableTitle)
+                        $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
+                            var text=data.list[i][2];
+                            var mystr = text.substring(0,10)+"  "+text.substring(11);
                             html = '<tr class=\"tr1\'">\n' +
                                 '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\''+ saveState +'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
-                                '<td>' + data.list[i][2] + '</td>' +
+                                '<td>' + mystr + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
                         }
@@ -257,7 +253,6 @@
             }
 
             {#团队文档列表#}
-
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
@@ -269,11 +264,13 @@
                     success: function (data) {
                         $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
-                            html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\''+ saveState +'\')\"' +
+                            var text = data.list[i][6];
+                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                            var html = '<tr>\n' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
-                                '<td>' + data.list[i][6] + '</td>' +
+                                '<td>' + mystr + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
                         }
@@ -285,7 +282,6 @@
             $("#toDocs").on("click", function () {
                 window.location.href = "/RTFdocs/?saveState=" + saveState
             });
-            {# 点击协作空间名和设置出现不同的操作#}
 
             // 改变保存状态的值
             function changeSaveState(teamId, teamName) {
@@ -294,7 +290,7 @@
             }
         </script>
     </div>
-    <!-- 添加团队模态框（Modal） -->
+    <!-- 添加协作空间模态框（Modal） -->
     <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -303,9 +299,8 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 </div>
                 <div class="modal-body">
-                    空间名称:<br><br>
-                    <input type="text" id="teamName" name="teamName" class="name" placeholder="请输入"
-                           style="width: 100%;height: 40px"
+                    <p>空间名称</p>
+                    <input type="text" id="teamName" name="teamName" class="form-control" placeholder="请输入" style="padding-left: 3%;"
                            onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
                            autocomplete="off"/>
                 </div>
@@ -317,12 +312,11 @@
         </div><!-- /.modal -->
     </div>
     <!-- 添加协作成员的模态框（Modal） -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true" style="margin-left: 5%">
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" style="margin-left: 5%">
         <div class="modal-dialog">
             <div class="modal-content" style="width: 600px;height: 600px">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="myModalLabel" style="width: 80%;word-break:break-all">
+                    <h3 class="modal-title" id="myModalLabel2" style="width: 80%;word-break:break-all">
                         协作空间 &nbsp;&nbsp;&nbsp;&nbsp; <span id="tName">1234</span>
                     </h3>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
@@ -669,6 +663,33 @@
                             }
                         </script>
                     </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!-- 修改协作空间的模态框（Modal） -->
+    <div class="modal fade" id="editTeam" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true" style="margin-left: 5%">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel3">协作空间设置</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>空间名称</p>
+                    <input type="text" id="perName" class="form-control" hidden="hidden"/>
+                    <input type="text" id="name"  class="form-control" style="padding-left: 3%;"
+                           onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" autocomplete="off"/>
+                    <br><br><br>
+                    <p>所有权
+                        <span class="icon-question" style="margin-left: 1%;" data-toggle="tooltip" data-placement="right"
+                              title="所有权决定了协作空间里的文件被谁管理。如果所有权归属于企业，则会受到企业安全设置的影响、被审计系统收录，并参与效能看板的统计。"></span>
+                    </p>
+                    <p><strong>该空间是个人空间，内容所有权属于空间管理员</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" onclick="editTeam()" style="width: 120px;height: 48px">修改</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">关闭</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->

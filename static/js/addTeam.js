@@ -18,13 +18,45 @@ function addTeam() {
             "teamName": teamName
         },
         success: function (data) {
-            if (data.status == 200) {
-                //清除input框的值
-                $("#teamName").val("");
+           if(data.status==200){
                 alert(data.message);
-                //window.location.href = '/index/';
-            } else {
-                $("#teamName").val("");
+                window.location.href='/index/';
+            }else{
+                alert(data.message);
+            }
+        },
+    });
+};
+
+//修改协作空间
+function editTeam() {
+    var teamName = $("#name").val();
+    var preTeamName = $("#perName").val();
+    if (teamName == "" || teamName == null) {
+        alert("空间名不能为空！");
+        return false;
+    }
+    if (teamName.length > 50) {
+        alert("空间名最长50字符！");
+        return false;
+    }
+    if(teamName==preTeamName){
+        alert("请修改");
+        return false;
+    }
+    $.ajax({
+        url: "/editTeam/",
+        type: "POST",
+        dataType: "json",
+        data: {
+            "teamName": teamName,
+            "pTeamName":preTeamName,
+        },
+        success: function (data) {
+            if(data.status==200){
+                alert(data.message);
+                window.location.href='/index/';
+            }else{
                 alert(data.message);
             }
         },
@@ -33,6 +65,11 @@ function addTeam() {
 
 //关闭协作空间的模态框时刷新index页面
 $('#teamModal').on('hide.bs.modal', function () {
+    window.location.href = '/index/';
+})
+
+//关闭修改协作空间的模态框时刷新index页面
+$('#editTeam').on('hide.bs.modal', function () {
     window.location.href = '/index/';
 })
 
@@ -54,8 +91,8 @@ $(function () {
                         " <span class=\"span3\" id=\"dropdownMenu1\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><i class=\"ti-settings\" ></i></span>\n" +
 
                         "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu1\">\n"+
-                        "<li><a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\" onclick=\"passName('" + data.list[i][1] + "')\" href=\"javascript:void(0)\">协作</a></li>\n" +
-                        "<li><a class=\"dropdown-item\" href=\"#\">设置</a></li>\n"+
+                        "<li><a data-toggle=\"modal\" data-target=\"#myModal\" class=\"dropdown-item\" onclick=\"passName1('" + data.list[i][1] + "')\" href=\"javascript:void(0)\">协作</a></li>\n" +
+                        "<li><a data-toggle=\"modal\" data-target=\"#editTeam\" class=\"dropdown-item\" onclick=\"passName2('" + data.list[i][1] + "')\" href=\"javascript:void(0)\">设置</a></li>\n"+
                         "<hr style='margin-top: 0;margin-bottom: 0'/>"+
                         "<li><a class=\"dropdown-item\" style=\'color:red\' id='del'  onclick='delTeam(" + data.list[i][0] + ")'>删除</a></li>\n" +
                         "</ul>"+
@@ -68,7 +105,7 @@ $(function () {
 });
 
 //给添加协作者的模态框传参
-function passName(teamName) {
+function passName1(teamName) {
     //把协作空间名传到添加协作者的模态框里
     $("#tName").text(teamName);
     //清除用户的搜索框和搜索结果
@@ -77,6 +114,13 @@ function passName(teamName) {
     //弹出模态框的时候查询普通协作者和管理员
     searchTeamUser();
     searchTeamAdmin()
+}
+
+//给修改协作空间的模态框传参
+function passName2(teamName) {
+    //把协作空间名传到添加协作者的模态框里
+    $("#perName").val(teamName);
+    $("#name").val(teamName);
 }
 
 //删除协作空间，放入回收站
@@ -96,6 +140,30 @@ function delTeam(teamId) {
          });
      }
 
+}
+
+//回收站
+function bin() {
+    $.ajax({
+        url: "/myBin/",
+        type: "POST",
+        dataType: "json",
+        success: function (data) {
+            $("#tab").html("");
+            $("#tab").append(tableTitle)
+            for (i = 0; i < data.list.length; i++) {
+                var text = data.list[i][2];
+                var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                html = '<tr class=\"tr1\'">\n' +
+                    '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\')\"' +
+                    'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
+                    '<td>' + data.list[i][1] + '</td>' +
+                    '<td>' + mystr + '</td>' +
+                    '</tr>'
+                $("#tab").append(html)
+            }
+        },
+    })
 }
 
 

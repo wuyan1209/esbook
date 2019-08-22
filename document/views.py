@@ -32,7 +32,7 @@ def addTeam(request):
             cursor.execute('select team_id from Team where team_name=%s', [teamName])
             tid = cursor.fetchone()
             if tid:
-                return JsonResponse({'status': 10023, 'message': '协作空间名字已存在，请换个名字'})
+                return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
             # 从session里获取当前登录用户
             username = request.session.get('username')
             # 通过用户名获取该用户的id
@@ -57,6 +57,26 @@ def addTeam(request):
             # 失败的时候回滚到保存点
             transaction.savepoint_rollback(save_id)
             return JsonResponse({'status': 4001, 'message': '添加失败'})
+
+# 修改协作空间
+def editTeam(request):
+    if request.is_ajax():
+        # 获取原本的空间名和要修改为的空间名
+        teamName = request.POST['teamName']
+        preTeamName = request.POST['pTeamName']
+        # 空间名是唯一的，查询是否在数据库里存在
+        try:
+            cursor = connection.cursor()
+            cursor.execute('select team_id from Team where team_name=%s', [teamName])
+            tid = cursor.fetchone()
+            if tid:
+                return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
+            cursor.execute('update team set team_name=%s where team_name=%s', [teamName, preTeamName])
+            cursor.close()
+            # 成功的话
+            return JsonResponse({'status': 200, 'message': '修改成功'})
+        except:
+            return JsonResponse({'status': 4001, 'message': '修改失败'})
 
 
 # 主页面查询该成员加入的协作空间

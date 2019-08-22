@@ -7,6 +7,8 @@ urlpatterns = [
     path('RTFdocs/', views.RTFdocs),
     # 添加协作空间
     path('addTeam/', views.addTeam),
+    # 修改协作空间
+    path('editTeam/', views.editTeam),
     # 主页面查询该成员加入的协作空间
     path('getAllTeam/', views.getAllTeam),
 
