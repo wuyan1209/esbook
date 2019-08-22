@@ -130,7 +130,7 @@
         </div>
         <div class="sidebar-footer">
             <a href="javascript:bin()" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
-                    class="icon-search icon-trash"></i><span>回收站</span></a>
+                    class="icon-search icon-trash"></i>&nbsp;&nbsp;<span>回收站</span></a>
         </div>
     </aside>
     <!-- ============================================================== -->
@@ -172,9 +172,11 @@
                     </nav>
                 </div>
                 <div style="margin-top: 2%">
+                    <h2 id="h2" style="margin-left: 2%"></h2>
                     <table id="tab">
 
                     </table>
+                    <div id="bin"></div>
                 </div>
                 <div id="fenye">
                     <nav aria-label="Page navigation example">
@@ -198,7 +200,13 @@
                 cellpadding: 0px;
                 cellspacing: 0px;
             }
-
+            .tab {
+                margin-left: 10px;
+                width: 95%;
+                border: 0px;
+                cellpadding: 0px;
+                cellspacing: 0px;
+            }
             #tab td, th {
                 padding-left: 20px;
                 border-bottom: gray 1px solid;
@@ -208,6 +216,20 @@
             #fenye {
                 margin-left: 65%;
                 margin-top: 10px;
+            }
+            .one{
+                display: inline-block;
+                margin-left: 2%;
+                width: 60%;
+            }
+            .two{
+                display: inline-block;
+            }
+            .hr1{
+                margin-left: 1%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background-color:black;
             }
         </style>
         <script>
@@ -230,13 +252,16 @@
                 "</tr>";
             {#显示我的文档列表#}
             function my_doc_file() {
+                $("#tab").html("");
+                $("#bin").html("");
+                $("#h2").text("我的文档");
+                $("#tab").append(tableTitle);
                 $.ajax({
                     url: "/filelist/",
                     type: "POST",
                     dataType: "json",
                     success: function (data) {
-                        $("#tab").html("");
-                        $("#tab").append(tableTitle);
+
                         for (i = 0; i < data.list.length; i++) {
                             var text=data.list[i][2];
                             var mystr = text.substring(0,10)+"  "+text.substring(11);
@@ -256,13 +281,15 @@
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
+                $("#bin").html("");
+                $("#h2").text(teamName);
+                $("#tab").append(tableTitle);
                 $.ajax({
                     url: "/teamfile/",
                     type: "POST",
                     data: {"teamName": teamName},
                     dataType: "json",
                     success: function (data) {
-                        $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
                             var text = data.list[i][6];
                             var mystr = text.substring(0, 10) + "  " + text.substring(11);

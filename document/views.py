@@ -1,8 +1,7 @@
-from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection, transaction
-from document.models import  User
+from document.models import  User,File
 import time  # 引入time模块
 import json  # 引入json模块
 
@@ -26,6 +25,8 @@ def addTeam(request):
     if request.is_ajax():
         # 获取空间名
         teamName = request.POST['teamName']
+        localTime = time.localtime(time.time())  # 获取当前时间
+        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
         try:
             # 空间名是唯一的，查询是否在数据库里存在
             cursor = connection.cursor()
@@ -40,7 +41,7 @@ def addTeam(request):
             # 创建保存点
             save_id = transaction.savepoint()
             # 添加协作空间
-            cursor.execute('insert into Team(team_name,user_id) value(%s,%s)', [teamName, userId])
+            cursor.execute('insert into Team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId,formatTime])
             # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
             cursor.execute('select team_id from team  order by team_id desc limit 1')
             row = cursor.fetchall()
@@ -306,8 +307,6 @@ def modifyRTFdocs(request):
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
 
 
-
-
 # 修改文档
 @transaction.atomic
 def ajax_modify_RTFdoc(request):
@@ -544,6 +543,8 @@ def delTeam(request):
 #             books = paginator.page(paginator.num_pages)
 #     return render(request, "fenye.html", {'books': list})
 # 查询团队文档
+# 团队文件
+# 团队文件
 def teamfile(request):
     teamname = request.POST.get("teamName")
     cursor = connection.cursor()
@@ -554,6 +555,7 @@ def teamfile(request):
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({"list": list})
+
 # 保存个人文件版本
 @transaction.atomic
 def saveEdition(request):
@@ -650,3 +652,54 @@ def getTeamEdition(request):
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({"list": list})
+
+# 我的回收站
+def myBin(request):
+    # 获取session的用户
+    username = request.session['username']
+    # 获取状态为1的属于此用户的文件和团队
+    cursor=connection.cursor()
+    cursor.execute('select * from( '
+                   '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
+                   ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="'+username+'")'
+                   ' UNION'
+                   ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                   ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                   ' and f.file_state=1 and u.user_name="'+username+'")'
+                   ' )t ORDER BY time DESC')
+    result=cursor.fetchall()
+    return JsonResponse({'status': 200, 'message':result})
+
+# 回收站恢复文件
+def restore(request):
+    id=request.POST['id']
+    what=request.POST['what']
+    cursor = connection.cursor()
+    # 判断该文件是文档还是协作空间
+    if what == '协作空间':
+        row=cursor.execute('update team set team_state=0 where team_id=' + id)
+    else:
+        row=cursor.execute('update file set file_state=0 where file_id=' + id)
+    cursor.close()
+    if row==1:
+        return JsonResponse({'status': 200, 'message':'已成功恢复文件至协作空间'})
+    else:
+        return JsonResponse({'status': 4001, 'message': '出现错误'})
+
+# 回收站彻底删除文件
+def deleteAll(request):
+    id=request.POST['id']
+    what=request.POST['what']
+    cursor = connection.cursor()
+    try:
+        # 判断该文件是文档还是协作空间
+        if what == '协作空间':
+            cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
+        else:
+            cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id='+id)
+            cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
+        cursor.close()
+        return JsonResponse({'status': 200, 'message': '删除成功'})
+    except:
+        cursor.close()
+        return JsonResponse({'status': 4004, 'message': '删除失败'})

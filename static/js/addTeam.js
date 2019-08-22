@@ -66,12 +66,12 @@ function editTeam() {
 //关闭协作空间的模态框时刷新index页面
 $('#teamModal').on('hide.bs.modal', function () {
     window.location.href = '/index/';
-})
+});
 
 //关闭修改协作空间的模态框时刷新index页面
 $('#editTeam').on('hide.bs.modal', function () {
     window.location.href = '/index/';
-})
+});
 
 //获取该成员的协作空间
 $(function () {
@@ -114,14 +114,14 @@ function passName1(teamName) {
     //弹出模态框的时候查询普通协作者和管理员
     searchTeamUser();
     searchTeamAdmin()
-}
+};
 
 //给修改协作空间的模态框传参
 function passName2(teamName) {
     //把协作空间名传到添加协作者的模态框里
     $("#perName").val(teamName);
     $("#name").val(teamName);
-}
+};
 
 //删除协作空间，放入回收站
 function delTeam(teamId) {
@@ -140,30 +140,83 @@ function delTeam(teamId) {
          });
      }
 
-}
+};
 
 //回收站
 function bin() {
+    var title = "<span class='one' style='font-weight: 500;margin-top: 15px'>文件名</span>\n" +
+        "<span class='two'  style='font-weight: 500;margin-top: 15px'>删除时间</span>\n"+"<hr class='hr1'>";
     $.ajax({
         url: "/myBin/",
         type: "POST",
         dataType: "json",
         success: function (data) {
+            /*清空之前的数据*/
             $("#tab").html("");
-            $("#tab").append(tableTitle)
-            for (i = 0; i < data.list.length; i++) {
-                var text = data.list[i][2];
+            $("#bin").html("");
+            $("#h2").text("回收站");
+            $("#bin").append(title);
+            for (i = 0; i < data.message.length; i++) {
+                var text = data.message[i][1];
                 var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                html = '<tr class=\"tr1\'">\n' +
-                    '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\')\"' +
-                    'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
-                    '<td>' + data.list[i][1] + '</td>' +
-                    '<td>' + mystr + '</td>' +
-                    '</tr>'
-                $("#tab").append(html)
+                html = " <div class=\"dropdown\">\n" +
+                    " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">" + data.message[i][0] + "</span>\n" +
+                    " <span class='two'>" + mystr + "</span>\n" +
+                    "<hr class='hr1'>"+
+                    "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n" +
+                    "<li><a  class=\"dropdown-item\" href=\"javascript:void(0)\" " +
+                    "onclick = \"restore('" + data.message[i][2] + "','"+ data.message[i][3] + "')\">" +
+                    "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</a></li>\n" +
+                    "<hr style='margin-top: 0;margin-bottom: 0'/>"+
+                    "<li><a  class=\"dropdown-item\" style='color: red' href=\"javascript:void(0)\" " +
+                     "onclick = \"deleteAll('" + data.message[i][2] + "','"+ data.message[i][3] + "')\">" +
+                    "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</a></li>\n" +
+                    "</ul>" +
+                    "</div>";
+                $("#bin").append(html);
+            }
+        },
+    })
+};
+
+//回收站里恢复文件
+function restore(id,w) {
+    $.ajax({
+        url: "/restore/",
+        type: "POST",
+        dataType: "json",
+        data:{
+            "id":id,
+            "what":w
+        },
+        success: function (data) {
+            if (data.status == 200) {
+                alert(data.message);
+                window.location.href = '/index/';
+            } else {
+                alert(data.message);
+            }
+        },
+    })
+};
+
+//回收站彻底删除文件
+function deleteAll(id,w) {
+     $.ajax({
+        url: "/deleteAll/",
+        type: "POST",
+        dataType: "json",
+        data:{
+            "id":id,
+            "what":w
+        },
+        success: function (data) {
+            if (data.status == 200) {
+                alert(data.message);
+                window.location.href = '/index/';
+            } else {
+                alert(data.message);
             }
         },
     })
 }
-
-
