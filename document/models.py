@@ -219,7 +219,8 @@ class Team(models.Model):
     team_name = models.CharField(max_length=50)
     team_state = models.IntegerField(blank=True, null=True)
     user_id = models.IntegerField()
-    number = models.IntegerField(blank=True,null=True)
+    date = models.DateTimeField()
+    what = models.CharField(max_length=10)
 
     class Meta:
         managed = False

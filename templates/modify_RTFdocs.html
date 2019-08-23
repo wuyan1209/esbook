@@ -101,7 +101,8 @@
 <div id="toolbar-container" style="margin-top: 2px"></div>
 <input type="hidden" id="get_doc_content" value="{{ request.session.doc_content }}">
 <input type="hidden" id="doc_save_state" value="{{ saveState }}">
-<input type="hidden" id="userId" value="{{ 1 }}">
+<input type="hidden" id="userId" value="{{ request.session.userId }}">
+<input type="hidden" id="fileId" value="{{ request.session.file_id }}">
 <input type="hidden" id="teamId" value="{{ saveState }}">
 <div id="editor" style="height: 100px">
 </div>

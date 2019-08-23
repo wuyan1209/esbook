@@ -1,6 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -28,12 +28,11 @@
     <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
+    <![endif]-->
 </head>
 
 <body class="fix-header fix-sidebar card-no-border">
@@ -85,12 +84,18 @@
                     <!-- ============================================================== -->
                     <!-- Search -->
                     <!-- ============================================================== -->
-                    <li class="nav-item hidden-sm-down search-box"><a
-                            class="nav-link hidden-sm-down text-muted waves-effect waves-dark"
-                            href="javascript:void(0)"><i class="ti-search"></i></a>
-                        <form class="app-search">
-                            <input type="text" class="form-control" placeholder="搜索文件名、文件内容"> <a class="srh-btn"><i
-                                class="ti-close"></i></a></form>
+                    <li class="nav-item hidden-sm-down search-box">
+                        <a class="nav-link hidden-sm-down text-muted waves-effect waves-dark"
+                           href="javascript:void(0)">
+                            <i class="ti-search"></i>
+                        </a>
+                        {#                        <form class="app-search">#}
+                        <input id="search-bar" type="text" placeholder="搜索文件名、文件内容"
+                               onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" autocomplete="off">
+                        {#                            <a class="srh-btn" onclick="closeSearchReasult()"><i class="ti-close"></i></a>#}
+                        {#                            </input>#}
+                        {#                        </form>#}
+
                     </li>
                 </ul>
                 <!-- ============================================================== -->
@@ -111,6 +116,16 @@
             </div>
         </nav>
     </header>
+    <div id="search-results" class="topbar">
+        <div class="list-group-item">
+            <span>搜索结果：</span>
+        </div>
+        <div class="container" style="margin-left: 0;padding: 0;width: 100%">
+            <ul class="list-group" id="search-results-show">
+
+            </ul>
+        </div>
+    </div>
     <aside class="left-sidebar">
         <!-- Sidebar scroll-->
         <div class="scroll-sidebar">
@@ -123,19 +138,24 @@
                 <ul id="side">
                     <!--协作空间列表-->
                     <li class="waves-effect waves-dark" style="margin-left: 19px"><span>协作空间</span>
-                        <span  style="margin-left: 90px" data-toggle="modal" data-target="#teamModal"><i class="icon-search icon-plus"></i></span></li>
+                        <span style="margin-left: 90px" data-toggle="modal" data-target="#teamModal"><i
+                                class="icon-search icon-plus"></i></span></li>
                 </ul>
             </nav>
             <!-- End Sidebar navigation -->
         </div>
         <div class="sidebar-footer">
-            <a href="" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
-                    class="icon-search icon-trash"></i><span>回收站</span></a>
+            <a href="javascript:bin()" class="link" data-toggle="tooltip"
+               style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
+                    class="icon-search icon-trash"></i>&nbsp;&nbsp;<span>回收站</span></a>
         </div>
-        <script>
-            {#  点击回收站，查询所有状态为1的文件，显示到id为box2的div#}
-        </script>
     </aside>
+    <!-- ============================================================== -->
+    <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- Page wrapper  -->
+    <!-- ============================================================== -->
     <div class="page-wrapper">
         <!-- ============================================================== -->
         <!-- Container fluid  -->
@@ -155,23 +175,27 @@
                 </div>
                 <div>
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none">
+                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"
+                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                               onchange="upLoad()">
                         <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
                     </div>
                 </div>
             </div>
             <div id="box2">
-                <div>
+                {% comment %}<div>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item active" aria-current="page">我的文档</li>
                         </ol>
                     </nav>
-                </div>
+                </div>{% endcomment %}
                 <div style="margin-top: 2%">
+                    <h2 id="h2" style="margin-left: 2%"></h2>
                     <table id="tab">
 
                     </table>
+                    <div id="bin"></div>
                 </div>
                 <div id="fenye">
                     <nav aria-label="Page navigation example">
@@ -188,7 +212,16 @@
         </div>
         <!--文档列表的样式，不能提取出去，只能在页面，否则无效-->
         <style>
+
             #tab {
+                margin-left: 10px;
+                width: 95%;
+                border: 0px;
+                cellpadding: 0px;
+                cellspacing: 0px;
+            }
+
+            .tab {
                 margin-left: 10px;
                 width: 95%;
                 border: 0px;
@@ -206,11 +239,26 @@
                 margin-left: 65%;
                 margin-top: 10px;
             }
+
+            .one {
+                display: inline-block;
+                margin-left: 2%;
+                width: 60%;
+            }
+
+            .two {
+                display: inline-block;
+            }
+
+            .hr1 {
+                margin-left: 1%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background-color: black;
+            }
         </style>
         <script>
-
             $(function () {
-
                 saveState = "my_doc";
                 {#点击我的文档显示个人文档列表#}
                 $("#sidebarnav").on("click", function () {
@@ -230,6 +278,10 @@
             {#显示我的文档列表#}
 
             function my_doc_file() {
+                $("#tab").html("");
+                $("#bin").html("");
+                $("#h2").text("我的文档");
+                $("#tab").append(tableTitle);
                 $.ajax({
                     url: "/filelist/",
                     type: "POST",
@@ -237,14 +289,15 @@
                     success: function (data) {
                         $("#tab").html("");
                         $("#tab").append(tableTitle)
+
                         for (i = 0; i < data.list.length; i++) {
-                            time= data.list[i][2];
-                            updatetime=time.substring(0,10)+"  "+time.substring(11);
+                            var text = data.list[i][2];
+                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
                             html = '<tr class=\"tr1\'">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\''+ saveState +'\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
-                                '<td>' +updatetime + '</td>' +
+                                '<td>' + mystr + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
                         }
@@ -257,19 +310,23 @@
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
+                $("#bin").html("");
+                $("#h2").text(teamName);
+                $("#tab").append(tableTitle);
                 $.ajax({
                     url: "/teamfile/",
                     type: "POST",
                     data: {"teamName": teamName},
                     dataType: "json",
                     success: function (data) {
-                        $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
-                            html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\''+ saveState +'\')\"' +
+                            var text = data.list[i][6];
+                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                            var html = '<tr>\n' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
-                                '<td>' + data.list[i][6] + '</td>' +
+                                '<td>' + mystr + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
                         }
@@ -281,7 +338,9 @@
             $("#toDocs").on("click", function () {
                 window.location.href = "/RTFdocs/?saveState=" + saveState
             });
+
             {# 点击协作空间名和设置出现不同的操作#}
+
 
             // 改变保存状态的值
             function changeSaveState(teamId, teamName) {
@@ -290,8 +349,9 @@
             }
         </script>
     </div>
-    <!-- 添加团队模态框（Modal） -->
-    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <!-- 添加协作空间模态框（Modal） -->
+    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -299,15 +359,19 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 </div>
                 <div class="modal-body">
-                    空间名称:<br><br>
-                    <input type="text" id="teamName" name="teamName" class="name" placeholder="请输入"
-                           style="width: 100%;height: 40px"
+                    <p>空间名称</p>
+                    <input type="text" id="teamName" name="teamName" class="form-control" placeholder="请输入"
+                           style="padding-left: 3%;"
                            onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
                            autocomplete="off"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" onclick="addTeam()" style="width: 120px;height: 48px">添加</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">关闭</button>
+                    <button type="button" class="btn btn-info" onclick="addTeam()" style="width: 120px;height: 48px">
+                        添加
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            style="width: 120px;height: 48px">关闭
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
@@ -410,6 +474,7 @@
                             var roleName = $("#admin").text();
                             ajax(roleName)
                         });
+
                         function ajax(roleName) {
                             //获取用户名、协作空间名
                             var userName = $("#username").text();
@@ -469,7 +534,7 @@
                                     success: function (data) {
                                         if (data.status == 200 && data.message != null) {
                                             for (var i = 0; i < data.message.length; i++) {
-                                                if(data.message[i][3]=='只读'){
+                                                if (data.message[i][3] == '只读') {
                                                     var html = ''
                                                     html = '<tr>\n' +
                                                         '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
@@ -515,16 +580,18 @@
                                     },
                                 });
                             }
+
                             //select值改变时调用函数 参数：option的值、成员角色的id
-                            function Change1(value,memRoleId){
-                                if (value=="移除"){
+                            function Change1(value, memRoleId) {
+                                if (value == "移除") {
                                     del(memRoleId);
-                                }else{
-                                    editMemberRole(value,memRoleId);
+                                } else {
+                                    editMemberRole(value, memRoleId);
                                 }
                             }
+
                             //角色修改
-                            function editMemberRole(value,memRoleId) {
+                            function editMemberRole(value, memRoleId) {
                                 $.ajax({
                                     url: "/editMemberRole/",
                                     type: "POST",
@@ -541,6 +608,7 @@
                                     },
                                 });
                             }
+
                             //角色移除
                             function del(memRoleId) {
                                 if (confirm("确认要删除？")) {
@@ -583,37 +651,37 @@
                                     success: function (data) {
                                         if (data.status == 200 && data.message != null) {
                                             for (var i = 0; i < data.message.length; i++) {
-                                                if(data.message[i][3]=='超级管理员'){
+                                                if (data.message[i][3] == '超级管理员') {
                                                     var html = '<tr>\n' +
-                                                    '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
-                                                    '<img src="../static/assets/images/users/1.jpg"\n' +
-                                                    'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
-                                                    '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
-                                                    '</span>\n' +
-                                                    '</td>' +
-                                                    '<td>\n' +
-                                                    '<select class="btn btn-secondary dropdown-toggle" style="width:150px;">' +
-                                                    '<option value="超级管理员">超级管理员</option>\n' +
-                                                    '</select>\n' +
-                                                    '</td>\n' +
-                                                    '</tr>';
+                                                        '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
+                                                        '<img src="../static/assets/images/users/1.jpg"\n' +
+                                                        'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
+                                                        '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
+                                                        '</span>\n' +
+                                                        '</td>' +
+                                                        '<td>\n' +
+                                                        '<select class="btn btn-secondary dropdown-toggle" style="width:150px;">' +
+                                                        '<option value="超级管理员">超级管理员</option>\n' +
+                                                        '</select>\n' +
+                                                        '</td>\n' +
+                                                        '</tr>';
                                                     $("#table3").append(html);
-                                                }else{
-                                                     var html = '<tr>\n' +
-                                                    '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
-                                                    '<img src="../static/assets/images/users/1.jpg"\n' +
-                                                    'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
-                                                    '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
-                                                    '</span>\n' +
-                                                    '</td>' +
-                                                    '<td>\n' +
-                                                    '<select class="btn btn-secondary dropdown-toggle" style="width:150px;" id="test2" onchange="Change2(this.options[this.options.selectedIndex].value,'+data.message[i][0]+')">' +
-                                                    '<option value="管理员">管理员</option>\n' +
-                                                    '<option value="超级管理员">超级管理员</option>\n' +
-                                                    '<option value="移除">移除管理员角色</option>\n' +
-                                                    '</select>\n' +
-                                                    '</td>\n' +
-                                                    '</tr>';
+                                                } else {
+                                                    var html = '<tr>\n' +
+                                                        '<td style="width: 70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\n' +
+                                                        '<img src="../static/assets/images/users/1.jpg"\n' +
+                                                        'style="width:12%; height:auto; border-radius:50%; overflow:hidden;"/>&nbsp;&nbsp;\n' +
+                                                        '<span style="font-size: medium;" title="' + data.message[i][1] + '" id="name">\n' + data.message[i][1] +
+                                                        '</span>\n' +
+                                                        '</td>' +
+                                                        '<td>\n' +
+                                                        '<select class="btn btn-secondary dropdown-toggle" style="width:150px;" id="test2" onchange="Change2(this.options[this.options.selectedIndex].value,' + data.message[i][0] + ')">' +
+                                                        '<option value="管理员">管理员</option>\n' +
+                                                        '<option value="超级管理员">超级管理员</option>\n' +
+                                                        '<option value="移除">移除管理员角色</option>\n' +
+                                                        '</select>\n' +
+                                                        '</td>\n' +
+                                                        '</tr>';
                                                     $("#table3").append(html);
                                                     $("#test2 option[value='" + data.message[i][3] + "']").attr("selected", true);
                                                 }
@@ -622,14 +690,16 @@
                                     },
                                 });
                             }
+
                             //select值改变时调用函数 参数：option的值、成员角色的id
-                            function Change2(value,memRoleId){
-                                if (value=="移除"){
+                            function Change2(value, memRoleId) {
+                                if (value == "移除") {
                                     delAdminRole(memRoleId)
-                                }else{
-                                    editAdminRole(value,memRoleId);
+                                } else {
+                                    editAdminRole(value, memRoleId);
                                 }
                             }
+
                             //管理员角色移除，改为可编辑
                             function delAdminRole(memRoleId) {
                                 $.ajax({
@@ -647,8 +717,9 @@
                                     },
                                 });
                             }
+
                             //角色修改为超管
-                            function editAdminRole(value,memRoleId) {
+                            function editAdminRole(value, memRoleId) {
                                 $.ajax({
                                     url: "/editAdminRole/",
                                     type: "POST",
@@ -665,6 +736,40 @@
                             }
                         </script>
                     </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!-- 修改协作空间的模态框（Modal） -->
+    <div class="modal fade" id="editTeam" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true"
+         style="margin-left: 5%">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel3">协作空间设置</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>空间名称</p>
+                    <input type="text" id="perName" class="form-control" hidden="hidden"/>
+                    <input type="text" id="name" class="form-control" style="padding-left: 3%;"
+                           onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
+                           autocomplete="off"/>
+                    <br><br><br>
+                    <p>所有权
+                        <span class="icon-question" style="margin-left: 1%;" data-toggle="tooltip"
+                              data-placement="right"
+                              title="所有权决定了协作空间里的文件被谁管理。如果所有权归属于企业，则会受到企业安全设置的影响、被审计系统收录，并参与效能看板的统计。"></span>
+                    </p>
+                    <p><strong>该空间是个人空间，内容所有权属于空间管理员</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" onclick="editTeam()" style="width: 120px;height: 48px">
+                        修改
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            style="width: 120px;height: 48px">关闭
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
@@ -709,6 +814,7 @@
 <!--添加协作空间-->
 <script src="../static/js/addTeam.js"></script>
 <script src="../static/js/modifyRTFdocs.js"></script>
+<script src="{% static 'js/search.js' %}"></script>
 </body>
 </html>
 

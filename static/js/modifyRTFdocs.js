@@ -120,28 +120,58 @@ function doc_content() {
 }
 
 // 打开已存在文档
-function docs_modify(name, id, saveState) {
+function docs_modify(name, id, saveState, fileId) {
     $.ajax({
         url: '/docsModify/',
         type: 'post',
         data: {
             file_name: name,
             user_id: id,
-            saveState: saveState
+            saveState: saveState,
+            fileId:fileId
         },
         dataType: 'json',
         success: function (data) {
             if (data.data == "success") {
-
                 window.location.href = "/modifyRTFdocs/?saveState=" + saveState;
-
-                //?file_name=" + data.file_name + "doc_content=" + data.doc_content;
             }
         }
     });
 }
 
 // 保存文档
+function modifyDocs() {
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //取得html格式的内容
+    var fileId = $("#fileId").val()
+    var now_doc_title = $("#docs_title").val();  //取得文档标题
+    if (now_doc_title == null || now_doc_title == "") {
+        alert("请输入文档名称");
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: '/ajax_modify_RTFdoc/',
+        dataType: "json",
+        data: {
+            doc_content: doc_content,
+            now_doc_title: now_doc_title,
+            fileId:fileId
+        },
+        success: function (data) {
+            if (data.saveStatus == "success") {
+                // 保存成功
+                alert("保存成功了");
+            } else {
+                // 保存失败
+                alert("保存失败了");
+            }
+        }
+    })
+}
+
+/*// 保存文档
 function modifyDocs(old_doc_title, doc_save_state, userId, teamId) {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
@@ -173,7 +203,7 @@ function modifyDocs(old_doc_title, doc_save_state, userId, teamId) {
             }
         }
     })
-}
+}*/
 
 // 保存个人版本
 function saveEdition() {
