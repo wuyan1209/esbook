@@ -11,6 +11,7 @@ import json  # 引入json模块
 def index(request):
     # 模拟登录时把用户名存取在session里
     request.session['username'] = "吴炎"
+    request.session['userId'] = 1
     return render(request, 'index.html')
 
 
@@ -252,7 +253,6 @@ def fileList(request):
     cursor.close()
     return JsonResponse({"list": row})
 
-
 # 修改doc文档
 def doc_modify(request):
     file_name = request.POST.get("file_name")  # 获取文件名称
@@ -277,15 +277,12 @@ def doc_modify(request):
         request.session["doc_content"] = doc_content
     return HttpResponse(json.dumps({'data': 'success'}))
 
-
 # 修改页面
 def modifyRTFdocs(request):
     # file_name = request.GET.get("file_name")
     # doc_content = request.GET.get("doc_content")
     saveState = request.GET.get("saveState")
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
-
-
 
 
 # 修改文档
@@ -534,13 +531,31 @@ def teamfile(request):
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({"list": list})
+
+#判断版本内容是否重复
+def editionExits(request):
+    content = request.POST.get('content')
+    return_param = {}
+    cursor = connection.cursor()
+    # 获取数据库中版本表的content
+    cursor.execute("select content from edition ")
+    contents = cursor.fetchall()
+    # 判断内容是否相同
+    for cont in contents:
+        if  cont[0] == content:
+            return_param['Exist'] = "YES"
+            break
+        else:
+            return_param['Exist'] = "No"
+    return HttpResponse(json.dumps(return_param))
+
 # 保存个人文件版本
 @transaction.atomic
 def saveEdition(request):
     # 获取用户名,版本内容,获取文件名称
     username = request.session.get('username')
     content = request.POST.get('content')
-    filename = request.POST.get('filename')
+    edi_name = request.POST.get('filename')
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
@@ -548,11 +563,12 @@ def saveEdition(request):
     try:
         cursor = connection.cursor()
         # 获取用户名、id
-        userid = int(cursor.execute('select user_id from user where user_name="' + username + '"'))
-        cursor.execute("select file_id from file where file_name = %s", [filename])
+        cursor.execute('select user_id from user where user_name="' + username + '"')
+        userid=cursor.fetchone()
+        cursor.execute("select file_id from file where file_name = %s", [edi_name])
         fileId = cursor.fetchone()
         # 保存版本
-        cursor.execute('insert into edition (save_date,content) values(% s, % s)', [formatTime, content])
+        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)', [formatTime, content,edi_name])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
         edi_id = cursor.fetchone()
         # 获取个人文件表id
@@ -563,9 +579,13 @@ def saveEdition(request):
         cursor.close()
         # 事务提交
         transaction.savepoint_commit(sid)
+        status = 200
+        message = '个人版本保存成功'
     except Exception as e:
+        status = 2001
+        message = '个人版本保存失败'
         transaction.savepoint_rollback(sid)
-    return JsonResponse({'status': 200})
+    return JsonResponse({'status': 200,"message":message})
 
 # 查看个人版本
 def getuseredition(request):
@@ -574,20 +594,19 @@ def getuseredition(request):
     username = request.session.get('username')
     # 获取文件名称、id、内容
     filename = request.POST.get('filename')
-    fileid = int(cursor.execute('select file_id from file where file_name="' + filename + '"'))
-    cursor.execute('select  u.user_name,f.file_name,e.save_date, e.content '
-                   'from user u,file f,user_edition ue,user_file uf,edition e '
-                   'where u.user_id=uf.user_id and uf.file_id=f.file_id and ue.edi_id=e.edi_id '
-                   'and u.user_name = %s and f.file_id = %s', [username, fileid])
+    cursor.execute('select file_id from file where file_name="' + filename + '"')
+    fileid=cursor.fetchone()
+    cursor.execute('select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
+                   'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
+                   'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"list": list})
+    return JsonResponse({'status': 200,"list": list})
 
 # 保存团队文件版本
 @transaction.atomic
 def saveTeamEdition(request):
-    # 获取团队名、成员名、版本内容、文件名
-    teamname=request.POST.get('teamName')
+    # 获取成员名、版本内容、文件名
     member=request.session.get('username')
     content = request.POST.get('content')
     filename = request.POST.get('filename')
@@ -598,7 +617,8 @@ def saveTeamEdition(request):
     try:
         cursor = connection.cursor()
         # 获取userid和fileid
-        userid = int(cursor.execute('select user_id from user where user_name="' + member + '"'))
+        cursor.execute('select user_id from user where user_name="' + member + '"')
+        userid =cursor.fetchone()
         cursor.execute("select file_id from file where file_name = %s", [filename])
         fileId = cursor.fetchone()
         # 保存版本
@@ -621,12 +641,55 @@ def saveTeamEdition(request):
 def getTeamEdition(request):
     cursor = connection.cursor()
     # 获取空间名、文件名、id、内容
-    teamname = request.session.get('teamName')
+    teamid = request.POST.get('teamid')
+    cursor.execute('select team_name from team where team_id="' + teamid + '"')
+    teamname = cursor.fetchone()
     filename = request.POST.get('filename')
-    fileid = int(cursor.execute('select file_id from file where file_name="' + filename + '"'))
-    cursor.execute('select t.team_name,u.user_name,f.file_id,e.save_date,e.content from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
+    cursor.execute('select file_id from file where file_name="' + filename + '"')
+    fileid = cursor.fetchone()
+    cursor.execute('select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
                    'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
-                   'and t.team_name = %s and f.file_id = %s', [teamname, fileid])
+                   'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"list": list})
+    return JsonResponse({'status': 200,"list": list})
+
+#删除版本
+def delectEdition(request):
+    # 版本的id
+    editionid = request.POST.get("ediId")
+    try:
+        cursor = connection.cursor()
+        cursor.execute('update edition set edi_state=1 where edi_id=' + editionid)
+        cursor.close()
+        # 成功的话保存
+        status = 200
+        message = '删除成功'
+    except:
+        # 失败
+        status = 4001
+        message = '删除失败'
+    return JsonResponse({'status': status, 'message': message})
+
+# 还原时保存文档
+@transaction.atomic
+def saveEditionRTFdoc(request):
+    content = request.POST.get('content')  # 文档内容  <p>三大</p><p>大叔大婶</p><p>123</p>
+    fileName = request.POST.get('fileName')  # 当前文档标题   爱迪生
+
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    return_param = {}
+    sid = transaction.savepoint()
+    cursor = connection.cursor()
+    try:
+        cursor.execute('select file_id from file where file_name="'+ fileName + '"')
+        fileId = cursor.fetchone() #25
+        cursor.execute( "update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",[content,formatTime,fileId])
+        return_param['saveStatus'] = "success";
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))

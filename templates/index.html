@@ -136,12 +136,6 @@
             {#  点击回收站，查询所有状态为1的文件，显示到id为box2的div#}
         </script>
     </aside>
-    <!-- ============================================================== -->
-    <!-- End Left Sidebar - style you can find in sidebar.scss  -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Page wrapper  -->
-    <!-- ============================================================== -->
     <div class="page-wrapper">
         <!-- ============================================================== -->
         <!-- Container fluid  -->
@@ -231,7 +225,7 @@
             var tableTitle = "<tr>\n" +
                 "<th style=\"width: 60%\">文档标题</th>\n" +
                 "<th style=\"width: 10%\">创建者</th>\n" +
-                "<th style=\"width: 30%\">时间</th>\n" +
+                "<th style=\"width: 30%\">更新时间</th>\n" +
                 "</tr>";
             {#显示我的文档列表#}
 
@@ -244,11 +238,13 @@
                         $("#tab").html("");
                         $("#tab").append(tableTitle)
                         for (i = 0; i < data.list.length; i++) {
+                            time= data.list[i][2];
+                            updatetime=time.substring(0,10)+"  "+time.substring(11);
                             html = '<tr class=\"tr1\'">\n' +
                                 '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\''+ saveState +'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
-                                '<td>' + data.list[i][2] + '</td>' +
+                                '<td>' +updatetime + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
                         }

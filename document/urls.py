@@ -54,6 +54,12 @@ urlpatterns = [
     path('getTeamEdition/', views.getTeamEdition),
     # 保存团队版本
     path('saveTeamEdition/', views.saveTeamEdition),
+    #删除保本
+    path('delectEdition/',views.delectEdition),
+    # 判断版本内容是否重复
+    path('editionExits/', views.editionExits),
+    #还原时保存文档
+    path('saveEditionRTFdoc/',views.saveEditionRTFdoc),
 
 
 
