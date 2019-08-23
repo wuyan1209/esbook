@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection, transaction
 from document.models import User
+from document.models import  User,File
 import time  # 引入time模块
 import json  # 引入json模块
 
@@ -27,6 +28,8 @@ def addTeam(request):
     if request.is_ajax():
         # 获取空间名
         teamName = request.POST['teamName']
+        localTime = time.localtime(time.time())  # 获取当前时间
+        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
         try:
             # 空间名是唯一的，查询是否在数据库里存在
             cursor = connection.cursor()
@@ -34,6 +37,7 @@ def addTeam(request):
             tid = cursor.fetchone()
             if tid:
                 return JsonResponse({'status': 10023, 'message': '协作空间名字已存在，请换个名字'})
+                return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
             # 从session里获取当前登录用户
             username = request.session.get('username')
             # 通过用户名获取该用户的id
@@ -42,6 +46,7 @@ def addTeam(request):
             save_id = transaction.savepoint()
             # 添加协作空间
             cursor.execute('insert into Team(team_name,user_id) value(%s,%s)', [teamName, userId])
+            cursor.execute('insert into Team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId,formatTime])
             # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
             cursor.execute('select team_id from team  order by team_id desc limit 1')
             row = cursor.fetchall()
@@ -58,6 +63,26 @@ def addTeam(request):
             # 失败的时候回滚到保存点
             transaction.savepoint_rollback(save_id)
             return JsonResponse({'status': 4001, 'message': '添加失败'})
+
+# 修改协作空间
+def editTeam(request):
+    if request.is_ajax():
+        # 获取原本的空间名和要修改为的空间名
+        teamName = request.POST['teamName']
+        preTeamName = request.POST['pTeamName']
+        # 空间名是唯一的，查询是否在数据库里存在
+        try:
+            cursor = connection.cursor()
+            cursor.execute('select team_id from Team where team_name=%s', [teamName])
+            tid = cursor.fetchone()
+            if tid:
+                return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
+            cursor.execute('update team set team_name=%s where team_name=%s', [teamName, preTeamName])
+            cursor.close()
+            # 成功的话
+            return JsonResponse({'status': 200, 'message': '修改成功'})
+        except:
+            return JsonResponse({'status': 4001, 'message': '修改失败'})
 
 
 # 主页面查询该成员加入的协作空间
@@ -514,6 +539,8 @@ def delTeam(request):
 #             books = paginator.page(paginator.num_pages)
 #     return render(request, "fenye.html", {'books': list})
 # 查询团队文档
+# 团队文件
+# 团队文件
 def teamfile(request):
     teamname = request.POST.get("teamName")
     cursor = connection.cursor()
@@ -634,7 +661,56 @@ def getTeamEdition(request):
     cursor.close()
     return JsonResponse({"list": list})
 
+# 我的回收站
+def myBin(request):
+    # 获取session的用户
+    username = request.session['username']
+    # 获取状态为1的属于此用户的文件和团队
+    cursor=connection.cursor()
+    cursor.execute('select * from( '
+                   '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
+                   ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="'+username+'")'
+                   ' UNION'
+                   ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                   ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                   ' and f.file_state=1 and u.user_name="'+username+'")'
+                   ' )t ORDER BY time DESC')
+    result=cursor.fetchall()
+    return JsonResponse({'status': 200, 'message':result})
 
+# 回收站恢复文件
+def restore(request):
+    id=request.POST['id']
+    what=request.POST['what']
+    cursor = connection.cursor()
+    # 判断该文件是文档还是协作空间
+    if what == '协作空间':
+        row=cursor.execute('update team set team_state=0 where team_id=' + id)
+    else:
+        row=cursor.execute('update file set file_state=0 where file_id=' + id)
+    cursor.close()
+    if row==1:
+        return JsonResponse({'status': 200, 'message':'已成功恢复文件至协作空间'})
+    else:
+        return JsonResponse({'status': 4001, 'message': '出现错误'})
+
+# 回收站彻底删除文件
+def deleteAll(request):
+    id=request.POST['id']
+    what=request.POST['what']
+    cursor = connection.cursor()
+    try:
+        # 判断该文件是文档还是协作空间
+        if what == '协作空间':
+            cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
+        else:
+            cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id='+id)
+            cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
+        cursor.close()
+        return JsonResponse({'status': 200, 'message': '删除成功'})
+    except:
+        cursor.close()
+        return JsonResponse({'status': 4004, 'message': '删除失败'})
 # 搜索文件
 def searchFile(request):
     cursor = connection.cursor()
@@ -670,4 +746,5 @@ def serachRTFdoc(request):
     request.session["file_id"] = fileCodition[0]
     request.session["file_name"] = fileCodition[1]
     request.session["doc_content"] = fileCodition[2]
+    return render(request, "modify_RTFdocs.html", return_param)
     return render(request, "modify_RTFdocs.html", return_param)

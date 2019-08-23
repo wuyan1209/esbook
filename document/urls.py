@@ -8,9 +8,10 @@ urlpatterns = [
     path('RTFdocs/', views.RTFdocs),
     # 添加协作空间
     path('addTeam/', views.addTeam),
+    # 修改协作空间
+    path('editTeam/', views.editTeam),
     # 主页面查询该成员加入的协作空间
     path('getAllTeam/', views.getAllTeam),
-
     # 保存个人空间的docs
     path('saveDocTest/', views.RTFdocs_save),
     # 保存协作空间的docs
@@ -19,7 +20,6 @@ urlpatterns = [
     path('serachUser/', views.serachUser),
     # 添加协作成员
     path('addMember/', views.addMember),
-
     # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
     # 修改doc文档
@@ -57,7 +57,13 @@ urlpatterns = [
     path('getTeamEdition/', views.getTeamEdition),
     # 保存团队版本
     path('saveTeamEdition/', views.saveTeamEdition),
-    # 按文件名和文件内容搜索
+    # 我的回收站
+    path('myBin/', views.myBin),
+    # 回收站恢复文件
+    path('restore/', views.restore),
+    # 回收站彻底删除文件
+    path('deleteAll/', views.deleteAll),
+	# 按文件名和文件内容搜索
     path('searchFile/', views.searchFile),
     # 打开搜索到的文件
     path('serachRTFdoc/', views.serachRTFdoc),
