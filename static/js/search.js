@@ -6,66 +6,81 @@ $(function () {
     $('#search-bar').on('compositionend', function () {
         flag = true;
     });
+
+    // 搜索栏改变即查
     $('#search-bar').on('input', function () {
         var searchCondition = $(this).val();
 
         setTimeout(function () {
             if (flag) {
-                // alert($(_this).val())
-                $("#search-results").css("display", "block");
-                if (searchCondition == "") {
-                    $("#search-results").css("display", "none");
-                }
-                if (searchCondition == " " || searchCondition == null) {
-                    alert("请输入要搜索的文件名或文件内容");
-                    $("#search-bar").val("")
-                    return;
-                }
-                $.ajax({
-                    url: "/searchFile/",
-                    type: "POST",
-                    data: {searchCondition: searchCondition},
-                    dataType: "json",
-                    success: function (data) {
-                        if (data == "" || data == null) {
-                            // 未找到文件
-                            $("#search-results-show").html("")
-                            $("#search-results-show").append("<div class=\"search-show\">未找到该文件</div>")
-                        } else {
-                            // 找到文件
-                            $("#search-results-show").html("")
-                            for (let i = 0; i < data.length; i++) {
-                                data[i].file_name = process_result(data[i].file_name, searchCondition);
-                                data[i].content = process_result(data[i].content, searchCondition);
-                                let html = "<li onclick='openFile(" + data[i].file_id + ")' class=\"list-group-item\">\n" +
-                                    "                    <div>\n" +
-                                    "                        <div>";
-                                if (data[i].type == 0) {
-                                    html += "<span><img src=\"/static/assets/images/802格式_文档docx.png\" width=\"20px\"\n" +
-                                        "                                       height=\"20px\"></span>"
-                                }
-                                html += "<span>" + data[i].file_name + "</span>\n" +
-                                    "                        </div>\n" +
-                                    "                        <div class=\"search-show\">\n" +
-                                    "                            " + data[i].content +
-                                    "                        </div>\n" +
-                                    "                        <div class=\"search-show\">\n" +
-                                    "                            " + data[i].cre_date + " 更新\n" +
-                                    "                        </div>\n" +
-                                    "                    </div>\n" +
-                                    "                </li>"
-                                $("#search-results-show").append(html)
-                            }
-                        }
-
-
-                    }
-                })
-
+                searchFile(searchCondition);
             }
         }, 0)
-    })
+    });
+
+    //搜索栏获取焦点并且搜索栏中有数据
+    $('#search-bar').on("focus", function () {
+        var searchValue = $("#search-bar").val();
+        if (searchValue != null || searchValue != "" || searchValue != " "){
+            searchFile(searchValue);
+        }
+    });
 });
+
+// 动态查询文件
+function searchFile(searchCondition) {
+    $("#search-results").css("display", "block");
+    if (searchCondition == "") {
+        $("#search-results").css("display", "none");
+        return;
+    }
+    if (searchCondition == " " || searchCondition == null) {
+        alert("请输入要搜索的文件名或文件内容");
+        $("#search-bar").val("")
+        return;
+    }
+    $.ajax({
+        url: "/searchFile/",
+        type: "POST",
+        data: {searchCondition: searchCondition},
+        dataType: "json",
+        success: function (data) {
+            console.log(data);
+            if (data == "" || data == null) {
+                // 未找到文件
+                $("#search-results-show").html("")
+                $("#search-results-show").append("<div class=\"search-show\">未找到该文件</div>")
+            } else {
+                // 找到文件
+                $("#search-results-show").html("")
+                for (let i = 0; i < data.length; i++) {
+                    data[i].file_name = process_result(data[i].file_name, searchCondition);
+                    data[i].content = process_result(data[i].content, searchCondition);
+                    let html = "<li onclick='openFile(" + data[i].file_id + ")' class=\"list-group-item\">\n" +
+                        "                    <div>\n" +
+                        "                        <div>";
+                    if (data[i].type == 0) {
+                        html += "<span><img src=\"/static/assets/images/802格式_文档docx.png\" width=\"20px\"\n" +
+                            "                                       height=\"20px\"></span>"
+                    }
+                    html += "<span>" + data[i].file_name + "</span>\n" +
+                        "                        </div>\n" +
+                        "                        <div class=\"search-show\">\n" +
+                        "                            " + data[i].content +
+                        "                        </div>\n" +
+                        "                        <div class=\"search-show\">\n" +
+                        "                            " + data[i].cre_date + " 更新\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                </li>"
+                    $("#search-results-show").append(html)
+                }
+            }
+
+
+        }
+    })
+}
 
 // 关闭搜索结果框
 function closeSearchReasult() {
@@ -98,5 +113,5 @@ window.onload = function () {
 
 // 打开搜索到的文件
 function openFile(fileId) {
-    window.location.href = "/serachRTFdoc/?file_id="+fileId;
+    window.location.href = "/serachRTFdoc/?file_id=" + fileId;
 }
