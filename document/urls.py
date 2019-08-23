@@ -1,5 +1,6 @@
 from django.urls import path
 from document import views
+
 urlpatterns = [
     # 主页面
     path('index/', views.index),
@@ -50,6 +51,8 @@ urlpatterns = [
     path('getuseredition/', views.getuseredition),
     # 保存版本
     path('saveEdition/', views.saveEdition),
+    # 登录页面
+    path('login', views.login),
     # 查看团队版本
     path('getTeamEdition/', views.getTeamEdition),
     # 保存团队版本
@@ -60,4 +63,10 @@ urlpatterns = [
     path('restore/', views.restore),
     # 回收站彻底删除文件
     path('deleteAll/', views.deleteAll),
+
+	# 按文件名和文件内容搜索
+    path('searchFile/', views.searchFile),
+    # 打开搜索到的文件
+    path('serachRTFdoc/', views.serachRTFdoc),
+
 ]

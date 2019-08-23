@@ -66,7 +66,6 @@
 
 #box1 {
     position: absolute;
-    top: 70px;
     left: 10px;
     margin-left: 85%;
     margin-top: 10px;
@@ -81,8 +80,37 @@
 }
 
 #box2 {
-    margin-top: -70px;
+    position: absolute;
+    margin-top: -20px;
     margin-left: 1%;
     width: 83%;
     height: auto;
+}
+
+#search-results {
+    width: 550px;
+    background-color: white;
+    /*border: black solid 1px;*/
+    height: auto;
+    display: none;
+    float: left;
+    margin-left: 16.8%;
+}
+
+#search-bar {
+    display: inline-block;
+    width: 500px;
+}
+
+.search-show {
+    margin-left: 25px;
+}
+
+#search-results-show img {
+    margin-right: 5px;
+}
+
+.search-results-show li:hover {
+    background-color: #888;
+    color: #fff;
 }
