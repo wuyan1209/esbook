@@ -147,8 +147,6 @@
             <!-- End Sidebar navigation -->
         </div>
         <div class="sidebar-footer">
-            <a href="" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
-                    class="icon-search icon-trash"></i><span>回收站</span></a>
             <a href="javascript:bin()" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
                     class="icon-search icon-trash"></i>&nbsp;&nbsp;<span>回收站</span></a>
         </div>
@@ -266,7 +264,6 @@
             var tableTitle = "<tr>\n" +
                 "<th style=\"width: 60%\">文档标题</th>\n" +
                 "<th style=\"width: 10%\">创建者</th>\n" +
-                "<th style=\"width: 30%\">时间</th>\n" +
                 "<th style=\"width: 30%\">更新时间</th>\n" +
                 "</tr>";
             {#显示我的文档列表#}
@@ -291,7 +288,6 @@
                                 '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\''+data.list[i][4]+'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
-                                '<td>' + data.list[i][2] + '</td>' +
                                 '<td>' + mystr + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
@@ -314,17 +310,13 @@
                     data: {"teamName": teamName},
                     dataType: "json",
                     success: function (data) {
-                        $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
-                            html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\''+data.list[i][7]+'\')\"' +
                             var text = data.list[i][6];
                             var mystr = text.substring(0, 10) + "  " + text.substring(11);
                             var html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\''+data.list[i][7]+'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
-                                '<td>' + data.list[i][6] + '</td>' +
                                 '<td>' + mystr + '</td>' +
                                 '</tr>'
                             $("#tab").append(html)
