@@ -32,7 +32,7 @@
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-<![endif]-->
+    <![endif]-->
 </head>
 
 <body class="fix-header fix-sidebar card-no-border">
@@ -90,7 +90,8 @@
                             <i class="ti-search"></i>
                         </a>
                         {#                        <form class="app-search">#}
-                        <input id="search-bar" type="text" placeholder="搜索文件名、文件内容" autocomplete="off">
+                        <input id="search-bar" type="text" placeholder="搜索文件名、文件内容"
+                               onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" autocomplete="off">
                         {#                            <a class="srh-btn" onclick="closeSearchReasult()"><i class="ti-close"></i></a>#}
                         {#                            </input>#}
                         {#                        </form>#}
@@ -144,7 +145,8 @@
             <!-- End Sidebar navigation -->
         </div>
         <div class="sidebar-footer">
-            <a href="javascript:bin()" class="link" data-toggle="tooltip" style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
+            <a href="javascript:bin()" class="link" data-toggle="tooltip"
+               style="font-size: 16px;margin-left:20%;padding: 15px 0px"><i
                     class="icon-search icon-trash"></i>&nbsp;&nbsp;<span>回收站</span></a>
         </div>
     </aside>
@@ -174,19 +176,20 @@
                 <div>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"
-                              accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="upLoad()">
+                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                               onchange="upLoad()">
                         <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
                     </div>
                 </div>
             </div>
             <div id="box2">
-                <div>
+                {% comment %}<div>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item active" aria-current="page">我的文档</li>
                         </ol>
                     </nav>
-                </div>
+                </div>{% endcomment %}
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 2%"></h2>
                     <table id="tab">
@@ -209,6 +212,7 @@
         </div>
         <!--文档列表的样式，不能提取出去，只能在页面，否则无效-->
         <style>
+
             #tab {
                 margin-left: 10px;
                 width: 95%;
@@ -216,6 +220,7 @@
                 cellpadding: 0px;
                 cellspacing: 0px;
             }
+
             .tab {
                 margin-left: 10px;
                 width: 95%;
@@ -223,6 +228,7 @@
                 cellpadding: 0px;
                 cellspacing: 0px;
             }
+
             #tab td, th {
                 padding-left: 20px;
                 border-bottom: gray 1px solid;
@@ -233,19 +239,22 @@
                 margin-left: 65%;
                 margin-top: 10px;
             }
-            .one{
+
+            .one {
                 display: inline-block;
                 margin-left: 2%;
                 width: 60%;
             }
-            .two{
+
+            .two {
                 display: inline-block;
             }
-            .hr1{
+
+            .hr1 {
                 margin-left: 1%;
                 margin-top: 10px;
                 margin-bottom: 10px;
-                background-color:black;
+                background-color: black;
             }
         </style>
         <script>
@@ -267,6 +276,7 @@
                 "<th style=\"width: 30%\">更新时间</th>\n" +
                 "</tr>";
             {#显示我的文档列表#}
+
             function my_doc_file() {
                 $("#tab").html("");
                 $("#bin").html("");
@@ -281,10 +291,10 @@
                         $("#tab").append(tableTitle)
 
                         for (i = 0; i < data.list.length; i++) {
-                            var text=data.list[i][2];
-                            var mystr = text.substring(0,10)+"  "+text.substring(11);
+                            var text = data.list[i][2];
+                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
                             html = '<tr class=\"tr1\'">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\''+data.list[i][4]+'\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
                                 '<td>' + mystr + '</td>' +
@@ -313,7 +323,7 @@
                             var text = data.list[i][6];
                             var mystr = text.substring(0, 10) + "  " + text.substring(11);
                             var html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\''+data.list[i][7]+'\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
                                 '<td>' + mystr + '</td>' +
@@ -340,7 +350,8 @@
         </script>
     </div>
     <!-- 添加协作空间模态框（Modal） -->
-    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -349,7 +360,8 @@
                 </div>
                 <div class="modal-body">
                     <p>空间名称</p>
-                    <input type="text" id="teamName" name="teamName" class="form-control" placeholder="请输入" style="padding-left: 3%;"
+                    <input type="text" id="teamName" name="teamName" class="form-control" placeholder="请输入"
+                           style="padding-left: 3%;"
                            onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
                            autocomplete="off"/>
                 </div>
@@ -729,7 +741,8 @@
         </div><!-- /.modal -->
     </div>
     <!-- 修改协作空间的模态框（Modal） -->
-    <div class="modal fade" id="editTeam" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true" style="margin-left: 5%">
+    <div class="modal fade" id="editTeam" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true"
+         style="margin-left: 5%">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -739,18 +752,24 @@
                 <div class="modal-body">
                     <p>空间名称</p>
                     <input type="text" id="perName" class="form-control" hidden="hidden"/>
-                    <input type="text" id="name"  class="form-control" style="padding-left: 3%;"
-                           onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" autocomplete="off"/>
+                    <input type="text" id="name" class="form-control" style="padding-left: 3%;"
+                           onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
+                           autocomplete="off"/>
                     <br><br><br>
                     <p>所有权
-                        <span class="icon-question" style="margin-left: 1%;" data-toggle="tooltip" data-placement="right"
+                        <span class="icon-question" style="margin-left: 1%;" data-toggle="tooltip"
+                              data-placement="right"
                               title="所有权决定了协作空间里的文件被谁管理。如果所有权归属于企业，则会受到企业安全设置的影响、被审计系统收录，并参与效能看板的统计。"></span>
                     </p>
                     <p><strong>该空间是个人空间，内容所有权属于空间管理员</strong></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" onclick="editTeam()" style="width: 120px;height: 48px">修改</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">关闭</button>
+                    <button type="button" class="btn btn-info" onclick="editTeam()" style="width: 120px;height: 48px">
+                        修改
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            style="width: 120px;height: 48px">关闭
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->

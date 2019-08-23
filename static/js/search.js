@@ -25,6 +25,11 @@ $(function () {
             searchFile(searchValue);
         }
     });
+
+    $("#search-bar").blur(function () {
+                $("#search-results").css("display", "none");
+
+    })
 });
 
 // 动态查询文件
@@ -45,7 +50,6 @@ function searchFile(searchCondition) {
         data: {searchCondition: searchCondition},
         dataType: "json",
         success: function (data) {
-            console.log(data);
             if (data == "" || data == null) {
                 // 未找到文件
                 $("#search-results-show").html("")
@@ -102,14 +106,14 @@ function process_result(data, searchCondition) {
 }
 
 // 点击查询结果框以外的地方关闭查询结果框
-window.onload = function () {
+/*window.onload = function () {
     document.onclick = function (e) {
         var ele = e ? e.target : window.event.srcElement;
         if (ele.id !== 'search-results') {
             document.getElementById('search-results').style.display = 'none';
         }
     };
-};
+};*/
 
 // 打开搜索到的文件
 function openFile(fileId) {
