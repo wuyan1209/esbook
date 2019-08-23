@@ -202,21 +202,24 @@ function restore(id,w) {
 
 //回收站彻底删除文件
 function deleteAll(id,w) {
-     $.ajax({
-        url: "/deleteAll/",
-        type: "POST",
-        dataType: "json",
-        data:{
-            "id":id,
-            "what":w
-        },
-        success: function (data) {
-            if (data.status == 200) {
-                alert(data.message);
-                window.location.href = '/index/';
-            } else {
-                alert(data.message);
-            }
-        },
-    })
+     if (window.confirm("即将彻底删除 1 个文件。删除后将无法恢复，请谨慎操作！")) {
+         $.ajax({
+             url: "/deleteAll/",
+             type: "POST",
+             dataType: "json",
+             data: {
+                 "id": id,
+                 "what": w
+             },
+             success: function (data) {
+                 if (data.status == 200) {
+                     alert(data.message);
+                     window.location.href = '/index/';
+                 } else {
+                     alert(data.message);
+                 }
+             },
+         })
+     }
+
 }
