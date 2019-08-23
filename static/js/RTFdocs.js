@@ -32,7 +32,7 @@ DecoupledEditor
     })
 
 $(function () {
-    var userId = $("#userId").val();
+    //var userId = $("#userId").val();
     var teamId = $("#teamId").val();
     // 文档名称不能重复
     $("#docs_title").change(function () {
@@ -44,7 +44,7 @@ $(function () {
             data: {
                 docsName: docsName,
                 saveState: saveState,
-                userId: userId,
+                //userId: userId,
                 teamId: teamId
             },
             dataType: 'json',

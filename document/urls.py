@@ -60,5 +60,4 @@ urlpatterns = [
     path('restore/', views.restore),
     # 回收站彻底删除文件
     path('deleteAll/', views.deleteAll),
-
 ]

@@ -1,15 +1,16 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection, transaction
-from document.models import  User,File
+from document.models import  User
 import time  # 引入time模块
 import json  # 引入json模块
 
 
 # 跳转到主页面
 def index(request):
-    # 模拟登录时把用户名存取在session里
+    # 模拟登录时把用户名和id存取在session里
     request.session['username'] = "吴炎"
+    request.session['userId'] = 1
     return render(request, 'index.html')
 
 
@@ -231,7 +232,8 @@ def saveTeamDoc(request):
 def docNameExist(request):
     docName = request.POST.get('docsName')  # 获取文档标题
     saveState = request.POST.get('saveState')  # 获取文档状态
-    userId = request.POST.get('userId')  # 获取用户Id
+    # userId = request.POST.get('userId')  # 获取用户Id
+    userId=request.session.get('userId')
     teamId = request.POST.get('teamId')  # 获取团队Id
     return_param = {}
     # 从数据库中查询文档标题

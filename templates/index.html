@@ -158,7 +158,8 @@
                 </div>
                 <div>
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none">
+                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"
+                              accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="upLoad()">
                         <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
                     </div>
                 </div>
@@ -309,7 +310,6 @@
             $("#toDocs").on("click", function () {
                 window.location.href = "/RTFdocs/?saveState=" + saveState
             });
-
             // 改变保存状态的值
             function changeSaveState(teamId, teamName) {
                 saveState = teamId;
