@@ -1,6 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -28,6 +28,8 @@
     <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
+    <link href="../static/css/shimo.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -85,17 +87,18 @@
                     <!-- ============================================================== -->
                     <!-- Search -->
                     <!-- ============================================================== -->
-                    <li class="nav-item hidden-sm-down search-box"><a
-                            class="nav-link hidden-sm-down text-muted waves-effect waves-dark"
-                            href="javascript:void(0)"><i class="ti-search"></i></a>
-                        <form class="app-search">
-                            <input type="text" class="form-control" placeholder="搜索文件名、文件内容"> <a class="srh-btn"><i
-                                class="ti-close"></i></a></form>
+                    <li class="nav-item hidden-sm-down search-box">
+                        <a class="nav-link hidden-sm-down text-muted waves-effect waves-dark"
+                           href="javascript:void(0)">
+                            <i class="ti-search"></i>
+                        </a>
+                        {#                        <form class="app-search">#}
+                        <input id="search-bar" type="text" placeholder="搜索文件名、文件内容" autocomplete="off">
+                        {#                            <a class="srh-btn" onclick="closeSearchReasult()"><i class="ti-close"></i></a>#}
+                        {#                            </input>#}
+                        {#                        </form>#}
 
                     </li>
-                    <div id="search-results">
-
-                    </div>
                 </ul>
                 <!-- ============================================================== -->
                 <!-- User profile and search -->
@@ -115,6 +118,16 @@
             </div>
         </nav>
     </header>
+    <div id="search-results" class="topbar">
+        <div class="list-group-item">
+            <span>搜索结果：</span>
+        </div>
+        <div class="container" style="margin-left: 0;padding: 0;width: 100%">
+            <ul class="list-group" id="search-results-show">
+
+            </ul>
+        </div>
+    </div>
     <aside class="left-sidebar">
         <!-- Sidebar scroll-->
         <div class="scroll-sidebar">
@@ -172,13 +185,6 @@
                 </div>
             </div>
             <div id="box2">
-                <div>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item active" aria-current="page">我的文档</li>
-                        </ol>
-                    </nav>
-                </div>
                 <div style="margin-top: 2%">
                     <table id="tab">
 
@@ -250,7 +256,7 @@
                         $("#tab").append(tableTitle)
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr class=\"tr1\'">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\''+data.list[i][4]+'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
                                 '<td>' + data.list[i][2] + '</td>' +
@@ -275,7 +281,7 @@
                         $("#tab").append(tableTitle);
                         for (i = 0; i < data.list.length; i++) {
                             html = '<tr>\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\')\"' +
+                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\''+data.list[i][7]+'\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
                                 '<td>' + data.list[i][6] + '</td>' +
@@ -730,6 +736,7 @@
 <!--添加协作空间-->
 <script src="../static/js/addTeam.js"></script>
 <script src="../static/js/modifyRTFdocs.js"></script>
+<script src="{% static 'js/search.js' %}"></script>
 </body>
 </html>
 

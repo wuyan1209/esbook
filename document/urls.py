@@ -1,5 +1,6 @@
 from django.urls import path
 from document import views
+
 urlpatterns = [
     # 主页面
     path('index/', views.index),
@@ -33,7 +34,7 @@ urlpatterns = [
     path('serachTeamUser/', views.serachTeamUser),
     # 查找协作空间的管理者
     path('serachTeamAdmin/', views.serachTeamAdmin),
-    #修改协作者的角色
+    # 修改协作者的角色
     path('editMemberRole/', views.editMemberRole),
     # 修改协作者为超管
     path('editAdminRole/', views.editAdminRole),
@@ -42,16 +43,22 @@ urlpatterns = [
     # 协作者管理员角色移除，改为可编辑
     path('delAdminRole/', views.delAdminRole),
     # 删除协作空间，放到回收站
-    path('delTeam/',views.delTeam),
-    #团队文件
-    path('teamfile/',views.teamfile),
-    #path('fenye/',views.paginator_view),
+    path('delTeam/', views.delTeam),
+    # 团队文件
+    path('teamfile/', views.teamfile),
+    # path('fenye/',views.paginator_view),
     # 查看版本
     path('getuseredition/', views.getuseredition),
     # 保存版本
     path('saveEdition/', views.saveEdition),
     # 登录页面
-    path('login', views.login)
-
-
+    path('login', views.login),
+    # 查看团队版本
+    path('getTeamEdition/', views.getTeamEdition),
+    # 保存团队版本
+    path('saveTeamEdition/', views.saveTeamEdition),
+    # 按文件名和文件内容搜索
+    path('searchFile/', views.searchFile),
+    # 打开搜索到的文件
+    path('serachRTFdoc/', views.serachRTFdoc),
 ]
