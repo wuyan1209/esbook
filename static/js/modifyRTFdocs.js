@@ -171,39 +171,7 @@ function modifyDocs() {
     })
 }
 
-/*// 保存文档
-function modifyDocs(old_doc_title, doc_save_state, userId, teamId) {
-    var doc_content = document.getElementById("editor"); //取得纯文本
-    doc_content = doc_content.innerHTML;    //取得html格式的内容
-    var now_doc_title = $("#docs_title").val();  //取得文档标题
-    if (now_doc_title == null || now_doc_title == "") {
-        alert("请输入文档名称");
-        return;
-    }
 
-    $.ajax({
-        type: 'POST',
-        url: '/ajax_modify_RTFdoc/',
-        dataType: "json",
-        data: {
-            doc_content: doc_content,
-            now_doc_title: now_doc_title,
-            old_doc_title: old_doc_title,
-            doc_save_state: doc_save_state,
-            userId: userId,
-            teamId: teamId,
-        },
-        success: function (data) {
-            if (data.saveStatus == "success") {
-                // 保存成功
-                alert("保存成功了");
-            } else {
-                // 保存失败
-                alert("保存失败了");
-            }
-        }
-    })
-}*/
 
 // 保存个人版本
 function saveEdition() {
@@ -276,10 +244,10 @@ function saveTeamEditor() {
                     success: function (data) {
                         if (data.status == 200) {
                             // 保存成功
-                            alert("团队版本保存成功了");
+                            alert(data.message);
                         } else {
                             // 保存失败
-                            alert("团队版本保存失败了");
+                             alert(data.message);
                         }
                     }
                 })
@@ -357,7 +325,7 @@ function getTeamEditor(teamId,) {
     })
 }
 
-//删除版本，放入回收站
+//删除版本
 function delectEdition(ediId) {
     if (window.confirm("您确定要删除吗？")) {
         $.ajax({
