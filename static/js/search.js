@@ -21,7 +21,7 @@ $(function () {
     //搜索栏获取焦点并且搜索栏中有数据
     $('#search-bar').on("focus", function () {
         var searchValue = $("#search-bar").val();
-        if (searchValue != null || searchValue != "" || searchValue != " "){
+        if (searchValue != null || searchValue != "" || searchValue != " ") {
             searchFile(searchValue);
         }
     });
@@ -47,7 +47,6 @@ function searchFile(searchCondition) {
         data: {searchCondition: searchCondition},
         dataType: "json",
         success: function (data) {
-            console.log(data);
             if (data == "" || data == null) {
                 // 未找到文件
                 $("#search-results-show").html("")
@@ -107,7 +106,7 @@ function process_result(data, searchCondition) {
 window.onload = function () {
     document.onclick = function (e) {
         var ele = e ? e.target : window.event.srcElement;
-        if (ele.id !== 'search-results') {
+        if (ele.id !== 'search-results' && ele.id != "search-bar") {
             document.getElementById('search-results').style.display = 'none';
         }
     };

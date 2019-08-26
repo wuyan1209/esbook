@@ -108,8 +108,23 @@
 </div>
 <div id="myEditor" class="alert">
     <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
-    <strong>成功！</strong>结果是成功的。
 </div>
+    <!-- 预览模态框 -->
+    <div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="margin: 35px 0 0 290px">
+            <div class="modal-content" style="width:850px;height:750px">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel"></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body" style="table-layout: fixed">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">关闭</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
 </body>
 <script src="../static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
 <script src="../static/assets/plugins/jquery/jquery.min.js"></script>
