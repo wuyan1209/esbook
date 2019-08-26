@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection, transaction
-from document.models import  User
+from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
 
@@ -42,7 +42,7 @@ def addTeam(request):
             # 创建保存点
             save_id = transaction.savepoint()
             # 添加协作空间
-            cursor.execute('insert into Team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId,formatTime])
+            cursor.execute('insert into Team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId, formatTime])
             # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
             cursor.execute('select team_id from team  order by team_id desc limit 1')
             row = cursor.fetchall()
@@ -59,6 +59,7 @@ def addTeam(request):
             # 失败的时候回滚到保存点
             transaction.savepoint_rollback(save_id)
             return JsonResponse({'status': 4001, 'message': '添加失败'})
+
 
 # 修改协作空间
 def editTeam(request):
@@ -232,7 +233,7 @@ def docNameExist(request):
     docName = request.POST.get('docsName')  # 获取文档标题
     saveState = request.POST.get('saveState')  # 获取文档状态
     # userId = request.POST.get('userId')  # 获取用户Id
-    userId=request.session.get('userId')
+    userId = request.session.get('userId')
     teamId = request.POST.get('teamId')  # 获取团队Id
     return_param = {}
     # 从数据库中查询文档标题
@@ -378,7 +379,8 @@ def editMemberRole(request):
         saveId = transaction.savepoint()
         try:
             # 修改角色
-            cursor.execute('update member_role set role_id=(select role_id from role where role_name="'+roleName+'") where mem_role_id='+memRoleId)
+            cursor.execute(
+                'update member_role set role_id=(select role_id from role where role_name="' + roleName + '") where mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -411,7 +413,8 @@ def editAdminRole(request):
         saveId = transaction.savepoint()
         try:
             # 修改角色
-            cursor.execute('update member_role set role_id=(select role_id from role where role_name="'+roleName+'") where mem_role_id='+memRoleId)
+            cursor.execute(
+                'update member_role set role_id=(select role_id from role where role_name="' + roleName + '") where mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -443,7 +446,8 @@ def delMemberRole(request):
         saveId = transaction.savepoint()
         try:
             # 移除角色
-            cursor.execute('delete tm,mr from team_member tm,member_role mr where tm.team_mem_id=mr.team_mem_id and mr.mem_role_id='+memRoleId)
+            cursor.execute(
+                'delete tm,mr from team_member tm,member_role mr where tm.team_mem_id=mr.team_mem_id and mr.mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -475,7 +479,8 @@ def delAdminRole(request):
         saveId = transaction.savepoint()
         try:
             # 角色修改为可编辑
-            cursor.execute('update member_role set role_id=(select role_id from role where role_name="可编辑") where mem_role_id='+memRoleId)
+            cursor.execute(
+                'update member_role set role_id=(select role_id from role where role_name="可编辑") where mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -545,60 +550,67 @@ def teamfile(request):
     cursor.close()
     return JsonResponse({"list": list})
 
+
 # 登录页面
 def login(requset):
     return render(requset, "login.html")
+
 
 # 我的回收站
 def myBin(request):
     # 获取session的用户
     username = request.session['username']
     # 获取状态为1的属于此用户的文件和团队
-    cursor=connection.cursor()
+    cursor = connection.cursor()
     cursor.execute('select * from( '
                    '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
-                   ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="'+username+'")'
-                   ' UNION'
-                   ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
-                   ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                   ' and f.file_state=1 and u.user_name="'+username+'")'
-                   ' )t ORDER BY time DESC')
-    result=cursor.fetchall()
-    return JsonResponse({'status': 200, 'message':result})
+                   ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
+                                                                                                                            ' UNION'
+                                                                                                                            ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                                                                                                                            ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                                                                                                                            ' and f.file_state=1 and u.user_name="' + username + '")'
+                                                                                                                                                                                 ' )t ORDER BY time DESC')
+    result = cursor.fetchall()
+    return JsonResponse({'status': 200, 'message': result})
+
 
 # 回收站恢复文件
 def restore(request):
-    id=request.POST['id']
-    what=request.POST['what']
+    id = request.POST['id']
+    what = request.POST['what']
     cursor = connection.cursor()
     # 判断该文件是文档还是协作空间
     if what == '协作空间':
-        row=cursor.execute('update team set team_state=0 where team_id=' + id)
+        row = cursor.execute('update team set team_state=0 where team_id=' + id)
     else:
-        row=cursor.execute('update file set file_state=0 where file_id=' + id)
+        row = cursor.execute('update file set file_state=0 where file_id=' + id)
     cursor.close()
-    if row==1:
-        return JsonResponse({'status': 200, 'message':'已成功恢复文件至协作空间'})
+    if row == 1:
+        return JsonResponse({'status': 200, 'message': '已成功恢复文件至协作空间'})
     else:
         return JsonResponse({'status': 4001, 'message': '出现错误'})
 
+
 # 回收站彻底删除文件
 def deleteAll(request):
-    id=request.POST['id']
-    what=request.POST['what']
+    id = request.POST['id']
+    what = request.POST['what']
     cursor = connection.cursor()
     try:
         # 判断该文件是文档还是协作空间
         if what == '协作空间':
-            cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
+            cursor.execute(
+                'delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
-            cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id='+id)
+            cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
             cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
         cursor.close()
         return JsonResponse({'status': 200, 'message': '删除成功'})
     except:
         cursor.close()
         return JsonResponse({'status': 4004, 'message': '删除失败'})
+
+
 # 搜索文件
 def searchFile(request):
     cursor = connection.cursor()
@@ -627,17 +639,24 @@ def searchFile(request):
 # 打开搜索到的文件
 def serachRTFdoc(request):
     file_id = request.GET.get("file_id")
-    return_param = {}
     cursor = connection.cursor()
     cursor.execute("select file_id, file_name, content from file where file_id = %s", [file_id])
     fileCodition = cursor.fetchone()
+    cursor.execute(
+        "select tm.team_id from team_member tm " 
+        "where tm.team_mem_id = (select team_mem_id from member_file where file_id = %s)", [fileCodition[0]])
+    teamId = cursor.fetchone()
+    if teamId:
+        saveState = teamId[0]
+    else:
+        saveState = "my_doc"
     request.session["file_id"] = fileCodition[0]
     request.session["file_name"] = fileCodition[1]
     request.session["doc_content"] = fileCodition[2]
-    return render(request, "modify_RTFdocs.html", return_param)
-    return render(request, "modify_RTFdocs.html", return_param)
+    return render(request, "modify_RTFdocs.html", {'saveState': saveState})
 
-#判断版本内容是否重复
+
+# 判断版本内容是否重复
 def editionExits(request):
     content = request.POST.get('content')
     return_param = {}
@@ -647,12 +666,13 @@ def editionExits(request):
     contents = cursor.fetchall()
     # 判断内容是否相同
     for cont in contents:
-        if  cont[0] == content:
+        if cont[0] == content:
             return_param['Exist'] = "YES"
             break
         else:
             return_param['Exist'] = "No"
     return HttpResponse(json.dumps(return_param))
+
 
 # 保存个人文件版本
 @transaction.atomic
@@ -669,11 +689,12 @@ def saveEdition(request):
         cursor = connection.cursor()
         # 获取用户名、id
         cursor.execute('select user_id from user where user_name="' + username + '"')
-        userid=cursor.fetchone()
+        userid = cursor.fetchone()
         cursor.execute("select file_id from file where file_name = %s", [edi_name])
         fileId = cursor.fetchone()
         # 保存版本
-        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)', [formatTime, content,edi_name])
+        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)',
+                       [formatTime, content, edi_name])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
         edi_id = cursor.fetchone()
         # 获取个人文件表id
@@ -690,7 +711,8 @@ def saveEdition(request):
         status = 2001
         message = '个人版本保存失败'
         transaction.savepoint_rollback(sid)
-    return JsonResponse({'status': 200,"message":message})
+    return JsonResponse({'status': 200, "message": message})
+
 
 # 查看个人版本
 def getuseredition(request):
@@ -700,19 +722,21 @@ def getuseredition(request):
     # 获取文件名称、id、内容
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
-    fileid=cursor.fetchone()
-    cursor.execute('select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
-                   'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
-                   'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
+    fileid = cursor.fetchone()
+    cursor.execute(
+        'select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
+        'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
+        'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({'status': 200,"list": list})
+    return JsonResponse({'status': 200, "list": list})
+
 
 # 保存团队文件版本
 @transaction.atomic
 def saveTeamEdition(request):
     # 获取成员名、版本内容、文件名
-    member=request.session.get('username')
+    member = request.session.get('username')
     content = request.POST.get('content')
     filename = request.POST.get('filename')
     # 获取当前时间
@@ -723,7 +747,7 @@ def saveTeamEdition(request):
         cursor = connection.cursor()
         # 获取userid和fileid
         cursor.execute('select user_id from user where user_name="' + member + '"')
-        userid =cursor.fetchone()
+        userid = cursor.fetchone()
         cursor.execute("select file_id from file where file_name = %s", [filename])
         fileId = cursor.fetchone()
         # 保存版本
@@ -745,7 +769,8 @@ def saveTeamEdition(request):
         message = '团队版本保存失败'
         transaction.savepoint_rollback(sid)
         transaction.savepoint_rollback(sid)
-    return JsonResponse({'status': 200,"message":message})
+    return JsonResponse({'status': 200, "message": message})
+
 
 # 查看团队版本
 def getTeamEdition(request):
@@ -757,14 +782,16 @@ def getTeamEdition(request):
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
     fileid = cursor.fetchone()
-    cursor.execute('select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
-                   'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
-                   'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
+    cursor.execute(
+        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
+        'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
+        'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({'status': 200,"list": list})
+    return JsonResponse({'status': 200, "list": list})
 
-#删除版本
+
+# 删除版本
 def delectEdition(request):
     # 版本的id
     editionid = request.POST.get("ediId")
@@ -781,6 +808,7 @@ def delectEdition(request):
         message = '删除失败'
     return JsonResponse({'status': status, 'message': message})
 
+
 # 还原时保存文档
 @transaction.atomic
 def saveEditionRTFdoc(request):
@@ -793,9 +821,10 @@ def saveEditionRTFdoc(request):
     sid = transaction.savepoint()
     cursor = connection.cursor()
     try:
-        cursor.execute('select file_id from file where file_name="'+ fileName + '"')
-        fileId = cursor.fetchone() #25
-        cursor.execute( "update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",[content,formatTime,fileId])
+        cursor.execute('select file_id from file where file_name="' + fileName + '"')
+        fileId = cursor.fetchone()  # 25
+        cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
+                       [content, formatTime, fileId])
         return_param['saveStatus'] = "success";
         transaction.savepoint_commit(sid)
     except Exception as e:
