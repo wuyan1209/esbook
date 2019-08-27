@@ -52,7 +52,7 @@ urlpatterns = [
     # 保存版本
     path('saveEdition/', views.saveEdition),
     # 登录页面
-    path('login', views.login),
+    path('login/', views.login),
     # 查看团队版本
     path('getTeamEdition/', views.getTeamEdition),
     # 保存团队版本
@@ -74,5 +74,9 @@ urlpatterns = [
     path('searchFile/', views.searchFile),
     # 打开搜索到的文件
     path('serachRTFdoc/', views.serachRTFdoc),
+    # 跳转注册页面
+    path('register/', views.register),
+    # 注册
+    path('registerUser/',views.registerUser)
 
 ]

@@ -803,3 +803,17 @@ def saveEditionRTFdoc(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+
+# 跳转到注册页面
+def register(request):
+    return render(request,'register.html');
+
+# 注册
+def registerUser(request):
+    userName=request.POST['userName'];
+    phone = request.POST['phone'];
+    password = request.POST['password'];
+    email = request.POST['email'];
+    code = request.POST['code'];
+    print(userName+" "+phone+" "+password+" "+email+" "+code)
+    return render(request,'register.html');
