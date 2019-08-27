@@ -271,7 +271,7 @@ def fileList(request):
     username = request.session.get('username')
     cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id '
                    'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
+                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
     row = cursor.fetchall()
     cursor.close()
     return JsonResponse({"list": row})
@@ -543,7 +543,7 @@ def teamfile(request):
     teamname = request.POST.get("teamName")
     cursor = connection.cursor()
     cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id '
-                   'from team t,team_member tm,member_file mf,file f ,user u where t.team_id=tm.team_id'
+                   'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
                    ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
                    'and  t.team_name ="' + teamname + '"order by f.cre_date desc')
     list = cursor.fetchall()
@@ -643,7 +643,7 @@ def serachRTFdoc(request):
     cursor.execute("select file_id, file_name, content from file where file_id = %s", [file_id])
     fileCodition = cursor.fetchone()
     cursor.execute(
-        "select tm.team_id from team_member tm " 
+        "select tm.team_id from team_member tm "
         "where tm.team_mem_id = (select team_mem_id from member_file where file_id = %s)", [fileCodition[0]])
     teamId = cursor.fetchone()
     if teamId:
@@ -831,4 +831,17 @@ def saveEditionRTFdoc(request):
         # 数据库更新失败
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))
+
+
+# 删除文件
+def delFiles(request):
+    file_id = request.POST.get("file_id")
+    cursor = connection.cursor()
+    return_param = {}
+    try:
+        cursor.execute("update file set file_state = 1 where file_id = %s", [file_id])
+        return_param["flag"] = "success"
+    except Exception as e:
+        return_param["flag"] = "fail"
     return HttpResponse(json.dumps(return_param))

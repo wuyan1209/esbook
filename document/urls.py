@@ -69,10 +69,10 @@ urlpatterns = [
     path('restore/', views.restore),
     # 回收站彻底删除文件
     path('deleteAll/', views.deleteAll),
-
 	# 按文件名和文件内容搜索
     path('searchFile/', views.searchFile),
     # 打开搜索到的文件
     path('serachRTFdoc/', views.serachRTFdoc),
-
+    # 删除文件
+    path('delFiles/', views.delFiles),
 ]

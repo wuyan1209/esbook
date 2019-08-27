@@ -29,6 +29,8 @@
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
 
+    <link href="{% static 'assets/plugins/layui/css/layui.css' %}">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -91,7 +93,8 @@
                         </a>
                         {#                        <form class="app-search">#}
                         <input id="search-bar" type="text" placeholder="搜索文件名、文件内容"
-                               onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" autocomplete="off">
+                               onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
+                               autocomplete="off">
                         {#                            <a class="srh-btn" onclick="closeSearchReasult()"><i class="ti-close"></i></a>#}
                         {#                            </input>#}
                         {#                        </form>#}
@@ -184,10 +187,17 @@
             </div>
             <div id="box2">
                 <div style="margin-top: 2%">
-                    <h2 id="h2" style="margin-left: 2%"></h2>
-                    <table id="tab">
+                    <h2 id="h2">我的文档</h2>
+                    <table id="tab" class="table table-hover">
 
                     </table>
+                    <div id="clickMenu" style="display: none;position:absolute;">
+                        <ul class="list-group">
+                            <li class="list-group-item" style="width: 100px" onclick="delFiles()">删除</li>
+                        </ul>
+                    </div>
+
+
                     <div id="bin"></div>
                 </div>
                 <div id="fenye">
@@ -222,11 +232,11 @@
                 cellspacing: 0px;
             }
 
-            #tab td, th {
-                padding-left: 20px;
-                border-bottom: gray 1px solid;
-                height: 40px;
-            }
+            {% comment %} #tab td, th {
+                 padding-left: 20px;
+                 border-bottom: gray 1px solid;
+                 height: 40px;
+             }{% endcomment %}
 
             #fenye {
                 margin-left: 65%;
@@ -259,15 +269,16 @@
                     saveState = "my_doc";
                     my_doc_file()
                 })
-
                 my_doc_file()
             });
-
-            var tableTitle = "<tr>\n" +
-                "<th style=\"width: 60%\">文档标题</th>\n" +
-                "<th style=\"width: 10%\">创建者</th>\n" +
-                "<th style=\"width: 30%\">更新时间</th>\n" +
-                "</tr>";
+            var tableTitle = "<thead>\n" +
+                "    <tr>\n" +
+                "      <th style=\"width: 60%\">文件名称</th>\n" +
+                "      <th style=\"width: 10 %\">作者</th>\n" +
+                "      <th style=\"width: 10 %\">更新时间</th>\n" +
+                "    </tr>\n" +
+                "  </thead>" +
+                "  <tbody>"
             {#显示我的文档列表#}
 
             function my_doc_file() {
@@ -282,11 +293,10 @@
                     success: function (data) {
                         $("#tab").html("");
                         $("#tab").append(tableTitle)
-
                         for (i = 0; i < data.list.length; i++) {
                             var text = data.list[i][2];
                             var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                            html = '<tr class=\"tr1\'">\n' +
+                            html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n' +
                                 '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
                                 '<td>' + data.list[i][1] + '</td>' +
@@ -294,6 +304,7 @@
                                 '</tr>'
                             $("#tab").append(html)
                         }
+                        $("#tab").append("</tbody>")
                     },
                 })
             }
@@ -315,7 +326,7 @@
                         for (i = 0; i < data.list.length; i++) {
                             var text = data.list[i][6];
                             var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                            var html = '<tr>\n' +
+                            var html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n' +
                                 '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
                                 'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
                                 '<td>' + data.list[i][3] + '</td>' +
@@ -323,6 +334,7 @@
                                 '</tr>'
                             $("#tab").append(html)
                         }
+                        $("#tab").append("</tbody>")
                     },
                 })
             }
@@ -332,8 +344,53 @@
                 window.location.href = "/RTFdocs/?saveState=" + saveState
             });
 
-            {# 点击协作空间名和设置出现不同的操作#}
+            //阻止浏览器默认右击点击事件
+            $("#tab").on("contextmenu", "tr", function () {
+                return false;
+            });
 
+            // 绑定右击事件
+            $("#tab").on("mousedown", "tr", function (e) {
+                //右键为3
+                if (3 == e.which) {
+                    var file_id = $(this).attr("file_id");
+                    var team_name = $(this).attr("teamname");
+                    $("#clickMenu").attr("file_id",file_id)
+                    $("#clickMenu").attr("team_name",team_name)
+
+                    $("#clickMenu").css("display", "block");
+                    //var divchild = $(this).children("div");
+                    $("#clickMenu").css("left", e.clientX - 250);
+                    $("#clickMenu").css("top", e.clientY - 50);
+                }
+            });
+
+            $("body").on("click", function () {
+                $("#clickMenu").css("display", "none");
+            })
+
+            // 删除文件
+            function delFiles() {
+                var file_id = $("#clickMenu").attr("file_id")
+                var team_name = $("#clickMenu").attr("team_name")
+                $.ajax({
+                    url: "/delFiles/",
+                    type: "post",
+                    data: {file_id: file_id},
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.flag == "success") {
+                            // 个人文档刷新
+                            if (saveState == "my_doc") {
+                                my_doc_file()
+                            } else {
+                                // 团队文档刷新
+                                team_file(team_name)
+                            }
+                        }
+                    }
+                })
+            }
 
             // 改变保存状态的值
             function changeSaveState(teamId, teamName) {
@@ -783,6 +840,7 @@
 <!-- Bootstrap tether Core JavaScript -->
 <script src="../static/assets/plugins/bootstrap/js/tether.min.js"></script>
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="{% static 'assets/plugins/layui/layui.js' %}"></script>
 <!-- slimscrollbar scrollbar JavaScript -->
 <script src="../static/js/jquery.slimscroll.js"></script>
 <!--Wave Effects -->
@@ -808,6 +866,7 @@
 <script src="../static/js/addTeam.js"></script>
 <script src="../static/js/modifyRTFdocs.js"></script>
 <script src="{% static 'js/search.js' %}"></script>
+
 </body>
 </html>
 
