@@ -128,7 +128,7 @@ function docs_modify(name, id, saveState, fileId) {
             file_name: name,
             user_id: id,
             saveState: saveState,
-            fileId:fileId
+            fileId: fileId
         },
         dataType: 'json',
         success: function (data) {
@@ -157,7 +157,7 @@ function modifyDocs() {
         data: {
             doc_content: doc_content,
             now_doc_title: now_doc_title,
-            fileId:fileId
+            fileId: fileId
         },
         success: function (data) {
             if (data.saveStatus == "success") {
@@ -170,7 +170,6 @@ function modifyDocs() {
         }
     })
 }
-
 
 
 // 保存个人版本
@@ -205,7 +204,7 @@ function saveEdition() {
                             alert(data.message);
                         } else {
                             // 保存失败
-                             alert(data.message);
+                            alert(data.message);
                         }
                     }
                 })
@@ -247,7 +246,7 @@ function saveTeamEditor() {
                             alert(data.message);
                         } else {
                             // 保存失败
-                             alert(data.message);
+                            alert(data.message);
                         }
                     }
                 })
@@ -269,8 +268,9 @@ function getEdition() {
         },
         success: function (data) {
             if (data.status == 200) {
+                $("#myEditor div").remove()
                 //查看成功
-                for (i = 0; i < data.list.length; i++) {
+                for (var i = 0; i < data.list.length; i++) {
                     time = data.list[i][2];
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px;\">\n" +
@@ -305,8 +305,9 @@ function getTeamEditor(teamId,) {
         },
         success: function (data) {
             if (data.status == 200) {
+                $("#myEditor div").remove()
                 //查看成功
-                for (i = 0; i < data.list.length; i++) {
+                for (var i = 0; i < data.list.length; i++) {
                     time = data.list[i][3];
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
@@ -345,7 +346,7 @@ function delectEdition(ediId) {
 
 //版本预览 给模态框传值
 function passName(filename, time, content) {
-    $("#myModalLabel").html(filename+'&emsp;&emsp;&emsp;'+time)
+    $("#myModalLabel").html(filename + '&emsp;&emsp;&emsp;' + time)
     $(".modal-body").html(content)
 }
 
