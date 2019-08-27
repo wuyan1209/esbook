@@ -76,8 +76,7 @@ urlpatterns = [
     # 跳转注册页面
     path('register/', views.register),
     # 注册
-    path('registerUser/',views.registerUser)
-
+    path('registerUser/',views.registerUser),
 
     # 删除文件
     path('delFiles/', views.delFiles),

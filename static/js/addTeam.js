@@ -144,7 +144,7 @@ function delTeam(teamId) {
 
 //回收站
 function bin() {
-    var title = "<span class='one' style='font-weight: 500;margin-top: 15px'>文件名</span>\n" +
+    var title = "<span class='one' style='font-weight: 500;'>文件名</span>\n" +
         "<span class='two'  style='font-weight: 500;margin-top: 15px'>删除时间</span>\n"+"<hr class='hr1'>";
     $.ajax({
         url: "/myBin/",
@@ -192,7 +192,11 @@ function restore(id,w) {
         success: function (data) {
             if (data.status == 200) {
                 alert(data.message);
-                window.location.href = '/index/';
+                if(w=='协作空间'){
+                    window.location.href = '/index/';
+                }else{
+                  bin()
+                }
             } else {
                 alert(data.message);
             }
@@ -214,7 +218,8 @@ function deleteAll(id,w) {
              success: function (data) {
                  if (data.status == 200) {
                      alert(data.message);
-                     window.location.href = '/index/';
+                     //window.location.href = '/index/';
+                     bin()
                  } else {
                      alert(data.message);
                  }

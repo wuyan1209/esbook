@@ -561,11 +561,14 @@ def myBin(request):
     cursor.execute('select * from( '
                    '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
-                                                                                                                            ' UNION'
-                                                                                                                            ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
-                                                                                                                            ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                                                                                                                            ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                 ' )t ORDER BY time DESC')
+                    ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                    ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' )t ORDER BY time DESC')
     result = cursor.fetchall()
     return JsonResponse({'status': 200, 'message': result})
 
@@ -591,6 +594,7 @@ def restore(request):
 def deleteAll(request):
     id = request.POST['id']
     what = request.POST['what']
+    print(id+" "+what)
     cursor = connection.cursor()
     try:
         # 判断该文件是文档还是协作空间
