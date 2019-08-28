@@ -9,17 +9,18 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">
+{#    <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">#}
     <title>esbook </title>
     <!-- Bootstrap Core CSS -->
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="data:image/ico;base64,aWNv">
     <!-- chartist CSS -->
-    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
-    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">
-    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
-          rel="stylesheet">
+    {% comment %}<link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">{% endcomment %}
+   {% comment %} <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
+          rel="stylesheet">{% endcomment %}
     <!--This page css - Morris CSS -->
-    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
+{#    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">#}
     <!-- Custom CSS -->
     <link href="../static/css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
@@ -28,9 +29,6 @@
     <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
-
-    <link href="{% static 'assets/plugins/layui/css/layui.css' %}">
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -825,7 +823,6 @@
 <!-- Bootstrap tether Core JavaScript -->
 <script src="../static/assets/plugins/bootstrap/js/tether.min.js"></script>
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="{% static 'assets/plugins/layui/layui.js' %}"></script>
 <!-- slimscrollbar scrollbar JavaScript -->
 <script src="../static/js/jquery.slimscroll.js"></script>
 <!--Wave Effects -->
@@ -840,8 +837,8 @@
 <!-- This page plugins -->
 <!-- ============================================================== -->
 <!-- chartist chart -->
-<script src="../static/assets/plugins/chartist-js/dist/chartist.min.js"></script>
-<script src="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.min.js"></script>
+{% comment %}<script src="../static/assets/plugins/chartist-js/dist/chartist.min.js"></script>
+<script src="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.min.js"></script>{% endcomment %}
 <!--c3 JavaScript -->
 <script src="../static/assets/plugins/d3/d3.min.js"></script>
 <script src="../static/assets/plugins/c3-master/c3.min.js"></script>

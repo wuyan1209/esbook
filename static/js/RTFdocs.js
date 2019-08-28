@@ -127,3 +127,41 @@ function saveDocs(saveState) {
     }
 
 }
+
+// 创建websocket连接
+var ws;
+
+function startWS() {
+    ws = new WebSocket('ws://127.0.0.1:8001');
+    ws.onopen = function () {
+        console.log("websocket opened!");
+    }
+
+    ws.onmessage = function (msg) {
+        console.log("receive message" + msg.data);
+        $("#toolbar-container").innerAdjacentHTML("beforeend","<p>"+msg.data+"</p>")
+
+    }
+
+    ws.onerror = function (error) {
+        console.log("websocket error:"+ error.name+ error.number);
+
+    }
+
+    ws.onclose = function () {
+        console.log("websocket closed!");
+
+    }
+}
+
+function sendMessage() {
+    console.log("send a message...")
+    var text = document.getElementById("text")
+    ws.send(text.value)
+}
+
+window.onbeforeunload = function () {
+    ws.onclose = function () {
+    }     // 关闭websocket连接
+    ws.close()
+}
