@@ -240,7 +240,7 @@ class TeamMember(models.Model):
 class User(models.Model):
     user_id = models.AutoField(primary_key=True)
     user_name = models.CharField(unique=True, max_length=50, blank=True, null=True)
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=100)
     email = models.CharField(unique=True, max_length=50, blank=True, null=True)
     phone = models.CharField(unique=True, max_length=11, blank=True, null=True)
     icon = models.CharField(max_length=150, blank=True, null=True)

@@ -75,10 +75,20 @@ urlpatterns = [
     path('serachRTFdoc/', views.serachRTFdoc),
     # 跳转注册页面
     path('register/', views.register),
-    # 注册
-    path('registerUser/',views.registerUser),
-
     # 删除文件
     path('delFiles/', views.delFiles),
-
+    # 校验用户名
+    path('valiName/', views.valiName),
+    # 校验手机号
+    path('valiPhone/', views.valiPhone),
+    # 校验邮箱号
+    path('valiEmail/', views.valiEmail),
+    # 注册
+    path('Register/', views.Register),
+    # 登录
+    path('userLogin/', views.userLogin),
+    # 退出登录
+    path('logout/', views.logout),
+    # 个人中心
+    path('personal/', views.personal),
 ]

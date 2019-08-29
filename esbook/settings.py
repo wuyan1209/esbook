@@ -78,7 +78,7 @@ DATABASES = {
         'NAME': 'esbook',  # 数据库的名字
         'USER': 'root',  # mysql数据库的用户名
         'PASSWORD': '123456',  # mysql数据库的密码
-        'HOST': '172.16.84.62',  # mysql数据库的主机名
+        'HOST': '47.105.172.29',  # mysql数据库的主机名
         'PORT': '3306',  # mysql数据库的端口号（这个可写可不写）
         'ATOMIC_REQUESTS': True
     }

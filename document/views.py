@@ -1,6 +1,8 @@
-from django.http import HttpResponse, JsonResponse
+
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.db import connection, transaction
+from django.contrib.auth.hashers import make_password,check_password
 from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
@@ -8,9 +10,6 @@ import json  # 引入json模块
 
 # 跳转到主页面
 def index(request):
-    # 模拟登录时把用户名和id存取在session里
-    request.session['username'] = "吴炎"
-    request.session['userId'] = 1
     return render(request, 'index.html')
 
 
@@ -594,7 +593,6 @@ def restore(request):
 def deleteAll(request):
     id = request.POST['id']
     what = request.POST['what']
-    print(id+" "+what)
     cursor = connection.cursor()
     try:
         # 判断该文件是文档还是协作空间
@@ -832,16 +830,6 @@ def saveEditionRTFdoc(request):
 def register(request):
     return render(request,'register.html');
 
-# 注册
-def registerUser(request):
-    userName=request.POST['userName'];
-    phone = request.POST['phone'];
-    password = request.POST['password'];
-    email = request.POST['email'];
-    code = request.POST['code'];
-    print(userName+" "+phone+" "+password+" "+email+" "+code)
-    return render(request,'register.html');
-
 
 # 删除文件
 def delFiles(request):
@@ -854,4 +842,128 @@ def delFiles(request):
     except Exception as e:
         return_param["flag"] = "fail"
     return HttpResponse(json.dumps(return_param))
+
+# 校验用户名
+def valiName(request):
+    name = request.POST['name'];  # 用户名
+    # 判断用户名是否存在
+    cursor = connection.cursor()
+    cursor.execute('select user_id from user where user_name=%s' ,[name])
+    userId = cursor.fetchone()
+    cursor.close()
+    if userId:
+        return JsonResponse({'status': 2001, 'message': "用户名已被占用"})
+    return JsonResponse({'status': 200, 'message': "ok"})
+# 校验手机号
+def valiPhone(request):
+    phone = request.POST['phone'];
+    # 判断用户名是否存在
+    cursor = connection.cursor()
+    cursor.execute('select user_id from user where phone=%s',[phone])
+    userId = cursor.fetchone()
+    cursor.close()
+    if userId:
+        return JsonResponse({'status': 2001, 'message': "手机号已被占用"})
+    return JsonResponse({'status': 200, 'message': "ok"})
+# 校验邮箱号
+def valiEmail(request):
+    email = request.POST['email'];
+    # 判断用户名是否存在
+    cursor = connection.cursor()
+    cursor.execute('select user_id from user where email=%s',[email])
+    userId = cursor.fetchone()
+    cursor.close()
+    if userId:
+        return JsonResponse({'status': 2001, 'message': "邮箱号已被占用"})
+    return JsonResponse({'status': 200, 'message': "ok"})
+
+# 注册
+def Register(request):
+    name=request.POST['name']; #用户名
+    email = request.POST['email']; #邮箱号
+    phone = request.POST['phone'];  # 手机号
+    password = request.POST['password']; #密码
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    # 密码加密
+    pwd=make_password(password,'a')
+    cursor = connection.cursor()
+    # 判断是手机号注册还是邮箱注册
+    #手机注册
+    if phone:
+        try:
+            cursor.execute("insert into user (user_name, password, phone, cre_date) values (%s,%s,%s,%s)",[name, pwd, phone, formatTime])
+            status=200
+            message="ok"
+        except :
+            status = 4001
+            message = "注册失败"
+        if status==200:
+            return HttpResponseRedirect("/login/")
+        else:
+            return JsonResponse({'status': status, 'message': message})
+    #邮箱注册
+    else:
+        try:
+            cursor.execute("insert into user (user_name, password, email, cre_date) values (%s,%s,%s,%s)",[name, pwd, email, formatTime])
+            status = 200
+            message = "ok"
+        except:
+            status = 4001
+            message = "注册失败"
+        if status == 200:
+            return HttpResponseRedirect("/login/")
+        else:
+            return JsonResponse({'status': status, 'message': message})
+
+# 登录
+def userLogin(request):
+    userName = request.POST['userName']
+    password = request.POST['password']
+    cursor = connection.cursor()
+    if userName.find("@")==-1:  # -1代表找不到  0代表找到
+        # 手机号登录
+        # 判断用户是否存在
+        cursor.execute('select user_id,user_name,password from user where phone=' + userName)
+        user = cursor.fetchone()
+        if user:
+            # 判断密码是否正确
+            ret = check_password(password, user[2])
+            if ret:
+                # 用户存session
+                request.session['username'] = user[1]
+                request.session['userId'] = user[0]
+                return HttpResponseRedirect('/index/')  #跳转到主界面
+            else:
+                return render(request, 'login.html', {"error": "密码错误"})
+        else:
+            return render(request, 'login.html', {"error": "用户不存在"})
+    else:
+        # 邮箱登录
+        # 判断用户是否存在
+        cursor.execute('select user_id,user_name,password from user where email=%s' ,[userName])
+        user = cursor.fetchone()
+        if user:
+            # 判断密码是否正确
+            ret=check_password(password,user[2])
+            if ret:
+                # 用户存session
+                request.session['username'] = user[1]
+                request.session['userId'] = user[0]
+                return HttpResponseRedirect('/index/')  #跳转到主界面
+            else:
+                return render(request, 'login.html', {"error": "密码错误"})
+        else:
+            return render(request,'login.html',{"error":"用户不存在"})
+
+
+# 退出登录
+def logout(request):
+    # 清除sessoin
+    request.session.clear();
+    return HttpResponseRedirect('/login/')  # 跳转到登录页面
+
+# 个人中心
+def personal(request):
+    return render(request,'personal.html');
 
