@@ -172,8 +172,9 @@ def addMember(request):
 # 保存个人空间的docs
 @transaction.atomic
 def RTFdocs_save(request):
-    doc_content = request.POST.get('doc_content', 0)  # 文档内容
-    doc_title = request.POST.get('doc_title', 0)  # 文档标题
+    doc_content = request.POST.get('doc_content')  # 文档内容
+    doc_title = request.POST.get('doc_title')  # 文档标题
+    userId = request.session.get("userId")
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
     return_param = {}
@@ -186,8 +187,10 @@ def RTFdocs_save(request):
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
         file_id = cursor.fetchone()
 
-        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [1, file_id])
+        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, file_id])
         return_param['saveStatus'] = "success"
+        return_param['userId'] = userId
+        return_param['fileId'] = file_id[0]
         transaction.savepoint_commit(sid)
     except Exception as e:
         # 数据库更新失败
@@ -203,6 +206,7 @@ def saveTeamDoc(request):
     teamId = request.POST.get('teamId')  # 团队ID
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    userId = request.session.get("userId")
     return_param = {}
     sid = transaction.savepoint()
     try:
@@ -213,13 +217,16 @@ def saveTeamDoc(request):
                        [doc_title, doc_content, formatTime])
         # 获取文件id
         cursor.execute("select file_id from file where file_name = %s", [doc_title])
-        file_id = cursor.fetchone()
+        file_id = cursor.fetchone()[0]
+
         # 获取团队成员id
-        cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [1, teamId])
+        cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [userId, teamId])
         team_mem_id = cursor.fetchone()
         # 保存团队文件
         cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
         return_param['saveStatus'] = "success"
+        return_param['fileId'] = file_id
+        return_param['teamId'] = teamId
         transaction.savepoint_commit(sid)
     except Exception as e:
         # 数据库更新失败
@@ -379,7 +386,8 @@ def editMemberRole(request):
         saveId = transaction.savepoint()
         try:
             # 修改角色
-            cursor.execute('update member_role set role_id=(select role_id from role where role_name="'+roleName+'") where mem_role_id='+memRoleId)
+            cursor.execute(
+                'update member_role set role_id=(select role_id from role where role_name="' + roleName + '") where mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -412,7 +420,8 @@ def editAdminRole(request):
         saveId = transaction.savepoint()
         try:
             # 修改角色
-            cursor.execute('update member_role set role_id=(select role_id from role where role_name="'+roleName+'") where mem_role_id='+memRoleId)
+            cursor.execute(
+                'update member_role set role_id=(select role_id from role where role_name="' + roleName + '") where mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -444,7 +453,8 @@ def delMemberRole(request):
         saveId = transaction.savepoint()
         try:
             # 移除角色
-            cursor.execute('delete tm,mr from team_member tm,member_role mr where tm.team_mem_id=mr.team_mem_id and mr.mem_role_id='+memRoleId)
+            cursor.execute(
+                'delete tm,mr from team_member tm,member_role mr where tm.team_mem_id=mr.team_mem_id and mr.mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -476,7 +486,8 @@ def delAdminRole(request):
         saveId = transaction.savepoint()
         try:
             # 角色修改为可编辑
-            cursor.execute('update member_role set role_id=(select role_id from role where role_name="可编辑") where mem_role_id='+memRoleId)
+            cursor.execute(
+                'update member_role set role_id=(select role_id from role where role_name="可编辑") where mem_role_id=' + memRoleId)
             cursor.close()
             # 成功的话保存
             status = 200
@@ -561,14 +572,14 @@ def myBin(request):
     cursor.execute('select * from( '
                    '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
-                    ' UNION'
-                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
-                    ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                    ' and f.file_state=1 and u.user_name="' + username + '")'
-                     ' UNION'
-                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
-                    ' and f.file_state=1 and u.user_name="' + username + '")'
-                     ' )t ORDER BY time DESC')
+                                                                                                                            ' UNION'
+                                                                                                                            ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                                                                                                                            ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                                                                                                                            ' and f.file_state=1 and u.user_name="' + username + '")'
+                                                                                                                                                                                 ' UNION'
+                                                                                                                                                                                 ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                                                                                                                                                                                 ' and f.file_state=1 and u.user_name="' + username + '")'
+                                                                                                                                                                                                                                      ' )t ORDER BY time DESC')
     result = cursor.fetchall()
     return JsonResponse({'status': 200, 'message': result})
 
@@ -594,12 +605,13 @@ def restore(request):
 def deleteAll(request):
     id = request.POST['id']
     what = request.POST['what']
-    print(id+" "+what)
+    print(id + " " + what)
     cursor = connection.cursor()
     try:
         # 判断该文件是文档还是协作空间
         if what == '协作空间':
-            cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
+            cursor.execute(
+                'delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
             cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
             cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
@@ -617,7 +629,7 @@ def searchFile(request):
     searchedFiles = []
     files = {}
 
-    # 查文件名
+    # 查文件
     cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
     fileIds = cursor.fetchall()
     for fileId in fileIds:
@@ -626,12 +638,13 @@ def searchFile(request):
             "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
             [fileId[0], 0])
         searchList = cursor.fetchone()
-        files['file_name'] = searchList[0]
-        files['content'] = searchList[1]
-        files['type'] = searchList[2]
-        files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
-        files['file_id'] = searchList[4]
-        searchedFiles.append(files.copy())
+        if searchList:
+            files['file_name'] = searchList[0]
+            files['content'] = searchList[1]
+            files['type'] = searchList[2]
+            files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
+            files['file_id'] = searchList[4]
+            searchedFiles.append(files.copy())
     return HttpResponse(json.dumps(searchedFiles))
 
 
@@ -692,7 +705,8 @@ def saveEdition(request):
         cursor.execute("select file_id from file where file_name = %s", [edi_name])
         fileId = cursor.fetchone()
         # 保存版本
-        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)', [formatTime, content,edi_name])
+        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)',
+                       [formatTime, content, edi_name])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
         edi_id = cursor.fetchone()
         # 获取个人文件表id
@@ -720,10 +734,11 @@ def getuseredition(request):
     # 获取文件名称、id、内容
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
-    fileid=cursor.fetchone()
-    cursor.execute('select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
-                   'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
-                   'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
+    fileid = cursor.fetchone()
+    cursor.execute(
+        'select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
+        'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
+        'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
@@ -779,9 +794,10 @@ def getTeamEdition(request):
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
     fileid = cursor.fetchone()
-    cursor.execute('select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
-                   'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
-                   'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
+    cursor.execute(
+        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
+        'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
+        'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
@@ -817,9 +833,10 @@ def saveEditionRTFdoc(request):
     sid = transaction.savepoint()
     cursor = connection.cursor()
     try:
-        cursor.execute('select file_id from file where file_name="'+ fileName + '"')
-        fileId = cursor.fetchone() #25
-        cursor.execute( "update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",[content,formatTime,fileId])
+        cursor.execute('select file_id from file where file_name="' + fileName + '"')
+        fileId = cursor.fetchone()  # 25
+        cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
+                       [content, formatTime, fileId])
         return_param['saveStatus'] = "success";
         transaction.savepoint_commit(sid)
     except Exception as e:
@@ -828,19 +845,21 @@ def saveEditionRTFdoc(request):
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
 
+
 # 跳转到注册页面
 def register(request):
-    return render(request,'register.html');
+    return render(request, 'register.html');
+
 
 # 注册
 def registerUser(request):
-    userName=request.POST['userName'];
+    userName = request.POST['userName'];
     phone = request.POST['phone'];
     password = request.POST['password'];
     email = request.POST['email'];
     code = request.POST['code'];
-    print(userName+" "+phone+" "+password+" "+email+" "+code)
-    return render(request,'register.html');
+    print(userName + " " + phone + " " + password + " " + email + " " + code)
+    return render(request, 'register.html');
 
 
 # 删除文件
@@ -854,4 +873,3 @@ def delFiles(request):
     except Exception as e:
         return_param["flag"] = "fail"
     return HttpResponse(json.dumps(return_param))
-

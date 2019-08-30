@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- Favicon icon -->
-{#    <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">#}
+    {#    <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">#}
     <title>esbook </title>
     <!-- Bootstrap Core CSS -->
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -17,10 +17,10 @@
     <!-- chartist CSS -->
     {% comment %}<link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
     <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">{% endcomment %}
-   {% comment %} <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
+    {% comment %} <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
           rel="stylesheet">{% endcomment %}
     <!--This page css - Morris CSS -->
-{#    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">#}
+    {#    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">#}
     <!-- Custom CSS -->
     <link href="../static/css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
@@ -169,7 +169,8 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)">文档</a>
+                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)" data-toggle="modal"
+                           data-target="#createDocs">文档</a>
                         <a class="dropdown-item" href="#">表格</a>
                         <a class="dropdown-item" href="#">幻灯片</a>
                     </div>
@@ -181,6 +182,35 @@
                                onchange="upLoad()">
                         <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
                     </div>
+                </div>
+                <div class="modal fade" id="createDocs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel">
+                                    请输入文档名称
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="doc_name"
+                                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
+                            </div>
+
+                            <div class="modal-footer">
+                                <span style="color: red;" id="docNameExist"></span>
+                                <button id="sure_doc" type="button" class="btn btn-primary">
+                                    确定
+                                </button>
+
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
                 </div>
             </div>
             <div id="box2">
@@ -194,7 +224,6 @@
                             <li class="list-group-item" style="width: 100px" onclick="delFiles()">删除</li>
                         </ul>
                     </div>
-
 
                     <div id="bin"></div>
                 </div>
@@ -221,6 +250,7 @@
                 cellpadding: 0px;
                 cellspacing: 0px;
             }
+
             #fenye {
                 margin-left: 65%;
                 margin-top: 10px;
@@ -322,24 +352,19 @@
                 })
             }
 
-            // 新建doc文档
-            $("#toDocs").on("click", function () {
-                window.location.href = "/RTFdocs/?saveState=" + saveState
-            });
-
             //阻止浏览器默认右击点击事件
             $("#tab").on("contextmenu", "tr", function () {
                 return false;
             });
 
             // 绑定右击事件
-            $("#tab").on("mousedown", "tr", function (e) {
+            $("#tab").on("mousedown", "tbody tr", function (e) {
                 //右键为3
                 if (3 == e.which) {
                     var file_id = $(this).attr("file_id");
                     var team_name = $(this).attr("teamname");
-                    $("#clickMenu").attr("file_id",file_id)
-                    $("#clickMenu").attr("team_name",team_name)
+                    $("#clickMenu").attr("file_id", file_id)
+                    $("#clickMenu").attr("team_name", team_name)
 
                     $("#clickMenu").css("display", "block");
                     //var divchild = $(this).children("div");
@@ -347,7 +372,7 @@
                     $("#clickMenu").css("top", e.clientY - 50);
                 }
             });
-
+            // 点击空白区域隐藏菜单
             $("body").on("click", function () {
                 $("#clickMenu").css("display", "none");
             })
@@ -848,6 +873,7 @@
 <script src="../static/js/addTeam.js"></script>
 <script src="../static/js/modifyRTFdocs.js"></script>
 <script src="{% static 'js/search.js' %}"></script>
+<script src="{% static 'js/RTFdocs.js' %}"></script>
 
 </body>
 </html>
