@@ -8,6 +8,7 @@ import time  # 引入time模块
 import json  # 引入json模块
 import os
 
+
 # 跳转到主页面
 from esbook.settings import BASE_DIR
 
@@ -1046,15 +1047,15 @@ def getcontent(file_path):
         styles = para.style.name
         fonts = para.runs
         for f in fonts:
-            if (f.bold):  # 加粗
-                content += "<p><strong>" + doc_test + "</strong><p>"
-            if (f.italic):  # 斜体
-                content += "<p><i>" + doc_test + "</i><p>"
+            if (f.bold):#加粗
+               content+="<p><strong>"+doc_test+"</strong></p>"
+            if(f.italic):#斜体
+               content += "<p><i>" + doc_test + "</i></p>"
             if (f.underline):  # 下划线
-                content += "<p><u>" + doc_test + "</u><p>"
-        if styles == 'Heading 1':  # 一级标题
-            content += "<h1>" + doc_test + "</h1>"
-        elif styles == 'Heading 2':  # 二级标题
+               content += "<p><u>" + doc_test + "</u></p>"
+        if styles=='Heading 1':#一级标题
+            content +="<h1>"+doc_test+"</h1>"
+        elif  styles=='Heading 2':#二级标题
             content += "<h2>" + doc_test + "</h2>"
         if doc_test == "":
             content += "<p></p>"

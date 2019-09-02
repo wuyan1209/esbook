@@ -110,51 +110,16 @@ $(function () {
     })
     $("#myEditor").hide()
 
-    //编辑器的值改变时
-    /*var flag = true;
-    $('#editor').on('compositionstart', function () {
-        flag = false;
-    });
-    $('#editor').on('compositionend', function () {
-        flag = true;
-    });
-    $('#editor').on('input', function () {
-        var doc_content = document.getElementById("editor"); //取得纯文本
-        doc_content = doc_content.innerHTML;    //取得html格式的内容
+
+
+    $("#editor").bind("DOMSubtreeModified", function () {
         setTimeout(function () {
-            if (flag) {
-                alert(doc_content)
-            }
-        }, 0)
-    });*/
+            modifyDocs();
+        }, 0);
+    });
 
-    /*  var title = $('#editor');//the element I want to monitor
-      title.bind('DOMNodeInserted', function (e) {
-          alert($(e.target).html());
-      });*/
-
-    var flag = true;
-    $('#editor').on('compositionstart', function () {
-        flag = false;
-    });
-    $('#editor').on('compositionend', function () {
-        flag = true;
-    });
-    $("#editor").bind("DOMNodeInserted DOMNodeRemoved", function () {
-        if (flag) {
-            setTimeout(function () {
-                changes()
-            }, 0)
-        }
-    });
 
 });
-
-function changes() {
-    var doc_content = document.getElementById("editor"); //取得纯文本
-    doc_content = doc_content.innerHTML;    //取得html格式的内容
-    alert(doc_content)
-}
 
 // 回显文档数据
 doc_content();
@@ -209,7 +174,7 @@ function modifyDocs() {
         success: function (data) {
             if (data.saveStatus == "success") {
                 // 保存成功
-                alert("保存成功了");
+                //alert("保存成功了");
             } else {
                 // 保存失败
                 alert("保存失败了");

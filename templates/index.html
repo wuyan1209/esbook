@@ -110,7 +110,7 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
-                        <a href="" class="link" data-toggle="tooltip" title="Logout"><i
+                        <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
                 </ul>
@@ -181,7 +181,9 @@
 {#                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>#}
 {#                    </div>#}
                     <form method="post"  id="myform"  action="" enctype="multipart/form-data">
-                        <input type="file" name="files" id="inputfiles">
+                        <a href="javascript:;" class="file">选择文件
+                            <input type="file" name="files" id="inputfiles">
+                        </a>
                         <input type="submit" value="导入" id="daoru">
                     </form>
                 </div>
@@ -235,6 +237,40 @@
                 margin-top: 10px;
                 margin-bottom: 10px;
                 background-color: #ffffff;
+            }
+            #daoru{
+                width: 146px;
+            }
+            .file {
+                position: relative;
+                display: inline-block;
+                width: 146px;
+                background: white;
+                {#border: 1px solid lightgrey;#}
+                border-radius: 4px;
+                {#padding: 4px 12px;#}
+                overflow: hidden;
+                color: black;
+                text-decoration: none;
+                text-indent: 0;
+                line-height: 20px;
+                text-align: center;
+            }
+            .file input {
+                position: absolute;
+                font-size: 100px;
+                right: 0;
+                top: 0;
+                opacity: 0;
+            }
+            .file:hover {
+                background: lightgrey;
+                border-color: #78C3F3;
+                color: black;
+                text-decoration: none;
+            }
+            #daoru{
+                border: none;
             }
         </style>
         <script>
