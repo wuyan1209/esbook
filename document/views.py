@@ -30,7 +30,7 @@ def addTeam(request):
         try:
             # 空间名是唯一的，查询是否在数据库里存在
             cursor = connection.cursor()
-            cursor.execute('select team_id from Team where team_name=%s', [teamName])
+            cursor.execute('select team_id from team where team_name=%s', [teamName])
             tid = cursor.fetchone()
             if tid:
                 return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
@@ -41,7 +41,7 @@ def addTeam(request):
             # 创建保存点
             save_id = transaction.savepoint()
             # 添加协作空间
-            cursor.execute('insert into Team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId, formatTime])
+            cursor.execute('insert into team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId, formatTime])
             # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
             cursor.execute('select team_id from team  order by team_id desc limit 1')
             row = cursor.fetchall()
@@ -231,7 +231,6 @@ def saveTeamDoc(request):
 def docNameExist(request):
     docName = request.POST.get('docsName')  # 获取文档标题
     saveState = request.POST.get('saveState')  # 获取文档状态
-    # userId = request.POST.get('userId')  # 获取用户Id
     userId = request.session.get('userId')
     teamId = request.POST.get('teamId')  # 获取团队Id
     return_param = {}
@@ -265,22 +264,35 @@ def docNameExist(request):
 
 # 查询文件
 def fileList(request):
-    cursor = connection.cursor()
+    page = request.POST['page']
     # 获取session里存放的username
     username = request.session.get('username')
+    # 每页显示条数
+    pageSize = 10
+    cursor = connection.cursor()
+    cursor.execute('select count(*) '
+                   'from user u,file f,user_file uf '
+                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"')
+    count = cursor.fetchone()[0]  # 总条数
+    totalPage = count / pageSize  # 总页数
+    if count % pageSize != 0:
+        totalPage = totalPage + 1
+    # 当页数大于总页数，直接返回
+    if int(page) > totalPage:
+        return JsonResponse({"status": 2001})
+    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
     cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id '
                    'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
+                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"'
+                   ' order by f.cre_date desc limit %s,%s',[offset,pageSize])
     row = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"list": row})
+    return JsonResponse({"page":int(page),"pageSize":pageSize,"totalPage":totalPage,"list": row})
 
 
 # 修改doc文档
 def doc_modify(request):
     file_name = request.POST.get("file_name")  # 获取文件名称
-    user_id = request.POST.get("user_id")  # 获取文件作者或团队的id
-    saveState = request.POST.get("saveState")  # 获取文件状态
     fileId = request.POST.get("fileId")  # 获取文件状态
 
     cursor = connection.cursor()
@@ -509,41 +521,32 @@ def delTeam(request):
     return JsonResponse({'status': status, 'message': message})
 
 
-# 分页
-# def paginator_view(request):
-#     cursor = connection.cursor()
-#     cursor.execute('select * from Permission ')
-#     list = cursor.fetchall()
-#     # 将数据按照规定每页显示 10 条, 进行分割
-#     paginator = Paginator(list, 3)
-#     if request.method == "GET":
-#         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
-#         page = request.GET.get('page')
-#         try:
-#             books = paginator.page(page)
-#         except PageNotAnInteger:
-#             # 如果请求的页数不是整数, 返回第一页。
-#             books = paginator.page(1)
-#         except InvalidPage:
-#             # 如果请求的页数不存在, 重定向页面
-#             return HttpResponse('找不到页面的内容')
-#         except EmptyPage:
-#             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
-#             books = paginator.page(paginator.num_pages)
-#     return render(request, "fenye.html", {'books': list})
-
-
 # 团队文件
 def teamfile(request):
     teamname = request.POST.get("teamName")
+    page = request.POST['page']
+    # 每页显示条数
+    pageSize = 10
     cursor = connection.cursor()
+    cursor.execute('select count(*) '
+                   'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
+                   ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
+                   'and  t.team_name ="' + teamname + '" ')
+    count = cursor.fetchone()[0]  # 总条数
+    totalPage = count / pageSize  # 总页数
+    if count % pageSize != 0:
+        totalPage = totalPage + 1
+    # 当页数大于总页数，直接返回
+    if int(page) > totalPage:
+        return JsonResponse({"status": 2001})
+    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
     cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id '
                    'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
                    ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
-                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc')
+                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s',[offset, pageSize])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"list": list})
+    return JsonResponse({"page":int(page),"pageSize":pageSize,"totalPage":totalPage,"list": list})
 
 
 # 登录页面
@@ -614,22 +617,26 @@ def searchFile(request):
     searchCondition = request.POST.get("searchCondition")  # 获取查询条件
     searchedFiles = []
     files = {}
-
-    # 查文件名
-    cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
+    # 获取username
+    username=request.session['username']
+    # 查找该用户自己的文件和加入的团队的文件
+    cursor.execute("select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='"+username+"' and f.file_name like '%" + searchCondition + "%' "
+                    "UNION "
+                    "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
+                     "and user_name='"+username+"' and file_name like '%" + searchCondition + "%'")
     fileIds = cursor.fetchall()
     for fileId in fileIds:
         # 根据查询到的fileID来获取file的详细数据
         cursor.execute(
-            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
-            [fileId[0], 0])
+            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",[fileId[0], 0])
         searchList = cursor.fetchone()
-        files['file_name'] = searchList[0]
-        files['content'] = searchList[1]
-        files['type'] = searchList[2]
-        files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
-        files['file_id'] = searchList[4]
-        searchedFiles.append(files.copy())
+        if searchList:
+            files['file_name'] = searchList[0]
+            files['content'] = searchList[1]
+            files['type'] = searchList[2]
+            files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
+            files['file_id'] = searchList[4]
+            searchedFiles.append(files.copy())
     return HttpResponse(json.dumps(searchedFiles))
 
 
@@ -966,4 +973,3 @@ def logout(request):
 # 个人中心
 def personal(request):
     return render(request,'personal.html');
-

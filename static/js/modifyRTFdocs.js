@@ -31,14 +31,16 @@ DecoupledEditor
         console.error(error);
     })
 
+
 $(function () {
+
     // 加载时获取文档标题
     var old_doc_title = $("#docs_title").val();     // 页面加载时获取文档名称
     var doc_save_state = $("#doc_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
     var userId = $("#userId").val();    // 用户的id
     var teamId = $("#teamId").val();    // 团队的id
 
-    // 点击保存按钮吧保存
+    // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
         modifyDocs(old_doc_title, doc_save_state, userId, teamId);
     });
@@ -107,7 +109,52 @@ $(function () {
         $("#myEditor").hide()
     })
     $("#myEditor").hide()
+
+    //编辑器的值改变时
+    /*var flag = true;
+    $('#editor').on('compositionstart', function () {
+        flag = false;
+    });
+    $('#editor').on('compositionend', function () {
+        flag = true;
+    });
+    $('#editor').on('input', function () {
+        var doc_content = document.getElementById("editor"); //取得纯文本
+        doc_content = doc_content.innerHTML;    //取得html格式的内容
+        setTimeout(function () {
+            if (flag) {
+                alert(doc_content)
+            }
+        }, 0)
+    });*/
+
+    /*  var title = $('#editor');//the element I want to monitor
+      title.bind('DOMNodeInserted', function (e) {
+          alert($(e.target).html());
+      });*/
+
+    var flag = true;
+    $('#editor').on('compositionstart', function () {
+        flag = false;
+    });
+    $('#editor').on('compositionend', function () {
+        flag = true;
+    });
+    $("#editor").bind("DOMNodeInserted DOMNodeRemoved", function () {
+        if (flag) {
+            setTimeout(function () {
+                changes()
+            }, 0)
+        }
+    });
+
 });
+
+function changes() {
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //取得html格式的内容
+    alert(doc_content)
+}
 
 // 回显文档数据
 doc_content();

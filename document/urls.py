@@ -91,4 +91,5 @@ urlpatterns = [
     path('logout/', views.logout),
     # 个人中心
     path('personal/', views.personal),
+
 ]

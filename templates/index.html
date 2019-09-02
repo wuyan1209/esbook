@@ -29,8 +29,6 @@
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
 
-    <link href="{% static 'assets/plugins/layui/css/layui.css' %}">
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -188,27 +186,18 @@
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 1.5%">我的文档</h2>
                     <table id="tab" class="table table-hover">
-
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
                         <ul class="list-group">
                             <li class="list-group-item" style="width: 100px" onclick="delFiles()">删除</li>
                         </ul>
                     </div>
-
-
                     <div id="bin"></div>
                 </div>
-                <div id="fenye">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href=" ">Previous</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
-                        </ul>
-                    </nav>
+                <!-- 分页容器： 显示分页按钮-->
+                <div class="fenye">
+                    <!-- 注意:3版本的分页容器标签是<ul>，2版本的容器标签是<div> -->
+                    <ul id="mypage"></ul>
                 </div>
             </div>
         </div>
@@ -266,31 +255,66 @@
             {#显示我的文档列表#}
 
             function my_doc_file() {
-                $("#tab").html("");
                 $("#bin").html("");
                 $("#h2").text("我的文档");
-                $("#tab").append(tableTitle);
                 $.ajax({
                     url: "/filelist/",
                     type: "POST",
                     dataType: "json",
+                    data: {page: '1'}, //参数：当前页为1
                     success: function (data) {
-                        $("#tab").html("");
-                        $("#tab").append(tableTitle)
-                        for (i = 0; i < data.list.length; i++) {
-                            var text = data.list[i][2];
-                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                            html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
-                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
-                                '<td>' + data.list[i][1] + '</td>' +
-                                '<td>' + mystr + '</td>' +
-                                '</tr>'
-                            $("#tab").append(html)
-                        }
-                        $("#tab").append("</tbody>")
+                        //处理第一页的数据
+                        appendHtml(data);
+                        var options = {//根据后台返回的分页相关信息，设置插件参数
+                            bootstrapMajorVersion: 3, //如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
+                            currentPage: data.page, //当前页数
+                            totalPages: data.totalPage, //总页数
+                            numberOfPages: data.pageSize,//每页记录数
+                            itemTexts: function (type, page, current) {//设置分页按钮显示字体样式
+                                switch (type) {
+                                    case "first":
+                                        return "首页";
+                                    case "prev":
+                                        return "上一页";
+                                    case "next":
+                                        return "下一页";
+                                    case "last":
+                                        return "末页";
+                                    case "page":
+                                        return page;
+                                }
+                            },
+                            onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
+                                $.ajax({//根据page去后台加载数据
+                                    url: "/filelist/",
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {"page": page},
+                                    success: function (data) {
+                                        appendHtml(data);//处理数据
+                                    }
+                                });
+                            }
+                        };
+                        $('#mypage').bootstrapPaginator(options);//设置分页
                     },
                 })
+            }
+            function appendHtml(data) {
+                $("#tab").html("");
+                $("#tab").append(tableTitle);
+                for (i = 0; i < data.list.length; i++) {
+                    var text = data.list[i][2];
+                    var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                    html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n' +
+                        '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
+                        '<td>' + data.list[i][1] + '</td>' +
+                        '<td>' + mystr + '</td>' +
+                        '</tr>';
+                    $("#tab").append(html)
+                }
+                $("#tab").append("</tbody>");
             }
 
             {#团队文档列表#}
@@ -304,23 +328,61 @@
                 $.ajax({
                     url: "/teamfile/",
                     type: "POST",
-                    data: {"teamName": teamName},
+                    data: {"teamName": teamName,"page":1},
                     dataType: "json",
                     success: function (data) {
-                        for (i = 0; i < data.list.length; i++) {
-                            var text = data.list[i][6];
-                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                            var html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
-                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
-                                '<td>' + data.list[i][3] + '</td>' +
-                                '<td>' + mystr + '</td>' +
-                                '</tr>'
-                            $("#tab").append(html)
-                        }
-                        $("#tab").append("</tbody>")
+                        //处理第一页的数据
+                        appendTable(data);
+                        var options = {//根据后台返回的分页相关信息，设置插件参数
+                            bootstrapMajorVersion: 3, //如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
+                            currentPage: data.page, //当前页数
+                            totalPages: data.totalPage, //总页数
+                            numberOfPages: data.pageSize,//每页记录数
+                            itemTexts: function (type, page, current) {//设置分页按钮显示字体样式
+                                switch (type) {
+                                    case "first":
+                                        return "首页";
+                                    case "prev":
+                                        return "上一页";
+                                    case "next":
+                                        return "下一页";
+                                    case "last":
+                                        return "末页";
+                                    case "page":
+                                        return page;
+                                }
+                            },
+                            onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
+                                $.ajax({//根据page去后台加载数据
+                                    url: "/teamfile/",
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {"teamName": teamName,"page": page},
+                                    success: function (data) {
+                                        appendTable(data);//处理数据
+                                    }
+                                });
+                            }
+                        };
+                        $('#mypage').bootstrapPaginator(options);//设置分页
                     },
                 })
+            }
+            function appendTable(data){
+                $("#tab").html("");
+                $("#tab").append(tableTitle);
+                for (i = 0; i < data.list.length; i++) {
+                    var text = data.list[i][6];
+                    var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                    var html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n' +
+                        '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
+                        '<td>' + data.list[i][3] + '</td>' +
+                        '<td>' + mystr + '</td>' +
+                        '</tr>'
+                    $("#tab").append(html)
+                }
+                $("#tab").append("</tbody>");
             }
 
             // 新建doc文档
@@ -824,7 +886,9 @@
 <!-- Bootstrap tether Core JavaScript -->
 <script src="../static/assets/plugins/bootstrap/js/tether.min.js"></script>
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="{% static 'assets/plugins/layui/layui.js' %}"></script>
+<!--分页插件-->
+<script src="../static/assets/plugins/bootstrap/js/bootstrap-paginator.js"></script>
+<script src="https://cdn.bootcss.com/tooltip.js/1.3.0/esm/tooltip.min.js"></script>
 <!-- slimscrollbar scrollbar JavaScript -->
 <script src="../static/js/jquery.slimscroll.js"></script>
 <!--Wave Effects -->

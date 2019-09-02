@@ -94,7 +94,7 @@
 
             <img src="../static/assets/images/users/1.jpg" style="height: 30px; width: 30px;border-radius: 15px;"
                  alt="user" class="profile-pic m-r-10"><span
-                style="color: black;margin-top: 2px;">admin</span>
+                style="color: black;margin-top: 2px;">{{request.session.username}}</span>
         </div>
     </nav>
 </header>
@@ -104,8 +104,8 @@
 <input type="hidden" id="userId" value="{{ request.session.userId }}">
 <input type="hidden" id="fileId" value="{{ request.session.file_id }}">
 <input type="hidden" id="teamId" value="{{ saveState }}">
-<div id="editor" style="height: 100px">
-</div>
+<!--编辑框-->
+<div id="editor" style="height: 100px"></div>
 <div id="myEditor" class="alert">
     <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
 </div>
