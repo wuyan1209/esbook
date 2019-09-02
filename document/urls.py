@@ -91,4 +91,11 @@ urlpatterns = [
     path('logout/', views.logout),
     # 个人中心
     path('personal/', views.personal),
+    # 个人文件上传
+    path("user_upload_file/",views.user_upload_file),
+    # 团队文件上传
+    path("team_upload_file/", views.team_upload_file),
+    #判断导入文件名是否重复
+    path('uploadexist/',views.uploadexist),
+
 ]
