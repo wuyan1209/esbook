@@ -1,14 +1,18 @@
-
+import docx
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db import connection, transaction
 from django.contrib.auth.hashers import make_password,check_password
 from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
+import os
 
 
 # 跳转到主页面
+from esbook.settings import BASE_DIR
+
+
 def index(request):
     return render(request, 'index.html')
 
@@ -30,7 +34,7 @@ def addTeam(request):
         try:
             # 空间名是唯一的，查询是否在数据库里存在
             cursor = connection.cursor()
-            cursor.execute('select team_id from Team where team_name=%s', [teamName])
+            cursor.execute('select team_id from team where team_name=%s', [teamName])
             tid = cursor.fetchone()
             if tid:
                 return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
@@ -41,7 +45,7 @@ def addTeam(request):
             # 创建保存点
             save_id = transaction.savepoint()
             # 添加协作空间
-            cursor.execute('insert into Team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId, formatTime])
+            cursor.execute('insert into team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId, formatTime])
             # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
             cursor.execute('select team_id from team  order by team_id desc limit 1')
             row = cursor.fetchall()
@@ -238,7 +242,6 @@ def saveTeamDoc(request):
 def docNameExist(request):
     docName = request.POST.get('docsName')  # 获取文档标题
     saveState = request.POST.get('saveState')  # 获取文档状态
-    # userId = request.POST.get('userId')  # 获取用户Id
     userId = request.session.get('userId')
     teamId = request.POST.get('teamId')  # 获取团队Id
     return_param = {}
@@ -272,22 +275,35 @@ def docNameExist(request):
 
 # 查询文件
 def fileList(request):
-    cursor = connection.cursor()
+    page = request.POST['page']
     # 获取session里存放的username
     username = request.session.get('username')
+    # 每页显示条数
+    pageSize = 10
+    cursor = connection.cursor()
+    cursor.execute('select count(*) '
+                   'from user u,file f,user_file uf '
+                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"')
+    count = cursor.fetchone()[0]  # 总条数
+    totalPage = count / pageSize  # 总页数
+    if count % pageSize != 0:
+        totalPage = totalPage + 1
+    # 当页数大于总页数，直接返回
+    if int(page) > totalPage:
+        return JsonResponse({"status": 2001})
+    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
     cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id '
                    'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '" order by f.cre_date desc')
+                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"'
+                   ' order by f.cre_date desc limit %s,%s',[offset,pageSize])
     row = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"list": row})
+    return JsonResponse({"page":int(page),"pageSize":pageSize,"totalPage":totalPage,"list": row})
 
 
 # 修改doc文档
 def doc_modify(request):
     file_name = request.POST.get("file_name")  # 获取文件名称
-    user_id = request.POST.get("user_id")  # 获取文件作者或团队的id
-    saveState = request.POST.get("saveState")  # 获取文件状态
     fileId = request.POST.get("fileId")  # 获取文件状态
 
     cursor = connection.cursor()
@@ -520,41 +536,32 @@ def delTeam(request):
     return JsonResponse({'status': status, 'message': message})
 
 
-# 分页
-# def paginator_view(request):
-#     cursor = connection.cursor()
-#     cursor.execute('select * from Permission ')
-#     list = cursor.fetchall()
-#     # 将数据按照规定每页显示 10 条, 进行分割
-#     paginator = Paginator(list, 3)
-#     if request.method == "GET":
-#         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
-#         page = request.GET.get('page')
-#         try:
-#             books = paginator.page(page)
-#         except PageNotAnInteger:
-#             # 如果请求的页数不是整数, 返回第一页。
-#             books = paginator.page(1)
-#         except InvalidPage:
-#             # 如果请求的页数不存在, 重定向页面
-#             return HttpResponse('找不到页面的内容')
-#         except EmptyPage:
-#             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
-#             books = paginator.page(paginator.num_pages)
-#     return render(request, "fenye.html", {'books': list})
-
-
 # 团队文件
 def teamfile(request):
     teamname = request.POST.get("teamName")
+    page = request.POST['page']
+    # 每页显示条数
+    pageSize = 10
     cursor = connection.cursor()
+    cursor.execute('select count(*) '
+                   'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
+                   ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
+                   'and  t.team_name ="' + teamname + '" ')
+    count = cursor.fetchone()[0]  # 总条数
+    totalPage = count / pageSize  # 总页数
+    if count % pageSize != 0:
+        totalPage = totalPage + 1
+    # 当页数大于总页数，直接返回
+    if int(page) > totalPage:
+        return JsonResponse({"status": 2001})
+    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
     cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id '
                    'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
                    ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
-                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc')
+                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s',[offset, pageSize])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"list": list})
+    return JsonResponse({"page":int(page),"pageSize":pageSize,"totalPage":totalPage,"list": list})
 
 
 # 登录页面
@@ -571,14 +578,14 @@ def myBin(request):
     cursor.execute('select * from( '
                    '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
-                                                                                                                            ' UNION'
-                                                                                                                            ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
-                                                                                                                            ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                                                                                                                            ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                 ' UNION'
-                                                                                                                                                                                 ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
-                                                                                                                                                                                 ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                                                                      ' )t ORDER BY time DESC')
+                    ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                    ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' )t ORDER BY time DESC')
     result = cursor.fetchall()
     return JsonResponse({'status': 200, 'message': result})
 
@@ -626,15 +633,23 @@ def searchFile(request):
     searchCondition = request.POST.get("searchCondition")  # 获取查询条件
     searchedFiles = []
     files = {}
+    # 获取username
+    username=request.session['username']
+    # 查找该用户自己的文件和加入的团队的文件
+    cursor.execute("select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='"+username+"' and f.file_name like '%" + searchCondition + "%' "
+                    "UNION "
+                    "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
+                     "and user_name='"+username+"' and file_name like '%" + searchCondition + "%'")
+
 
     # 查文件
     cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
+
     fileIds = cursor.fetchall()
     for fileId in fileIds:
         # 根据查询到的fileID来获取file的详细数据
         cursor.execute(
-            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
-            [fileId[0], 0])
+            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",[fileId[0], 0])
         searchList = cursor.fetchone()
         if searchList:
             files['file_name'] = searchList[0]
@@ -703,8 +718,7 @@ def saveEdition(request):
         cursor.execute("select file_id from file where file_name = %s", [edi_name])
         fileId = cursor.fetchone()
         # 保存版本
-        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)',
-                       [formatTime, content, edi_name])
+        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)', [formatTime, content,edi_name])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
         edi_id = cursor.fetchone()
         # 获取个人文件表id
@@ -732,11 +746,10 @@ def getuseredition(request):
     # 获取文件名称、id、内容
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
-    fileid = cursor.fetchone()
-    cursor.execute(
-        'select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
-        'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
-        'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
+    fileid=cursor.fetchone()
+    cursor.execute('select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
+                   'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
+                   'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
@@ -792,10 +805,9 @@ def getTeamEdition(request):
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
     fileid = cursor.fetchone()
-    cursor.execute(
-        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
-        'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
-        'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
+    cursor.execute('select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
+                   'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
+                   'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
@@ -831,10 +843,9 @@ def saveEditionRTFdoc(request):
     sid = transaction.savepoint()
     cursor = connection.cursor()
     try:
-        cursor.execute('select file_id from file where file_name="' + fileName + '"')
-        fileId = cursor.fetchone()  # 25
-        cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
-                       [content, formatTime, fileId])
+        cursor.execute('select file_id from file where file_name="'+ fileName + '"')
+        fileId = cursor.fetchone() #25
+        cursor.execute( "update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",[content,formatTime,fileId])
         return_param['saveStatus'] = "success";
         transaction.savepoint_commit(sid)
     except Exception as e:
@@ -995,4 +1006,183 @@ def logout(request):
 # 个人中心
 def personal(request):
     return render(request,'personal.html');
+
+
+#将本地文件写到项目中
+def handle_uploaded_file(file_obj, ext):
+    name = os.path.splitext(file_obj.name)[0]
+    filename = "%s%s" % (name, ext)
+    localurl = "static\\pic\\"
+    file_path = os.path.join(BASE_DIR, localurl,filename)
+    print(file_path)
+    with open(file_path, 'wb+') as f:
+        for chunk in file_obj.chunks():
+            f.write(chunk)
+
+#获取文档中的内容
+def getcontent(file_path):
+    # 获取文档对象
+    file = docx.Document(file_path)
+    # 输出每一段的内容
+    content = ""
+    for para in file.paragraphs:
+        doc_test = para.text
+        styles = para.style.name
+        fonts = para.runs
+        for f in fonts:
+            if (f.bold):#加粗
+               content+="<p><strong>"+doc_test+"</strong><p>"
+            if(f.italic):#斜体
+               content += "<p><i>" + doc_test + "</i><p>"
+            if (f.underline):  # 下划线
+               content += "<p><u>" + doc_test + "</u><p>"
+        if styles=='Heading 1':#一级标题
+            content +="<h1>"+doc_test+"</h1>"
+        elif  styles=='Heading 2':#二级标题
+            content += "<h2>" + doc_test + "</h2>"
+        if doc_test == "":
+            content += "<p></p>"
+
+    return content
+
+#个人文件上传
+@transaction.atomic
+def user_upload_file(request):
+    userid=request.session.get("userId")
+    # fileobj=request.POST.get('fileobj')
+    # print(fileobj)
+    # filename=fileobj.name
+    # print(filename)
+    # name = fileobj.name.split('.')[0]
+    # print(filename)
+    if request.method == "POST":
+        files = request.FILES
+        if len(files) == 0:
+            message = '没有文件上传，请重新上传'
+            return JsonResponse({ 'message': message})
+        for file_key in files:
+            file_obj = files[file_key]
+            ext = os.path.splitext(file_obj.name)[1]
+            name=os.path.splitext(file_obj.name)[0]
+            #调用方法
+            handle_uploaded_file(file_obj, ext)
+            filename = "%s%s" % (name,ext)
+            localurl = "static\\pic\\"
+            file_path = os.path.join(BASE_DIR, localurl, filename)
+            # 获取当前时间
+            localTime = time.localtime(time.time())
+            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
+            # 调用方法
+            content=getcontent(file_path)
+            sid = transaction.savepoint()
+            try:
+               # 在数据库中存储路径
+               cursor = connection.cursor()
+               cursor.execute('insert into file(file_name,content,url,cre_date) values(%s,%s,%s,%s)',
+                           [name,content, file_path, formatTime])
+               cursor.execute("select file_id from file where file_name = %s order by file_id desc limit 1", [name])
+               file_id = cursor.fetchone()
+               cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userid, file_id])
+               cursor.close()
+               status=200
+               message = "文件上传成功"
+               transaction.savepoint_commit(sid)
+               return redirect("/index/")
+            except Exception as e:
+               # 数据库更新失败
+               status = 2001
+               message = "文件上传失败"
+               transaction.savepoint_rollback(sid)
+               return JsonResponse({'status': status, 'message': message})
+
+#团队文件上传
+@transaction.atomic
+def team_upload_file(request):
+    userid=request.session.get("userId")
+    teamID=request.GET.get("saveState")
+    if request.method == "POST":
+        files = request.FILES
+        if len(files) == 0:
+            message = '没有文件上传，请重新上传'
+            return JsonResponse({ 'message': message})
+        for file_key in files:
+            file_obj = files[file_key]
+            ext = os.path.splitext(file_obj.name)[1]
+            name=os.path.splitext(file_obj.name)[0]
+            # 调用方法
+            handle_uploaded_file(file_obj, ext)
+            filename = "%s%s" % (name,ext)
+            localurl = "static\\pic\\"
+            file_path = os.path.join(BASE_DIR, localurl, filename)
+            # 获取当前时间
+            localTime = time.localtime(time.time())
+            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
+            #调用方法
+            getcontent(file_path)
+
+            sid = transaction.savepoint()
+            try:
+                # 在数据库中存储路径
+                cursor = connection.cursor()
+                # 向file表中插入文件数据
+                cursor.execute("insert into file(file_name,content,url,cre_date) values(%s,%s,%s,%s)",
+                                       [name, content, file_path,formatTime])
+                # 获取文件id
+                cursor.execute("select file_id from file where file_name = %s order by file_id desc limit 1", [name])
+                file_id = cursor.fetchone()
+                # 获取团队成员id
+                cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;",
+                                       [userid, teamID])
+                team_mem_id = cursor.fetchone()
+                # 保存团队文件
+                cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)",
+                                       [team_mem_id, file_id])
+                cursor.close()
+                status=200
+                message = "文件上传成功"
+                transaction.savepoint_commit(sid)
+                return redirect("/index/")
+            except Exception as e:
+                # 数据库更新失败
+                status = 2001
+                message = "文件上传失败"
+                transaction.savepoint_rollback(sid)
+                return JsonResponse({'status': status, 'message': message})
+
+#判断导入的文件名是否重复
+def uploadexist(request):
+    name=request.POST.get('filename')
+    userid = request.session.get("userId")
+    saveState = request.POST.get('saveState')  # 获取文档状态
+    teamId = request.POST.get('teamId')  # 获取团队Id
+    filename=name.split('.')[0]
+    # 在数据库中存储路径
+    cursor = connection.cursor()
+    if saveState == "my_doc":
+        cursor.execute('select file_name from file f where f.file_id in'
+                   ' (select file_id from user_file where user_id = %s)', [userid])
+        fileNamas = cursor.fetchall()
+        for fileName in fileNamas:
+           if str(fileName[0]) == filename:
+              status=200
+              message="文件名存在，请重新命名"
+              break
+        else:
+              status=2001
+              message = "文件不存在，可以导入该文件"
+    else:
+         # 团队文档的名称是否重复
+        cursor.execute("select file_name from file f, member_file mf "
+                       "where f.file_id = mf.file_id and mf.team_mem_id in "
+                       "(select team_mem_id from team_member where team_id = %s)", [teamId])
+        fileNamas = cursor.fetchall()
+        for fileName in fileNamas:
+            if str(fileName[0]) == filename:
+                status = 200
+                message = "文件名存在，请重新命名"
+                break
+            else:
+                status = 2001
+                message = "文件不存在，可以导入该文件"
+    return JsonResponse({"status": status, "message": message})
 

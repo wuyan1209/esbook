@@ -9,18 +9,17 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- Favicon icon -->
-    {#    <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">#}
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/assets/images/favicon.png">
     <title>esbook </title>
     <!-- Bootstrap Core CSS -->
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="data:image/ico;base64,aWNv">
     <!-- chartist CSS -->
-    {% comment %}<link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
-    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">{% endcomment %}
-    {% comment %} <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
-          rel="stylesheet">{% endcomment %}
+    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
+          rel="stylesheet">
     <!--This page css - Morris CSS -->
-    {#    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">#}
+    <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../static/css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
@@ -29,6 +28,7 @@
     <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -107,9 +107,10 @@
                     <!-- Profile -->
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="/personal/">
-                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>{{request.session.username}}</a>
-                        <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
+                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
+                        <a href="" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
                 </ul>
@@ -168,74 +169,39 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)" data-toggle="modal"
-                           data-target="#createDocs">文档</a>
+                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)">文档</a>
                         <a class="dropdown-item" href="#">表格</a>
                         <a class="dropdown-item" href="#">幻灯片</a>
                     </div>
                 </div>
                 <div>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"
-                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                               onchange="upLoad()">
-                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
-                    </div>
-                </div>
-                <div class="modal fade" id="createDocs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="myModalLabel">
-                                    请输入文档名称
-                                </h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                    &times;
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="doc_name"
-                                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
-                            </div>
-
-                            <div class="modal-footer">
-                                <span style="color: red;" id="docNameExist"></span>
-                                <button id="sure_doc" type="button" class="btn btn-primary">
-                                    确定
-                                </button>
-
-                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                                </button>
-                            </div>
-                        </div><!-- /.modal-content -->
-                    </div><!-- /.modal -->
+{#                    <div class="custom-file">#}
+{#                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"#}
+{#                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">#}
+{#                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>#}
+{#                    </div>#}
+                    <form method="post"  id="myform"  action="" enctype="multipart/form-data">
+                        <input type="file" name="files" id="inputfiles">
+                        <input type="submit" value="导入" id="daoru">
+                    </form>
                 </div>
             </div>
             <div id="box2">
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 1.5%">我的文档</h2>
                     <table id="tab" class="table table-hover">
-
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
                         <ul class="list-group">
                             <li class="list-group-item" style="width: 100px" onclick="delFiles()">删除</li>
                         </ul>
                     </div>
-
                     <div id="bin"></div>
                 </div>
-                <div id="fenye">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href=" ">Previous</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">1</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
-                            <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
-                        </ul>
-                    </nav>
+                <!-- 分页容器： 显示分页按钮-->
+                <div class="fenye">
+                    <!-- 注意:3版本的分页容器标签是<ul>，2版本的容器标签是<div> -->
+                    <ul id="mypage"></ul>
                 </div>
             </div>
         </div>
@@ -249,7 +215,6 @@
                 cellpadding: 0px;
                 cellspacing: 0px;
             }
-
             #fenye {
                 margin-left: 65%;
                 margin-top: 10px;
@@ -282,6 +247,52 @@
                     my_doc_file()
                 })
                 my_doc_file()
+                //导入文件操作
+                $("#inputfiles").on("change",function () {
+                    //动态改变action中的值
+                    if (saveState=='my_doc') {
+                        $("#myform").attr("action", "/user_upload_file/");
+                    }else {
+                        $("#myform").attr("action", "/team_upload_file/?saveState="+saveState);
+                    }
+                    var files = $('#inputfiles').prop('files');//获取到文件列表
+                    console.log(files[0].name)
+                    //判断导入文件名是否存在
+                    $.ajax({
+                        url:"/uploadexist/",
+                        data:{
+                            "filename":files[0].name,
+                            "saveState":saveState,
+                            "teamId":saveState,
+                        },
+                        type: "POST",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.status == 200) {
+                                alert("文档名已经存在，请重新命名")
+                            }else {
+                                alert("文档不存在，可以导入")
+                            }
+                            // 个人文件导入
+                            {#$.ajax({#}
+                            {#    url:"/user_upload_file/",#}
+                            {#    data:{"saveState":saveState,"fileobj":files[0]},#}
+                            {#    type: "POST",#}
+                            {#    dataType: "json",#}
+                            {#    success: function (data) {#}
+                            {#        if (data.status == 200) {#}
+                            {#            // 保存成功#}
+                            {#            alert(data.message);#}
+                            {#        } else {#}
+                            {#            // 保存失败#}
+                            {#            alert(data.message);#}
+                            {#        }#}
+                            {#    }#}
+                            {# })#}
+
+                        }
+                    })
+                })
             });
             var tableTitle = "<thead>\n" +
                 "    <tr>\n" +
@@ -292,37 +303,70 @@
                 "  </thead>" +
                 "  <tbody>"
             {#显示我的文档列表#}
-
             function my_doc_file() {
-                $("#tab").html("");
                 $("#bin").html("");
                 $("#h2").text("我的文档");
-                $("#tab").append(tableTitle);
                 $.ajax({
                     url: "/filelist/",
                     type: "POST",
                     dataType: "json",
+                    data: {page: '1'}, //参数：当前页为1
                     success: function (data) {
-                        $("#tab").html("");
-                        $("#tab").append(tableTitle)
-                        for (i = 0; i < data.list.length; i++) {
-                            var text = data.list[i][2];
-                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                            html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
-                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
-                                '<td>' + data.list[i][1] + '</td>' +
-                                '<td>' + mystr + '</td>' +
-                                '</tr>'
-                            $("#tab").append(html)
-                        }
-                        $("#tab").append("</tbody>")
+                        //处理第一页的数据
+                        appendHtml(data);
+                        var options = {//根据后台返回的分页相关信息，设置插件参数
+                            bootstrapMajorVersion: 3, //如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
+                            currentPage: data.page, //当前页数
+                            totalPages: data.totalPage, //总页数
+                            numberOfPages: data.pageSize,//每页记录数
+                            itemTexts: function (type, page, current) {//设置分页按钮显示字体样式
+                                switch (type) {
+                                    case "first":
+                                        return "首页";
+                                    case "prev":
+                                        return "上一页";
+                                    case "next":
+                                        return "下一页";
+                                    case "last":
+                                        return "末页";
+                                    case "page":
+                                        return page;
+                                }
+                            },
+                            onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
+                                $.ajax({//根据page去后台加载数据
+                                    url: "/filelist/",
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {"page": page},
+                                    success: function (data) {
+                                        appendHtml(data);//处理数据
+                                    }
+                                });
+                            }
+                        };
+                        $('#mypage').bootstrapPaginator(options);//设置分页
                     },
                 })
             }
+            function appendHtml(data) {
+                $("#tab").html("");
+                $("#tab").append(tableTitle);
+                for (i = 0; i < data.list.length; i++) {
+                    var text = data.list[i][2];
+                    var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                    html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n' +
+                        '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</td>' +
+                        '<td>' + data.list[i][1] + '</td>' +
+                        '<td>' + mystr + '</td>' +
+                        '</tr>';
+                    $("#tab").append(html)
+                }
+                $("#tab").append("</tbody>");
+            }
 
             {#团队文档列表#}
-
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
@@ -332,24 +376,67 @@
                 $.ajax({
                     url: "/teamfile/",
                     type: "POST",
-                    data: {"teamName": teamName},
+                    data: {"teamName": teamName,"page":1},
                     dataType: "json",
                     success: function (data) {
-                        for (i = 0; i < data.list.length; i++) {
-                            var text = data.list[i][6];
-                            var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                            var html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n' +
-                                '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
-                                'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
-                                '<td>' + data.list[i][3] + '</td>' +
-                                '<td>' + mystr + '</td>' +
-                                '</tr>'
-                            $("#tab").append(html)
-                        }
-                        $("#tab").append("</tbody>")
+                        //处理第一页的数据
+                        appendTable(data);
+                        var options = {//根据后台返回的分页相关信息，设置插件参数
+                            bootstrapMajorVersion: 3, //如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
+                            currentPage: data.page, //当前页数
+                            totalPages: data.totalPage, //总页数
+                            numberOfPages: data.pageSize,//每页记录数
+                            itemTexts: function (type, page, current) {//设置分页按钮显示字体样式
+                                switch (type) {
+                                    case "first":
+                                        return "首页";
+                                    case "prev":
+                                        return "上一页";
+                                    case "next":
+                                        return "下一页";
+                                    case "last":
+                                        return "末页";
+                                    case "page":
+                                        return page;
+                                }
+                            },
+                            onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
+                                $.ajax({//根据page去后台加载数据
+                                    url: "/teamfile/",
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {"teamName": teamName,"page": page},
+                                    success: function (data) {
+                                        appendTable(data);//处理数据
+                                    }
+                                });
+                            }
+                        };
+                        $('#mypage').bootstrapPaginator(options);//设置分页
                     },
                 })
             }
+            function appendTable(data){
+                $("#tab").html("");
+                $("#tab").append(tableTitle);
+                for (i = 0; i < data.list.length; i++) {
+                    var text = data.list[i][6];
+                    var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                    var html = '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n' +
+                        '<td><a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</td>' +
+                        '<td>' + data.list[i][3] + '</td>' +
+                        '<td>' + mystr + '</td>' +
+                        '</tr>'
+                    $("#tab").append(html)
+                }
+                $("#tab").append("</tbody>");
+            }
+
+            // 新建doc文档
+            $("#toDocs").on("click", function () {
+                window.location.href = "/RTFdocs/?saveState=" + saveState
+            });
 
             //阻止浏览器默认右击点击事件
             $("#tab").on("contextmenu", "tr", function () {
@@ -357,13 +444,13 @@
             });
 
             // 绑定右击事件
-            $("#tab").on("mousedown", "tbody tr", function (e) {
+            $("#tab").on("mousedown", "tr", function (e) {
                 //右键为3
                 if (3 == e.which) {
                     var file_id = $(this).attr("file_id");
                     var team_name = $(this).attr("teamname");
-                    $("#clickMenu").attr("file_id", file_id)
-                    $("#clickMenu").attr("team_name", team_name)
+                    $("#clickMenu").attr("file_id",file_id)
+                    $("#clickMenu").attr("team_name",team_name)
 
                     $("#clickMenu").css("display", "block");
                     //var divchild = $(this).children("div");
@@ -371,7 +458,7 @@
                     $("#clickMenu").css("top", e.clientY - 50);
                 }
             });
-            // 点击空白区域隐藏菜单
+
             $("body").on("click", function () {
                 $("#clickMenu").css("display", "none");
             })
@@ -847,6 +934,9 @@
 <!-- Bootstrap tether Core JavaScript -->
 <script src="../static/assets/plugins/bootstrap/js/tether.min.js"></script>
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<!--分页插件-->
+<script src="../static/assets/plugins/bootstrap/js/bootstrap-paginator.js"></script>
+<script src="https://cdn.bootcss.com/tooltip.js/1.3.0/esm/tooltip.min.js"></script>
 <!-- slimscrollbar scrollbar JavaScript -->
 <script src="../static/js/jquery.slimscroll.js"></script>
 <!--Wave Effects -->
@@ -861,8 +951,8 @@
 <!-- This page plugins -->
 <!-- ============================================================== -->
 <!-- chartist chart -->
-{% comment %}<script src="../static/assets/plugins/chartist-js/dist/chartist.min.js"></script>
-<script src="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.min.js"></script>{% endcomment %}
+<script src="../static/assets/plugins/chartist-js/dist/chartist.min.js"></script>
+<script src="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.min.js"></script>
 <!--c3 JavaScript -->
 <script src="../static/assets/plugins/d3/d3.min.js"></script>
 <script src="../static/assets/plugins/c3-master/c3.min.js"></script>
@@ -872,10 +962,11 @@
 <script src="../static/js/addTeam.js"></script>
 <script src="../static/js/modifyRTFdocs.js"></script>
 <script src="{% static 'js/search.js' %}"></script>
-<script src="{% static 'js/RTFdocs.js' %}"></script>
 
 </body>
 </html>
+
+
 
 
 

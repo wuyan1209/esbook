@@ -1,17 +1,55 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        #editor {
+            border: #C3C3C3 solid 1px;
+            width: 210mm;
+        {#height: 297mm;#} margin: 0 auto;
+            margin-top: 20px;
+            box-sizing: border-box;
+            padding: 2.54ch 3.17cm;
+        }
+
+        .ck-editor__editable {
+            min-height: 297mm;
+        }
+
+        #menu_bar {
+            border: #C3C3C3 solid 1px;
+        }
+
+        {% comment %}#docs_title: {
+            border: 1px solid transparent;
+        }{% endcomment %}
+
+        #docs_title:focus {
+            border: 1px solid #58a6e7;
+            outline: 0;
+        }
+
+        #docs_title {
+            border: none;
+            background-color: #fafafa;
+            color: white;
+            font-family: 新宋体;
+            font-size: 18px;
+            color: black;
+            width: 92px;
+            min-width: 92px;
+            min-height: 28px;
+            color: rgb(0, 0, 0);
+        }
+    </style>
     {#    <link href="/bootstrap-4.3.1-dist/css/bootstrap.min.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- chartist CSS -->
-    {#    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">#}
-    {#    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">#}
+{#    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">#}
+{#    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">#}
     <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
           rel="stylesheet">
-    <link href="../static/css/modify_RTFdocs.css" rel="stylesheet">
     <!--This page css - Morris CSS -->
     <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -25,7 +63,7 @@
 
         <div class="navbar-collapse">
             <!-- ============================================================== -->
-            <a href="javascript:history.go(-1)" style="margin-left: 30px">
+            <a href="javascript:history.back(-1)" style="margin-left: 30px">
                 <b>
                     <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
                 </b>
@@ -36,7 +74,7 @@
                  class="light-logo">
 
             <!-- 保存按钮 -->
-            <a id="CKEditor_data_modify" href="javascript:void(0);" style="margin-right: 10px">
+            <a id="CKEditor_data_save" href="javascript:void(0);" style="margin-right: 10px">
                 <b>
                     <img src="../static/assets/images/保存.png" width="26" height="25" alt="goback">
                 </b>
@@ -52,23 +90,15 @@
                 {#                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">#}
                 {#                    无标题文档</p>#}
                 <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档"
-                       value="{{ request.session.file_name }}"
+                       value=""
                        placeholder="无标题文档">
                 <!-- ============================================================== -->
 
                 <!-- 下拉按钮 -->
             </ul>
-            <div class="dropdown" style="margin-left: 10px">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    版本
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a id="saveedi" class="dropdown-item" href="javascript:void(0);">保存</a>
-                    <a id="showEditor" class="dropdown-item" href="javascript:void(0);">查看</a>
-                </div>
-            </div>
-
+            <!-- ============================================================== -->
+            <!-- User profile and search -->
+            <!-- ============================================================== -->
             <div class="dropdown" style="margin-left: 10px">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -98,46 +128,19 @@
         </div>
     </nav>
 </header>
-{# 富文本ui按钮 #}
+
 <div id="toolbar-container" style="margin-top: 2px"></div>
 
-<input type="hidden" id="get_doc_content" value="{{ request.session.doc_content }}">
-<input type="hidden" id="doc_save_state" value="{{ saveState }}">
-<input type="hidden" id="userId" value="{{ request.session.userId }}">
-<input type="hidden" id="fileId" value="{{ request.session.file_id }}">
+<!-- This container will become the editable. -->
+<input type="hidden" id="docSaveState" value="{{ saveState }}">
+<input type="hidden" id="userId" value="{{ 1 }}">
 <input type="hidden" id="teamId" value="{{ saveState }}">
-
-{# 文档内容 #}
-<div id="editor" style="height: 100px">
-
-</div>
-
-{# 查看版本 #}
-<div id="myEditor" class="alert">
-    <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
-</div>
-<!-- 预览模态框 -->
-<div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="margin: 35px 0 0 290px">
-        <div class="modal-content" style="width:850px;height:750px">
-            <div class="modal-header">
-                <h3 class="modal-title" id="myModalLabel"></h3>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            </div>
-            <div class="modal-body" style="table-layout: fixed">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">
-                    关闭
-                </button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal -->
+<div id="editor">
 </div>
 </body>
-<script src="../static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
+<script src="/static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
 <script src="../static/assets/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap tether Core JavaScript -->
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="{% static 'js/modifyRTFdocs.js' %}"></script>
+<script src="../static/js/RTFdocs.js"></script>
 </html>
