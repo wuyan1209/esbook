@@ -98,33 +98,42 @@
         </div>
     </nav>
 </header>
+{# 富文本ui按钮 #}
 <div id="toolbar-container" style="margin-top: 2px"></div>
+
 <input type="hidden" id="get_doc_content" value="{{ request.session.doc_content }}">
 <input type="hidden" id="doc_save_state" value="{{ saveState }}">
 <input type="hidden" id="userId" value="{{ request.session.userId }}">
 <input type="hidden" id="fileId" value="{{ request.session.file_id }}">
 <input type="hidden" id="teamId" value="{{ saveState }}">
+
+{# 文档内容 #}
 <div id="editor" style="height: 100px">
+
 </div>
+
+{# 查看版本 #}
 <div id="myEditor" class="alert">
     <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
 </div>
-    <!-- 预览模态框 -->
-    <div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog" style="margin: 35px 0 0 290px">
-            <div class="modal-content" style="width:850px;height:750px">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="myModalLabel"></h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body" style="table-layout: fixed">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">关闭</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-    </div>
+<!-- 预览模态框 -->
+<div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="margin: 35px 0 0 290px">
+        <div class="modal-content" style="width:850px;height:750px">
+            <div class="modal-header">
+                <h3 class="modal-title" id="myModalLabel"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" style="table-layout: fixed">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
 </body>
 <script src="../static/ckeditor5-build-decoupled-document/ckeditor.js"></script>
 <script src="../static/assets/plugins/jquery/jquery.min.js"></script>

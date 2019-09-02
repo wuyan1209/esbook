@@ -38,7 +38,7 @@ $(function () {
     var userId = $("#userId").val();    // 用户的id
     var teamId = $("#teamId").val();    // 团队的id
 
-    // 点击保存按钮吧保存
+    // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
         modifyDocs(old_doc_title, doc_save_state, userId, teamId);
     });
