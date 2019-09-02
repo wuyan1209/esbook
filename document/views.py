@@ -1,10 +1,10 @@
-import docx
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import connection, transaction
 from django.contrib.auth.hashers import make_password,check_password
 from document.models import User
-import time  # 引入time模块
+import time  # 引入tim
+# e模块
 import json  # 引入json模块
 import os
 
