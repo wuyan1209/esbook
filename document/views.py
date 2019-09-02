@@ -839,8 +839,8 @@ def delectEdition(request):
 # 还原时保存文档
 @transaction.atomic
 def saveEditionRTFdoc(request):
-    content = request.POST.get('content')  # 文档内容  <p>三大</p><p>大叔大婶</p><p>123</p>
-    fileName = request.POST.get('fileName')  # 当前文档标题   爱迪生
+    content = request.POST.get('content')  # 文档内容
+    fileName = request.POST.get('fileName')  # 当前文档标题  
 
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’

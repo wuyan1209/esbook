@@ -378,13 +378,13 @@ function getoldEdition(content) {
                 fileName: doc_title,
             },
             success: function (data) {
-                if (data.saveStatus == "success") {
+                if (data.status == 200) {
                     // 成功
-                    alert("已经将内容还原")
+                    alert(data.message)
                     window.location.href = '/index/';
                 } else {
                     // 失败
-                    alert("还原失败了");
+                    alert(data.message)
                 }
             }
         })
