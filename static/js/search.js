@@ -26,6 +26,11 @@ $(function () {
         }
     });
 
+    // 搜索栏时区焦点隐藏搜索结果
+    $("#search-bar").on("blur", function () {
+        closeSearchReasult()
+    })
+
 
 });
 

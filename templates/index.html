@@ -107,9 +107,10 @@
                     <!-- Profile -->
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="/personal/">
-                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>{{request.session.username}}</a>
-                        <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
+                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
+                        <a href="" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
                 </ul>
@@ -174,12 +175,15 @@
                     </div>
                 </div>
                 <div>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"
-                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                               onchange="upLoad()">
-                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>
-                    </div>
+{#                    <div class="custom-file">#}
+{#                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"#}
+{#                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">#}
+{#                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>#}
+{#                    </div>#}
+                    <form method="post"  id="myform"  action="" enctype="multipart/form-data">
+                        <input type="file" name="files" id="inputfiles">
+                        <input type="submit" value="导入" id="daoru">
+                    </form>
                 </div>
             </div>
             <div id="box2">
@@ -243,6 +247,52 @@
                     my_doc_file()
                 })
                 my_doc_file()
+                //导入文件操作
+                $("#inputfiles").on("change",function () {
+                    //动态改变action中的值
+                    if (saveState=='my_doc') {
+                        $("#myform").attr("action", "/user_upload_file/");
+                    }else {
+                        $("#myform").attr("action", "/team_upload_file/?saveState="+saveState);
+                    }
+                    var files = $('#inputfiles').prop('files');//获取到文件列表
+                    console.log(files[0].name)
+                    //判断导入文件名是否存在
+                    $.ajax({
+                        url:"/uploadexist/",
+                        data:{
+                            "filename":files[0].name,
+                            "saveState":saveState,
+                            "teamId":saveState,
+                        },
+                        type: "POST",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.status == 200) {
+                                alert("文档名已经存在，请重新命名")
+                            }else {
+                                alert("文档不存在，可以导入")
+                            }
+                            // 个人文件导入
+                            {#$.ajax({#}
+                            {#    url:"/user_upload_file/",#}
+                            {#    data:{"saveState":saveState,"fileobj":files[0]},#}
+                            {#    type: "POST",#}
+                            {#    dataType: "json",#}
+                            {#    success: function (data) {#}
+                            {#        if (data.status == 200) {#}
+                            {#            // 保存成功#}
+                            {#            alert(data.message);#}
+                            {#        } else {#}
+                            {#            // 保存失败#}
+                            {#            alert(data.message);#}
+                            {#        }#}
+                            {#    }#}
+                            {# })#}
+
+                        }
+                    })
+                })
             });
             var tableTitle = "<thead>\n" +
                 "    <tr>\n" +
@@ -253,7 +303,6 @@
                 "  </thead>" +
                 "  <tbody>"
             {#显示我的文档列表#}
-
             function my_doc_file() {
                 $("#bin").html("");
                 $("#h2").text("我的文档");
@@ -318,7 +367,6 @@
             }
 
             {#团队文档列表#}
-
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
@@ -917,6 +965,8 @@
 
 </body>
 </html>
+
+
 
 
 
