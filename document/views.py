@@ -7,6 +7,7 @@ import time  # 引入tim
 # e模块
 import json  # 引入json模块
 import os
+import docx
 
 
 # 跳转到主页面
@@ -1031,11 +1032,11 @@ def getcontent(file_path):
         fonts = para.runs
         for f in fonts:
             if (f.bold):#加粗
-               content+="<p><strong>"+doc_test+"</strong><p>"
+               content+="<p><strong>"+doc_test+"</strong></p>"
             if(f.italic):#斜体
-               content += "<p><i>" + doc_test + "</i><p>"
+               content += "<p><i>" + doc_test + "</i></p>"
             if (f.underline):  # 下划线
-               content += "<p><u>" + doc_test + "</u><p>"
+               content += "<p><u>" + doc_test + "</u></p>"
         if styles=='Heading 1':#一级标题
             content +="<h1>"+doc_test+"</h1>"
         elif  styles=='Heading 2':#二级标题
