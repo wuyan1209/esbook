@@ -1,10 +1,10 @@
+import docx
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import connection, transaction
-from django.contrib.auth.hashers import make_password,check_password
+from django.contrib.auth.hashers import make_password, check_password
 from document.models import User
-import time  # 引入tim
-# e模块
+import time  # 引入time模块
 import json  # 引入json模块
 import os
 
@@ -298,7 +298,7 @@ def fileList(request):
                    ' order by f.cre_date desc limit %s,%s',[offset,pageSize])
     row = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"page":int(page),"pageSize":pageSize,"totalPage":totalPage,"list": row})
+    return JsonResponse({"page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": row})
 
 
 # 修改doc文档
@@ -558,10 +558,10 @@ def teamfile(request):
     cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id,f.type '
                    'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
                    ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
-                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s',[offset, pageSize])
+                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s', [offset, pageSize])
     list = cursor.fetchall()
     cursor.close()
-    return JsonResponse({"page":int(page),"pageSize":pageSize,"totalPage":totalPage,"list": list})
+    return JsonResponse({"page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list})
 
 
 # 登录页面
@@ -657,7 +657,7 @@ def searchFile(request):
     searchedFiles = []
     files = {}
     # 获取username
-    username=request.session['username']
+    username = request.session['username']
     # 查找该用户自己的文件和加入的团队的文件
     cursor.execute("select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='"+username+"' and f.file_name like '%" + searchCondition + "%' "
                     "UNION "
@@ -857,8 +857,8 @@ def delectEdition(request):
 # 还原时保存文档
 @transaction.atomic
 def saveEditionRTFdoc(request):
-    content = request.POST.get('content')  # 文档内容  <p>三大</p><p>大叔大婶</p><p>123</p>
-    fileName = request.POST.get('fileName')  # 当前文档标题   爱迪生
+    content = request.POST.get('content')  # 文档内容
+    fileName = request.POST.get('fileName')  # 当前文档标题
 
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
@@ -866,16 +866,21 @@ def saveEditionRTFdoc(request):
     sid = transaction.savepoint()
     cursor = connection.cursor()
     try:
-        cursor.execute('select file_id from file where file_name="'+ fileName + '"')
-        fileId = cursor.fetchone() #25
-        cursor.execute( "update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",[content,formatTime,fileId])
-        return_param['saveStatus'] = "success";
+        cursor.execute('select file_id from file where file_name="' + fileName + '"')
+        fileId = cursor.fetchone()
+        cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
+                       [content, formatTime, fileId])
+        # 成功的话保存
+        status = 200
+        message = '已经内容还原到该版本'
         transaction.savepoint_commit(sid)
     except Exception as e:
         # 数据库更新失败
-        return_param['saveStatus'] = "fail"
+        # 失败
+        status = 4001
+        message = '还原失败，请重新操作'
         transaction.savepoint_rollback(sid)
-    return HttpResponse(json.dumps(return_param))
+    return JsonResponse({'status': status, 'message': message})
 
 
 # 跳转到注册页面
@@ -906,53 +911,59 @@ def delFiles(request):
         return_param["flag"] = "fail"
     return HttpResponse(json.dumps(return_param))
 
+
 # 校验用户名
 def valiName(request):
     name = request.POST['name'];  # 用户名
     # 判断用户名是否存在
     cursor = connection.cursor()
-    cursor.execute('select user_id from user where user_name=%s' ,[name])
+    cursor.execute('select user_id from user where user_name=%s', [name])
     userId = cursor.fetchone()
     cursor.close()
     if userId:
         return JsonResponse({'status': 2001, 'message': "用户名已被占用"})
     return JsonResponse({'status': 200, 'message': "ok"})
+
+
 # 校验手机号
 def valiPhone(request):
     phone = request.POST['phone'];
     # 判断用户名是否存在
     cursor = connection.cursor()
-    cursor.execute('select user_id from user where phone=%s',[phone])
+    cursor.execute('select user_id from user where phone=%s', [phone])
     userId = cursor.fetchone()
     cursor.close()
     if userId:
         return JsonResponse({'status': 2001, 'message': "手机号已被占用"})
     return JsonResponse({'status': 200, 'message': "ok"})
+
+
 # 校验邮箱号
 def valiEmail(request):
     email = request.POST['email'];
     # 判断用户名是否存在
     cursor = connection.cursor()
-    cursor.execute('select user_id from user where email=%s',[email])
+    cursor.execute('select user_id from user where email=%s', [email])
     userId = cursor.fetchone()
     cursor.close()
     if userId:
         return JsonResponse({'status': 2001, 'message': "邮箱号已被占用"})
     return JsonResponse({'status': 200, 'message': "ok"})
 
+
 # 注册
 def Register(request):
-    name=request.POST['name']; #用户名
-    email = request.POST['email']; #邮箱号
+    name = request.POST['name'];  # 用户名
+    email = request.POST['email'];  # 邮箱号
     phone = request.POST['phone'];  # 手机号
-    password = request.POST['password']; #密码
+    password = request.POST['password'];  # 密码
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
     # 密码加密
-    pwd=make_password(password,'a')
+    pwd = make_password(password, 'a')
     cursor = connection.cursor()
     # 判断是手机号注册还是邮箱注册
-    #手机注册
+    # 手机注册
     if phone:
         try:
             cursor.execute("insert into user (user_name, password, phone, cre_date) values (%s,%s,%s,%s)",[name, pwd, phone, formatTime])
@@ -961,11 +972,11 @@ def Register(request):
         except :
             status = 4001
             message = "注册失败"
-        if status==200:
+        if status == 200:
             return HttpResponseRedirect("/login/")
         else:
             return JsonResponse({'status': status, 'message': message})
-    #邮箱注册
+    # 邮箱注册
     else:
         try:
             cursor.execute("insert into user (user_name, password, email, cre_date) values (%s,%s,%s,%s)",[name, pwd, email, formatTime])
@@ -979,12 +990,13 @@ def Register(request):
         else:
             return JsonResponse({'status': status, 'message': message})
 
+
 # 登录
 def userLogin(request):
     userName = request.POST['userName']
     password = request.POST['password']
     cursor = connection.cursor()
-    if userName.find("@")==-1:  # -1代表找不到  0代表找到
+    if userName.find("@") == -1:  # -1代表找不到  0代表找到
         # 手机号登录
         # 判断用户是否存在
         cursor.execute('select user_id,user_name,password from user where phone=' + userName)
@@ -996,7 +1008,7 @@ def userLogin(request):
                 # 用户存session
                 request.session['username'] = user[1]
                 request.session['userId'] = user[0]
-                return HttpResponseRedirect('/index/')  #跳转到主界面
+                return HttpResponseRedirect('/index/')  # 跳转到主界面
             else:
                 return render(request, 'login.html', {"error": "密码错误"})
         else:
@@ -1004,20 +1016,20 @@ def userLogin(request):
     else:
         # 邮箱登录
         # 判断用户是否存在
-        cursor.execute('select user_id,user_name,password from user where email=%s' ,[userName])
+        cursor.execute('select user_id,user_name,password from user where email=%s', [userName])
         user = cursor.fetchone()
         if user:
             # 判断密码是否正确
-            ret=check_password(password,user[2])
+            ret = check_password(password, user[2])
             if ret:
                 # 用户存session
                 request.session['username'] = user[1]
                 request.session['userId'] = user[0]
-                return HttpResponseRedirect('/index/')  #跳转到主界面
+                return HttpResponseRedirect('/index/')  # 跳转到主界面
             else:
                 return render(request, 'login.html', {"error": "密码错误"})
         else:
-            return render(request,'login.html',{"error":"用户不存在"})
+            return render(request, 'login.html', {"error": "用户不存在"})
 
 
 # 退出登录
@@ -1026,23 +1038,25 @@ def logout(request):
     request.session.clear();
     return HttpResponseRedirect('/login/')  # 跳转到登录页面
 
+
 # 个人中心
 def personal(request):
-    return render(request,'personal.html');
+    return render(request, 'personal.html');
 
 
-#将本地文件写到项目中
+# 将本地文件写到项目中
 def handle_uploaded_file(file_obj, ext):
     name = os.path.splitext(file_obj.name)[0]
     filename = "%s%s" % (name, ext)
     localurl = "static\\pic\\"
-    file_path = os.path.join(BASE_DIR, localurl,filename)
+    file_path = os.path.join(BASE_DIR, localurl, filename)
     print(file_path)
     with open(file_path, 'wb+') as f:
         for chunk in file_obj.chunks():
             f.write(chunk)
 
-#获取文档中的内容
+
+# 获取文档中的内容
 def getcontent(file_path):
     # 获取文档对象
     file = docx.Document(file_path)
@@ -1054,24 +1068,28 @@ def getcontent(file_path):
         fonts = para.runs
         for f in fonts:
             if (f.bold):#加粗
-               content+="<p><strong>"+doc_test+"</strong><p>"
+               content+="<p><strong>"+doc_test+"</strong></p>"
             if(f.italic):#斜体
-               content += "<p><i>" + doc_test + "</i><p>"
+               content += "<p><i>" + doc_test + "</i></p>"
             if (f.underline):  # 下划线
-               content += "<p><u>" + doc_test + "</u><p>"
+               content += "<p><u>" + doc_test + "</u></p>"
         if styles=='Heading 1':#一级标题
             content +="<h1>"+doc_test+"</h1>"
         elif  styles=='Heading 2':#二级标题
             content += "<h2>" + doc_test + "</h2>"
+        if styles=='Normal':#正常的纯文本
+            content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
 
+
     return content
 
-#个人文件上传
+
+# 个人文件上传
 @transaction.atomic
 def user_upload_file(request):
-    userid=request.session.get("userId")
+    userid = request.session.get("userId")
     # fileobj=request.POST.get('fileobj')
     # print(fileobj)
     # filename=fileobj.name
@@ -1082,86 +1100,32 @@ def user_upload_file(request):
         files = request.FILES
         if len(files) == 0:
             message = '没有文件上传，请重新上传'
-            return JsonResponse({ 'message': message})
+            return JsonResponse({'message': message})
         for file_key in files:
             file_obj = files[file_key]
             ext = os.path.splitext(file_obj.name)[1]
-            name=os.path.splitext(file_obj.name)[0]
-            #调用方法
+            name = os.path.splitext(file_obj.name)[0]
+            # 调用方法
             handle_uploaded_file(file_obj, ext)
-            filename = "%s%s" % (name,ext)
+            filename = "%s%s" % (name, ext)
             localurl = "static\\pic\\"
             file_path = os.path.join(BASE_DIR, localurl, filename)
             # 获取当前时间
             localTime = time.localtime(time.time())
             formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
             # 调用方法
-            content=getcontent(file_path)
-            sid = transaction.savepoint()
-            try:
-               # 在数据库中存储路径
-               cursor = connection.cursor()
-               cursor.execute('insert into file(file_name,content,url,cre_date) values(%s,%s,%s,%s)',
-                           [name,content, file_path, formatTime])
-               cursor.execute("select file_id from file where file_name = %s order by file_id desc limit 1", [name])
-               file_id = cursor.fetchone()
-               cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userid, file_id])
-               cursor.close()
-               status=200
-               message = "文件上传成功"
-               transaction.savepoint_commit(sid)
-               return redirect("/index/")
-            except Exception as e:
-               # 数据库更新失败
-               status = 2001
-               message = "文件上传失败"
-               transaction.savepoint_rollback(sid)
-               return JsonResponse({'status': status, 'message': message})
-
-#团队文件上传
-@transaction.atomic
-def team_upload_file(request):
-    userid=request.session.get("userId")
-    teamID=request.GET.get("saveState")
-    if request.method == "POST":
-        files = request.FILES
-        if len(files) == 0:
-            message = '没有文件上传，请重新上传'
-            return JsonResponse({ 'message': message})
-        for file_key in files:
-            file_obj = files[file_key]
-            ext = os.path.splitext(file_obj.name)[1]
-            name=os.path.splitext(file_obj.name)[0]
-            # 调用方法
-            handle_uploaded_file(file_obj, ext)
-            filename = "%s%s" % (name,ext)
-            localurl = "static\\pic\\"
-            file_path = os.path.join(BASE_DIR, localurl, filename)
-            # 获取当前时间
-            localTime = time.localtime(time.time())
-            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
-            #调用方法
-            getcontent(file_path)
-
+            content = getcontent(file_path)
             sid = transaction.savepoint()
             try:
                 # 在数据库中存储路径
                 cursor = connection.cursor()
-                # 向file表中插入文件数据
-                cursor.execute("insert into file(file_name,content,url,cre_date) values(%s,%s,%s,%s)",
-                                       [name, content, file_path,formatTime])
-                # 获取文件id
+                cursor.execute('insert into file(file_name,content,url,cre_date) values(%s,%s,%s,%s)',
+                               [name, content, file_path, formatTime])
                 cursor.execute("select file_id from file where file_name = %s order by file_id desc limit 1", [name])
                 file_id = cursor.fetchone()
-                # 获取团队成员id
-                cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;",
-                                       [userid, teamID])
-                team_mem_id = cursor.fetchone()
-                # 保存团队文件
-                cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)",
-                                       [team_mem_id, file_id])
+                cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userid, file_id])
                 cursor.close()
-                status=200
+                status = 200
                 message = "文件上传成功"
                 transaction.savepoint_commit(sid)
                 return redirect("/index/")
@@ -1172,29 +1136,84 @@ def team_upload_file(request):
                 transaction.savepoint_rollback(sid)
                 return JsonResponse({'status': status, 'message': message})
 
-#判断导入的文件名是否重复
+
+# 团队文件上传
+@transaction.atomic
+def team_upload_file(request):
+    userid = request.session.get("userId")
+    teamID = request.GET.get("saveState")
+    if request.method == "POST":
+        files = request.FILES
+        if len(files) == 0:
+            message = '没有文件上传，请重新上传'
+            return JsonResponse({'message': message})
+        for file_key in files:
+            file_obj = files[file_key]
+            ext = os.path.splitext(file_obj.name)[1]
+            name = os.path.splitext(file_obj.name)[0]
+            # 调用方法
+            handle_uploaded_file(file_obj, ext)
+            filename = "%s%s" % (name, ext)
+            localurl = "static\\pic\\"
+            file_path = os.path.join(BASE_DIR, localurl, filename)
+            # 获取当前时间
+            localTime = time.localtime(time.time())
+            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
+            # 调用方法
+            content = getcontent(file_path)
+            sid = transaction.savepoint()
+            try:
+                # 在数据库中存储路径
+                cursor = connection.cursor()
+                # 向file表中插入文件数据
+                cursor.execute("insert into file(file_name,content,url,cre_date) values(%s,%s,%s,%s)",
+                               [name, content, file_path, formatTime])
+                # 获取文件id
+                cursor.execute("select file_id from file where file_name = %s order by file_id desc limit 1", [name])
+                file_id = cursor.fetchone()
+                # 获取团队成员id
+                cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;",
+                               [userid, teamID])
+                team_mem_id = cursor.fetchone()
+                # 保存团队文件
+                cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)",
+                               [team_mem_id, file_id])
+                cursor.close()
+                status = 200
+                message = "文件上传成功"
+                transaction.savepoint_commit(sid)
+                return redirect("/index/")
+            except Exception as e:
+                # 数据库更新失败
+                status = 2001
+                message = "文件上传失败"
+                transaction.savepoint_rollback(sid)
+                return JsonResponse({'status': status, 'message': message})
+
+
+# 判断导入的文件名是否重复
 def uploadexist(request):
-    name=request.POST.get('filename')
+    name = request.POST.get('filename')
     userid = request.session.get("userId")
     saveState = request.POST.get('saveState')  # 获取文档状态
     teamId = request.POST.get('teamId')  # 获取团队Id
-    filename=name.split('.')[0]
+    filename = name.split('.')[0]
     # 在数据库中存储路径
     cursor = connection.cursor()
     if saveState == "my_doc":
         cursor.execute('select file_name from file f where f.file_id in'
-                   ' (select file_id from user_file where user_id = %s)', [userid])
+                       ' (select file_id from user_file where user_id = %s)', [userid])
         fileNamas = cursor.fetchall()
         for fileName in fileNamas:
-           if str(fileName[0]) == filename:
-              status=200
-              message="文件名存在，请重新命名"
-              break
+            if str(fileName[0]) == filename:
+                status = 200
+                message = "文件名存在，请重新命名"
+                break
         else:
-              status=2001
-              message = "文件不存在，可以导入该文件"
+            status = 2001
+            message = "文件不存在，可以导入该文件"
     else:
-         # 团队文档的名称是否重复
+        # 团队文档的名称是否重复
         cursor.execute("select file_name from file f, member_file mf "
                        "where f.file_id = mf.file_id and mf.team_mem_id in "
                        "(select team_mem_id from team_member where team_id = %s)", [teamId])
@@ -1209,3 +1228,6 @@ def uploadexist(request):
                 message = "文件不存在，可以导入该文件"
     return JsonResponse({"status": status, "message": message})
 
+# 构建websocket服务端
+def chat(request):
+    return render(request, "chat.html")

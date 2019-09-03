@@ -69,7 +69,7 @@ urlpatterns = [
     path('restore/', views.restore),
     # 回收站彻底删除文件
     path('deleteAll/', views.deleteAll),
-	# 按文件名和文件内容搜索
+    # 按文件名和文件内容搜索
     path('searchFile/', views.searchFile),
     # 打开搜索到的文件
     path('serachRTFdoc/', views.serachRTFdoc),
@@ -93,11 +93,12 @@ urlpatterns = [
     path('personal/', views.personal),
 
     # 个人文件上传
-    path("user_upload_file/",views.user_upload_file),
+    path("user_upload_file/", views.user_upload_file),
     # 团队文件上传
     path("team_upload_file/", views.team_upload_file),
-    #判断导入文件名是否重复
-    path('uploadexist/',views.uploadexist),
-
+    # 判断导入文件名是否重复
+    path('uploadexist/', views.uploadexist),
+    # 配置websocket客户端
+    path('chat/', views.chat),
 
 ]
