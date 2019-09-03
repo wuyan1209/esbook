@@ -840,7 +840,7 @@ def delectEdition(request):
 @transaction.atomic
 def saveEditionRTFdoc(request):
     content = request.POST.get('content')  # 文档内容
-    fileName = request.POST.get('fileName')  # 当前文档标题  
+    fileName = request.POST.get('fileName')  # 当前文档标题
 
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
@@ -849,16 +849,20 @@ def saveEditionRTFdoc(request):
     cursor = connection.cursor()
     try:
         cursor.execute('select file_id from file where file_name="' + fileName + '"')
-        fileId = cursor.fetchone()  # 25
+        fileId = cursor.fetchone()
         cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
                        [content, formatTime, fileId])
-        return_param['saveStatus'] = "success";
+        # 成功的话保存
+        status = 200
+        message = '已经内容还原到该版本'
         transaction.savepoint_commit(sid)
     except Exception as e:
         # 数据库更新失败
-        return_param['saveStatus'] = "fail"
+        # 失败
+        status = 4001
+        message = '还原失败，请重新操作'
         transaction.savepoint_rollback(sid)
-    return HttpResponse(json.dumps(return_param))
+    return JsonResponse({'status': status, 'message': message})
 
 
 # 跳转到注册页面
@@ -1057,8 +1061,11 @@ def getcontent(file_path):
             content +="<h1>"+doc_test+"</h1>"
         elif  styles=='Heading 2':#二级标题
             content += "<h2>" + doc_test + "</h2>"
+        if styles=='Normal':#正常的纯文本
+            content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
+
 
     return content
 
@@ -1137,8 +1144,7 @@ def team_upload_file(request):
             localTime = time.localtime(time.time())
             formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
             # 调用方法
-            getcontent(file_path)
-
+            content = getcontent(file_path)
             sid = transaction.savepoint()
             try:
                 # 在数据库中存储路径
