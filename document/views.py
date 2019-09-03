@@ -292,11 +292,10 @@ def fileList(request):
     if int(page) > totalPage:
         return JsonResponse({"status": 2001})
     offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
-    cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id '
+    cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id,f.type '
                    'from user u,file f,user_file uf '
                    'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"'
-                                                                                                                              ' order by f.cre_date desc limit %s,%s',
-                   [offset, pageSize])
+                   ' order by f.cre_date desc limit %s,%s',[offset,pageSize])
     row = cursor.fetchall()
     cursor.close()
     return JsonResponse({"page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": row})
@@ -556,7 +555,7 @@ def teamfile(request):
     if int(page) > totalPage:
         return JsonResponse({"status": 2001})
     offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
-    cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id '
+    cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id,f.type '
                    'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
                    ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
                    'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s', [offset, pageSize])
@@ -572,23 +571,46 @@ def login(requset):
 
 # 我的回收站
 def myBin(request):
+    page = request.POST['page']
     # 获取session的用户
     username = request.session['username']
-    # 获取状态为1的属于此用户的文件和团队
+    # 每页显示条数
+    pageSize = 10
     cursor = connection.cursor()
+    cursor.execute('select count(*) from( '
+                   '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
+                   ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
+                    ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                    ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' )t ORDER BY time DESC')
+    count = cursor.fetchone()[0]  # 总条数
+    totalPage = count / pageSize  # 总页数
+    if count % pageSize != 0:
+        totalPage = totalPage + 1
+    # 当页数大于总页数，直接返回
+    if int(page) > totalPage:
+        return JsonResponse({"status": 2001})
+    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
+    # 获取状态为1的属于此用户的文件和团队
     cursor.execute('select * from( '
                    '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
-                                                                                                                            ' UNION'
-                                                                                                                            ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
-                                                                                                                            ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                                                                                                                            ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                 ' UNION'
-                                                                                                                                                                                 ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
-                                                                                                                                                                                 ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                                                                      ' )t ORDER BY time DESC')
+                    ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                    ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' UNION'
+                    ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                     ' )t ORDER BY time DESC limit %s,%s',[offset,pageSize])
     result = cursor.fetchall()
-    return JsonResponse({'status': 200, 'message': result})
+    cursor.close()
+    return JsonResponse({'status': 200, 'message': result,"page":int(page),"pageSize":pageSize,"totalPage":totalPage})
 
 
 # 回收站恢复文件
@@ -637,11 +659,11 @@ def searchFile(request):
     # 获取username
     username = request.session['username']
     # 查找该用户自己的文件和加入的团队的文件
-    cursor.execute(
-        "select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='" + username + "' and f.file_name like '%" + searchCondition + "%' "
-                                                                                                                                                                                              "UNION "
-                                                                                                                                                                                              "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
-                                                                                                                                                                                              "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
+    cursor.execute("select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='"+username+"' and f.file_name like '%" + searchCondition + "%' "
+                    "UNION "
+                    "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
+                     "and user_name='"+username+"' and file_name like '%" + searchCondition + "%'")
+
 
     # 查文件
     cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
@@ -650,8 +672,7 @@ def searchFile(request):
     for fileId in fileIds:
         # 根据查询到的fileID来获取file的详细数据
         cursor.execute(
-            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
-            [fileId[0], 0])
+            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",[fileId[0], 0])
         searchList = cursor.fetchone()
         if searchList:
             files['file_name'] = searchList[0]
@@ -720,8 +741,7 @@ def saveEdition(request):
         cursor.execute("select file_id from file where file_name = %s", [edi_name])
         fileId = cursor.fetchone()
         # 保存版本
-        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)',
-                       [formatTime, content, edi_name])
+        cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)', [formatTime, content,edi_name])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
         edi_id = cursor.fetchone()
         # 获取个人文件表id
@@ -749,11 +769,10 @@ def getuseredition(request):
     # 获取文件名称、id、内容
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
-    fileid = cursor.fetchone()
-    cursor.execute(
-        'select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
-        'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
-        'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
+    fileid=cursor.fetchone()
+    cursor.execute('select  u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name from user u,file f,user_edition ue,user_file uf,edition e '
+                   'where ue.edi_id=e.edi_id and ue.user_file_id=uf.user_file_id and uf.user_id=u.user_id and uf.file_id=f.file_id '
+                   'and u.user_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [username, fileid])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
@@ -809,10 +828,9 @@ def getTeamEdition(request):
     filename = request.POST.get('filename')
     cursor.execute('select file_id from file where file_name="' + filename + '"')
     fileid = cursor.fetchone()
-    cursor.execute(
-        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
-        'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
-        'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
+    cursor.execute('select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
+                   'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
+                   'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
@@ -948,11 +966,10 @@ def Register(request):
     # 手机注册
     if phone:
         try:
-            cursor.execute("insert into user (user_name, password, phone, cre_date) values (%s,%s,%s,%s)",
-                           [name, pwd, phone, formatTime])
-            status = 200
-            message = "ok"
-        except:
+            cursor.execute("insert into user (user_name, password, phone, cre_date) values (%s,%s,%s,%s)",[name, pwd, phone, formatTime])
+            status=200
+            message="ok"
+        except :
             status = 4001
             message = "注册失败"
         if status == 200:
@@ -962,8 +979,7 @@ def Register(request):
     # 邮箱注册
     else:
         try:
-            cursor.execute("insert into user (user_name, password, email, cre_date) values (%s,%s,%s,%s)",
-                           [name, pwd, email, formatTime])
+            cursor.execute("insert into user (user_name, password, email, cre_date) values (%s,%s,%s,%s)",[name, pwd, email, formatTime])
             status = 200
             message = "ok"
         except:
