@@ -653,9 +653,8 @@ def deleteAll(request):
         # 判断该文件是文档还是协作空间
         if what == '协作空间':
             # 判断该协作空间是否有文件
-            cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t '
-                           'where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id '
-                           'and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
+                           'and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
             fileId = cursor.fetchall()
             # 有文件
             if fileId:
@@ -684,9 +683,8 @@ def deleteAll(request):
             # 团队文件
             if result:
                 # 判断文件是否有版本
-                cursor.execute('select me.edi_id from edition e,member_edition me,member_file mf,file f '
-                               'where mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id'
-                               'and f.file_id='+id)
+                cursor.execute('select me.edi_id from edition e,member_edition me,member_file mf,file f where mf.file_id=f.file_id '
+                               'and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and f.file_id='+id)
                 ediId=cursor.fetchall()
                 # 有版本
                 if ediId:
@@ -697,9 +695,8 @@ def deleteAll(request):
             # 私有文件
             else:
                 # 判断文件是否有版本
-                cursor.execute('select ue.edi_id from user_file uf,file f,user_edition ue,edition e'
-                               'where uf.file_id=f.file_id and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id'
-                               'and f.file_id='+id)
+                cursor.execute('select ue.edi_id from user_file uf,file f,user_edition ue,edition e where uf.file_id=f.file_id '
+                               'and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id='+id)
                 ediId = cursor.fetchall()
                 # 有版本
                 if ediId:
