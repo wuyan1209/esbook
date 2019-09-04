@@ -23,7 +23,7 @@ urlpatterns = [
     # 文档名称是否重复
     path('docNameExist/', views.docNameExist),
     # 修改doc文档
-    path('docsModify/', views.doc_modify),
+    path('docsModify/', views.docsModify),
     # 私人文件列表
     path('filelist/', views.fileList),
     # 打开修改文档

@@ -109,7 +109,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>{{ request.session.username }}</a>
+                            <img src="../static/assets/images/users/1.jpg" alt="user"
+                                 class="profile-pic m-r-10"/>{{ request.session.username }}</a>
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
@@ -282,10 +283,8 @@
                 display: inline-block;
                 width: 146px;
                 background: white;
-                {#border: 1px solid lightgrey;#}
-                border-radius: 4px;
-                {#padding: 4px 12px;#}
-                overflow: hidden;
+            {#border: 1px solid lightgrey;#} border-radius: 4px;
+            {#padding: 4px 12px;#} overflow: hidden;
                 color: black;
                 height: 26px;
                 text-decoration: none;
@@ -375,8 +374,7 @@
                 "      <th style=\"width: 10 %\">作者</th>\n" +
                 "      <th style=\"width: 10 %\">更新时间</th>\n" +
                 "    </tr>\n" +
-                "  </thead>" +
-                "  <tbody>"
+                "  </thead>"
             {#显示我的文档列表#}
 
             function my_doc_file() {
@@ -429,14 +427,14 @@
             function appendHtml(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
-                if(data.status==2001){
-                    var tmp='<span style="margin:10px">'+data.message+'</span>';
+                if (data.status == 2001) {
+                    var tmp = '<span style="margin:10px">' + data.message + '</span>';
                     $("#tab").append(tmp);
                     $("#Hidden").css("display", "none");
-                }else {
+                } else {
                     $("#Hidden").css("display", "block");
-                    for (i = 0; i < data.list.length; i++) {
-                        var html = ' ';
+                    var html = ' ';
+                    for (var i = 0; i < data.list.length; i++) {
                         var text = data.list[i][2];
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
                         html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n';
@@ -459,10 +457,10 @@
                         html += '<td>' + data.list[i][1] + '</td>' +
                             '<td>' + mystr + '</td>' +
                             '</tr>';
-                        $("#tab").append(html)
                     }
-                    $("#tab").append("</tbody>");
+                    $("#tab").append("<tbody>" + html + "</tbody>");
                 }
+
             }
 
             {#团队文档列表#}
@@ -518,14 +516,14 @@
             function appendTable(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
-                if(data.status==2001){
-                    var tmp='<span style="margin:10px">'+data.message+'</span>';
+                if (data.status == 2001) {
+                    var tmp = '<span style="margin:10px">' + data.message + '</span>';
                     $("#tab").append(tmp);
                     $("#Hidden").css("display", "none");
-                }else{
+                } else {
                     $("#Hidden").css("display", "block");
+                    var html = ' ';
                     for (i = 0; i < data.list.length; i++) {
-                        var html = ' ';
                         var text = data.list[i][6];
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
                         html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n'
@@ -548,9 +546,8 @@
                         html += '<td>' + data.list[i][3] + '</td>' +
                             '<td>' + mystr + '</td>' +
                             '</tr>';
-                        $("#tab").append(html)
                     }
-                    $("#tab").append("</tbody>");
+                    $("#tab").append("<tbody>" + html + "</tbody>");
                 }
 
             }

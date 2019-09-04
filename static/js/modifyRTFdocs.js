@@ -39,7 +39,7 @@ $(function () {
     var doc_save_state = $("#doc_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
     var userId = $("#userId").val();    // 用户的id
     var teamId = $("#teamId").val();    // 团队的id
-    content = $("#editor").html();  // 文档的内容
+    content = $("#editor").html();  // 页面加载时获取的文档内容
 
     // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
@@ -113,10 +113,21 @@ $(function () {
     // 页面加载时隐藏版本框
     $("#myEditor").hide()
 
+    /*var doc = $("b.facility");
+    var doc = $("#editor");
+    doc.bind('DOMNodeInserted', function (e) {
+
+        alert('element now contains: ' + $(e.target).html());
+
+    });*/
 
     // 文档改变即保存文档
     $("#editor").bind("DOMSubtreeModified", function () {
         setTimeout(function () {
+            var doc_content = $("#editor").html();
+            if (doc_content == content) {
+                return
+            }
             modifyDocs();
             if (doc_save_state != "my_doc") {
                 sendWebsocket(doc_content)
@@ -147,9 +158,9 @@ function init() {
         var data = e.data;
         data = data.replace(/'/g, '"');
         data = $.parseJSON(data);
-        var cooperation_fileId = data.fileId;
-        var cooperation_userId = data.userId;
-        var cooperation_content = data.doc_content;
+        var cooperation_fileId = data.fileId;   //  被修改的文件的id
+        var cooperation_userId = data.userId;   //  修改文件用户的id
+        var cooperation_content = data.doc_content;     //  修改的内容
 
         // 获取当前用户和文件的id
         var fileId = $("#fileId").val()
@@ -157,23 +168,33 @@ function init() {
 
         if (cooperation_fileId == fileId && cooperation_userId != userId) {
             // 团队成员打开了同一个文件
-            $.ajax({
+            if (content != "" && content != cooperation_content) {
+                content = cooperation_content;
+                $("#editor").html("");
+                $("#editor").html(cooperation_content);
+            }
+            /*$.ajax({
                 url: "/cooperation_edite/",
                 type: "POST",
                 data: {fileId: cooperation_fileId},
                 dataType: "json",
                 success: function (data) {
-                    var db_doc_content = data.doc_content;
+                    var db_doc_content = data.doc_content;  // 从数据库中获取的文档内容
                     console.log(doc_content);
                     console.log(cooperation_content);
                     if (content != "" && content != cooperation_content) {
-                        content = $("#editor").html()
+                        content = $("#editor").html();
                         $("#editor").html("");
-                        $("#editor").html(doc_content);
+                        $("#editor").html(db_doc_content);
                     }
                 }
-            })
+            })*/
             // alert("我来了")
+        }
+
+        if (cooperation_fileId == fileId && cooperation_userId == userId) {
+            // 修改文档本人
+            content = $("#editor").html();
         }
     };
 
@@ -191,10 +212,7 @@ function init() {
 
 // 发送内容到websocket
 function sendWebsocket(doc_content) {
-    var doc_content = $("#editor").html();
-    if (doc_content == content) {
-        return
-    }
+
     // 1:文件已自动保存，团队成员更新页面
     var fileId = $("#fileId").val()
     var userId = $("#userId").val()
@@ -222,7 +240,9 @@ function doc_content() {
 
 // 打开已存在文档
 function docs_modify(name, id, saveState, fileId) {
-    $.ajax({
+    window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + name +
+        "&user_id="+id+"&fileId="+fileId;
+    /*$.ajax({
         url: '/docsModify/',
         type: 'post',
         data: {
@@ -237,7 +257,7 @@ function docs_modify(name, id, saveState, fileId) {
                 window.location.href = "/modifyRTFdocs/?saveState=" + saveState;
             }
         }
-    });
+    });*/
 }
 
 // 保存文档
@@ -356,11 +376,12 @@ function saveTeamEditor() {
     })
 
 }
+
 //获取字符串中“的位置
- function findstr(str,cha,num){
-    var x=str.indexOf(cha);
-    for(var i=0;i<num;i++){
-        x=str.indexOf(cha,x+1);
+function findstr(str, cha, num) {
+    var x = str.indexOf(cha);
+    for (var i = 0; i < num; i++) {
+        x = str.indexOf(cha, x + 1);
     }
     return x;
 }
@@ -383,16 +404,16 @@ function getEdition() {
                 for (var i = 0; i < data.list.length; i++) {
                     //处理字符串中包含字符串
                     contents = data.list[i][3];
-                    var str=" '" + data.list[i][3] + "'";
-                    var reg=/\"/g;
-                    str=str.replace(reg,'&quot;');//双引号 //&apos;单引号
+                    var str = " '" + data.list[i][3] + "'";
+                    var reg = /\"/g;
+                    str = str.replace(reg, '&quot;');//双引号 //&apos;单引号
 
                     time = data.list[i][2];
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px;\">\n" +
                         " <span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
                         " <span style='display:block'>" + data.list[i][0] + "保存&nbsp;&nbsp;&nbsp;&nbsp;" +
-                        "<a href= \'javascript:void (0)\' data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('"+ data.list[i][5] +"','" + updatetime + "'," + str + ")\">预览</a>" +
+                        "<a href= \'javascript:void (0)\' data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + str + ")\">预览</a>" +
                         "&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick=\"getoldEdition(" + str + ")\">还原</a>&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0) \" onclick='delectEdition(" + data.list[i][4] + ")'>删除</a></span>\n" +
                         " </div>"
                     $("#myEditor").append(html);
@@ -424,19 +445,19 @@ function getTeamEditor(teamId,) {
                 $("#myEditor div").remove()
                 //查看成功
                 for (var i = 0; i < data.list.length; i++) {
-                      //处理字符串中包含字符串
+                    //处理字符串中包含字符串
                     contents = data.list[i][4];
-                    var str=" '" + data.list[i][4] + "'";
-                    var reg=/\"/g;
-                    str=str.replace(reg,'&quot;');//双引号 //&apos;单引号
+                    var str = " '" + data.list[i][4] + "'";
+                    var reg = /\"/g;
+                    str = str.replace(reg, '&quot;');//双引号 //&apos;单引号
 
                     time = data.list[i][3];
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
                         "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
                         "<span style='display:block'>" + data.list[i][1] + "保存&nbsp;&nbsp;&nbsp;&nbsp;" +
-                        "<a href= \"javascript:void (0)\"data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('"+ data.list[i][2] +"','" + updatetime + "'," + str + ")\">预览</a>" +
-                        "&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick=\"getoldEdition("+ str + ")\">还原</a>&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</a></span>\n" +
+                        "<a href= \"javascript:void (0)\"data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][2] + "','" + updatetime + "'," + str + ")\">预览</a>" +
+                        "&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick=\"getoldEdition(" + str + ")\">还原</a>&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</a></span>\n" +
                         "</div>"
                     $("#myEditor").append(html);
                 }

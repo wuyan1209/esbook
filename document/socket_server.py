@@ -11,7 +11,7 @@ import json
 def new_client(client, server):
     print("New client connected and was given id %d" % client['id'])
     # 发送给所有的连接
-    server.send_message_to_all("有新人进来了")
+    # server.send_message_to_all("有新人进来了")
 
 
 # 客户端关闭是调用
@@ -32,11 +32,11 @@ def message_received(client, server, send_message):
     # message = urllib.parse.unquote()
     # print("Client(%d) said: %s" % (client['id'], message))
     # print("teamId:", teamId)
-    print("send_message:", send_message)
+
     # 发送给所有的连接
     send_message = str(send_message)
-    send_message = send_message.replace()
-    server.send_message_to_all()
+    print("send_message:", send_message)
+    server.send_message_to_all(send_message)
 
 
 # Server Port

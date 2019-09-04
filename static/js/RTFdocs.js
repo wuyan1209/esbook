@@ -102,7 +102,10 @@ $(function () {
 });
 
 function toModify(doc_name, userId, fileId) {
-    $.ajax({
+    window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + doc_name +
+        "&user_id="+userId+"&fileId="+fileId;
+
+   /* $.ajax({
         url: '/docsModify/',
         type: 'post',
         data: {
@@ -114,8 +117,8 @@ function toModify(doc_name, userId, fileId) {
         dataType: 'json',
         success: function (data) {
             if (data.data == "success") {
-                window.location.href = "/modifyRTFdocs/?saveState=" + saveState;
+
             }
         }
-    });
+    });*/
 }

@@ -305,9 +305,11 @@ def fileList(request):
 
 
 # 修改doc文档
-def doc_modify(request):
-    file_name = request.POST.get("file_name")  # 获取文件名称
-    fileId = request.POST.get("fileId")  # 获取文件状态
+def docsModify(request):
+    file_name = request.GET.get("file_name")  # 获取文件名称
+    fileId = request.GET.get("fileId")  # 获取文件id
+    saveState = request.GET.get("saveState")  # 获取文件状态
+    user_id = request.GET.get("user_id")  # 获取文件状态
 
     cursor = connection.cursor()
     cursor.execute('select content from file f '
@@ -317,7 +319,8 @@ def doc_modify(request):
     request.session["file_name"] = file_name
     request.session["doc_content"] = doc_content
     request.session["file_id"] = fileId
-    return HttpResponse(json.dumps({'data': 'success'}))
+    # return HttpResponse(json.dumps({'data': 'success'}))
+    return render(request, "modify_RTFdocs.html", {"saveState": saveState})
 
 
 # 修改页面
