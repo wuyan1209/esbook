@@ -1231,3 +1231,5 @@ def uploadexist(request):
 # 构建websocket服务端
 def chat(request):
     return render(request, "chat.html")
+def showrxcel(request):
+    return render(request,"excel.html")
