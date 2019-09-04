@@ -152,8 +152,6 @@ function bin() {
         dataType: "json",
         data:{"page":1},
         success: function (data) {
-            console.log(data.message.length)
-            console.log(data.message)
             //处理第一页的数据
             appendBin(data);
             var options = {//根据后台返回的分页相关信息，设置插件参数

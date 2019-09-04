@@ -46,7 +46,6 @@ urlpatterns = [
     path('delTeam/', views.delTeam),
     # 团队文件
     path('teamfile/', views.teamfile),
-    # path('fenye/',views.paginator_view),
     # 查看版本
     path('getuseredition/', views.getuseredition),
     # 保存版本
@@ -100,5 +99,7 @@ urlpatterns = [
     path('uploadexist/', views.uploadexist),
     # 协作编辑
     path('cooperation_edite/', views.cooperation_edite),
+    #Excel
+    path('excel/',views.showrxcel),
 
 ]
