@@ -466,7 +466,7 @@ function delectEdition(ediId) {
     var userId = $("#userId").val();
     var fileId = $("#fileId").val();
 
-    if (window.confirm("您确定要删除该版本吗？")) {
+    if (window.confirm("您确定要删除该版本吗？删除之后将无法还原！")) {
 
         window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
             "&user_id=" + userId + "&fileId=" + fileId+ "&ediId=" + ediId;

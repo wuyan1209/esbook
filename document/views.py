@@ -1080,19 +1080,28 @@ def getcontent(file_path):
         doc_test = para.text
         styles = para.style.name
         fonts = para.runs
-        for f in fonts:
-            if (f.bold):  # 加粗
-                content += "<p><strong>" + doc_test + "</strong></p>"
-            if (f.italic):  # 斜体
-                content += "<p><i>" + doc_test + "</i></p>"
-            if (f.underline):  # 下划线
-                content += "<p><u>" + doc_test + "</u></p>"
         if styles == 'Heading 1':  # 一级标题
             content += "<h1>" + doc_test + "</h1>"
         elif styles == 'Heading 2':  # 二级标题
             content += "<h2>" + doc_test + "</h2>"
+        elif styles == 'Heading 3':  # 3级标题
+            content += "<h3>" + doc_test + "</h3>"
+        elif styles == 'Heading 4':  # 4级标题
+            content += "<h4>" + doc_test + "</h4>"
+        elif styles == 'Heading 5':  # 5级标题
+            content += "<h5>" + doc_test + "</h5>"
+        elif styles == 'Heading 6':  # 6级标题
+            content += "<h6>" + doc_test + "</h6>"
         if styles == 'Normal':  # 正常的纯文本
-            content += "<p>" + doc_test + "</p>"
+            for f in fonts:
+                if (f.bold):  # 加粗
+                    content += "<p><strong>" + doc_test + "</strong></p>"
+                if (f.italic):  # 斜体
+                    content += "<p><i>" + doc_test + "</i></p>"
+                if (f.underline):  # 下划线
+                    content += "<p><u>" + doc_test + "</u></p>"
+                if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
+                    content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
 
