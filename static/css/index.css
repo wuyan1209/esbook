@@ -11,11 +11,15 @@
 
 .span2 {
     margin-left: 3%;
+    width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: keep-all;
 }
 
 .span3 {
     position: absolute;
-    margin-left: 27%;
     background-color: white;
     border: none;
 }
@@ -24,7 +28,7 @@
     background-color: white;
     color: #7a7d81;
     display: inline-block;
-    width: 50%;
+    width: 80%;
 }
 
 .aaaaa:hover {
