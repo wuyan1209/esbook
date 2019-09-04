@@ -60,8 +60,6 @@ urlpatterns = [
     path('delectEdition/', views.delectEdition),
     # 判断版本内容是否重复
     path('editionExits/', views.editionExits),
-    # 还原时保存文档
-    path('saveEditionRTFdoc/', views.saveEditionRTFdoc),
     # 我的回收站
     path('myBin/', views.myBin),
     # 回收站恢复文件
@@ -101,5 +99,7 @@ urlpatterns = [
     path('cooperation_edite/', views.cooperation_edite),
     #Excel
     path('excel/',views.showrxcel),
+    # 还原
+    path('getoldEdition/', views.getoldEdition),
 
 ]

@@ -917,35 +917,6 @@ def delectEdition(request):
     return JsonResponse({'status': status, 'message': message})
 
 
-# 还原时保存文档
-@transaction.atomic
-def saveEditionRTFdoc(request):
-    content = request.POST.get('content')  # 文档内容
-    fileName = request.POST.get('fileName')  # 当前文档标题
-
-    localTime = time.localtime(time.time())  # 获取当前时间
-    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
-    return_param = {}
-    sid = transaction.savepoint()
-    cursor = connection.cursor()
-    try:
-        cursor.execute('select file_id from file where file_name="' + fileName + '"')
-        fileId = cursor.fetchone()
-        cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
-                       [content, formatTime, fileId])
-        # 成功的话保存
-        status = 200
-        message = '已经内容还原到该版本'
-        transaction.savepoint_commit(sid)
-    except Exception as e:
-        # 数据库更新失败
-        # 失败
-        status = 4001
-        message = '还原失败，请重新操作'
-        transaction.savepoint_rollback(sid)
-    return JsonResponse({'status': status, 'message': message})
-
-
 # 跳转到注册页面
 def register(request):
     return render(request, 'register.html');
@@ -1305,3 +1276,21 @@ def cooperation_edite(request):
 
 def showrxcel(request):
     return render(request, "excel.html")
+
+def getoldEdition(request):
+    saveState = request.GET.get("saveState")
+    content = request.GET.get("content")
+    user_id = request.GET.get("user_id")
+    fileId = request.GET.get("fileId")
+
+    cursor = connection.cursor()
+    cursor.execute('select file_name from file f '
+                   'where f.file_id = %s',
+                   [fileId])
+    file_name = cursor.fetchone()[0]
+    cursor.execute("update file set content = %s where file_id = %s",[content, fileId])
+
+    request.session["file_name"] = file_name
+    request.session["doc_content"] = content
+    request.session["file_id"] = fileId
+    return render(request, "modify_RTFdocs.html", {"saveState": saveState})
