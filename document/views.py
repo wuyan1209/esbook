@@ -896,28 +896,9 @@ def getTeamEdition(request):
     return JsonResponse({'status': 200, "list": list})
 
 
-# 删除版本
-def delectEdition(request):
-    # 版本的id
-    editionid = request.POST.get("ediId")
-    try:
-        cursor = connection.cursor()
-        cursor.execute('delete from edition where edi_id=' + editionid)
-        cursor.close()
-        # 成功的话保存
-        status = 200
-        message = '删除成功'
-    except:
-        # 失败
-        status = 4001
-        message = '删除失败'
-    return JsonResponse({'status': status, 'message': message})
-
-
 # 跳转到注册页面
 def register(request):
     return render(request, 'register.html');
-
 
 # 注册
 def registerUser(request):
@@ -1274,6 +1255,7 @@ def cooperation_edite(request):
 def showrxcel(request):
     return render(request, "excel.html")
 
+#还原版本
 def getoldEdition(request):
     saveState = request.GET.get("saveState")
     content = request.GET.get("content")
@@ -1286,6 +1268,26 @@ def getoldEdition(request):
                    [fileId])
     file_name = cursor.fetchone()[0]
     cursor.execute("update file set content = %s where file_id = %s",[content, fileId])
+
+    request.session["file_name"] = file_name
+    request.session["doc_content"] = content
+    request.session["file_id"] = fileId
+    return render(request, "modify_RTFdocs.html", {"saveState": saveState})
+
+#删除版本
+def delectEdition(request):
+    saveState = request.GET.get("saveState")
+    content = request.GET.get("content")
+    user_id = request.GET.get("user_id")
+    fileId = request.GET.get("fileId")
+    editionid=request.GET.get("ediId")
+
+    cursor = connection.cursor()
+    cursor.execute('select file_name from file f '
+                   'where f.file_id = %s',
+                   [fileId])
+    file_name = cursor.fetchone()[0]
+    cursor.execute('delete from edition where edi_id=' + editionid)
 
     request.session["file_name"] = file_name
     request.session["doc_content"] = content

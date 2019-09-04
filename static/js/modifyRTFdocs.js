@@ -462,22 +462,30 @@ function getTeamEditor(teamId, fileId) {
 
 //删除版本
 function delectEdition(ediId) {
-    if (window.confirm("您确定要删除吗？")) {
-        $.ajax({
-            url: "/delectEdition/",
-            type: "POST",
-            dataType: "json",
-            data: {
-                "ediId": ediId,
-            },
-            success: function (data) {
-                alert(data.message);
-                window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + doc_name +
-        "&user_id="+userId+"&fileId="+fileId;
-                ;
-            },
-        });
+     var saveState = $("#doc_save_state").val();
+    var userId = $("#userId").val();
+    var fileId = $("#fileId").val();
+
+    if (window.confirm("您确定要删除该版本吗？")) {
+
+        window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
+            "&user_id=" + userId + "&fileId=" + fileId+ "&ediId=" + ediId;
+
     }
+    // if (window.confirm("您确定要删除该版本吗？")) {
+    //     $.ajax({
+    //         url: "/delectEdition/",
+    //         type: "POST",
+    //         dataType: "json",
+    //         data: {
+    //             "ediId": ediId,
+    //         },
+    //         success: function (data) {
+    //             alert(data.message);
+    //
+    //         },
+    //     });
+    // }
 }
 
 //版本预览 给模态框传值
@@ -492,7 +500,7 @@ function getoldEdition(content) {
     var userId = $("#userId").val();
     var fileId = $("#fileId").val();
 
-    if (window.confirm("您确定要还原到该版本吗？")) {
+    if (window.confirm("您确定要将内容还原到该版本吗？")) {
 
         window.location.href = "/getoldEdition/?saveState=" + saveState + "&content=" + content +
             "&user_id=" + userId + "&fileId=" + fileId;
