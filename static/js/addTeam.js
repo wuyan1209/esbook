@@ -195,41 +195,48 @@ function appendBin(data) {
     $("#bin").html("");
     $("#h2").text("回收站");
     $("#bin").append(title);
-    for (i = 0; i < data.message.length; i++) {
-        var html=" ";
-        var text = data.message[i][1];
-        var mystr = text.substring(0, 10) + "  " + text.substring(11);
-        html += " <div class=\"dropdown\">\n"
-        /*协作空间*/
-        var t1 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><i class=\"icon-search icon-home\"></i>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
-        /*word*/
-        var t2 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/word.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
-        /*excel*/
-        var t3 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/excel.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
-        /*ppt*/
-        var t4 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/ppt.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
-        if(data.message[i][3]=='协作空间'){
-            html=html+t1;
-        }else if(data.message[i][3]==0){
-            html=html+t2
-        }else if(data.message[i][3]==1){
-            html=html+t3
-        }else if(data.message[i][3]==2){
-            html=html+t4
+    if (data.status == 2001) {
+        var tmp = '<span style="margin:18px">' + data.message + '</span>';
+        $("#bin").append(tmp);
+        $("#Hidden").css("display", "none");
+    } else {
+        $("#Hidden").css("display", "block");
+        for (i = 0; i < data.message.length; i++) {
+            var html = " ";
+            var text = data.message[i][1];
+            var mystr = text.substring(0, 10) + "  " + text.substring(11);
+            html += " <div class=\"dropdown\">\n"
+            /*协作空间*/
+            var t1 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><i class=\"icon-search icon-home\"></i>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            /*word*/
+            var t2 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/word.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            /*excel*/
+            var t3 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/excel.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            /*ppt*/
+            var t4 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/ppt.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            if (data.message[i][3] == '协作空间') {
+                html = html + t1;
+            } else if (data.message[i][3] == 0) {
+                html = html + t2
+            } else if (data.message[i][3] == 1) {
+                html = html + t3
+            } else if (data.message[i][3] == 2) {
+                html = html + t4
+            }
+            html += " <span class='two'>" + mystr + "</span>\n" +
+                "<hr class='hr1'>" +
+                "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n" +
+                "<li><a  class=\"dropdown-item\" href=\"javascript:void(0)\" " +
+                "onclick = \"restore('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
+                "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</a></li>\n" +
+                "<hr style='margin-top: 0;margin-bottom: 0'/>" +
+                "<li><a  class=\"dropdown-item\" style='color: red' href=\"javascript:void(0)\" " +
+                "onclick = \"deleteAll('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
+                "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</a></li>\n" +
+                "</ul>" +
+                "</div>";
+            $("#bin").append(html);
         }
-        html += " <span class='two'>" + mystr + "</span>\n" +
-            "<hr class='hr1'>" +
-            "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n" +
-            "<li><a  class=\"dropdown-item\" href=\"javascript:void(0)\" " +
-            "onclick = \"restore('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
-            "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</a></li>\n" +
-            "<hr style='margin-top: 0;margin-bottom: 0'/>" +
-            "<li><a  class=\"dropdown-item\" style='color: red' href=\"javascript:void(0)\" " +
-            "onclick = \"deleteAll('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
-            "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</a></li>\n" +
-            "</ul>" +
-            "</div>";
-        $("#bin").append(html);
     }
 }
 

@@ -201,7 +201,7 @@
                     <div id="bin"></div>
                 </div>
                 <!-- 分页容器： 显示分页按钮-->
-                <div class="fenye">
+                <div class="fenye" id="Hidden">
                     <!-- 注意:3版本的分页容器标签是<ul>，2版本的容器标签是<div> -->
                     <ul id="mypage"></ul>
                 </div>
@@ -388,33 +388,40 @@
             function appendHtml(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
-                for (i = 0; i < data.list.length; i++) {
-                    var html=' ';
-                    var text = data.list[i][2];
-                    var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                    html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n';
-                    /*word*/
-                    var t1='<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
-                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
-                    /*excel*/
-                    var t2='<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
-                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
-                    /*ppt*/
-                    var t3='<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
-                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
-                    if (data.list[i][5] == 0) {
-                        html = html + t1;
-                    } else if (data.list[i][5] == 1) {
-                        html = html + t2
-                    } else if (data.list[i][5] == 2) {
-                        html = html + t3
+                if(data.status==2001){
+                    var tmp='<span style="margin:10px">'+data.message+'</span>';
+                    $("#tab").append(tmp);
+                    $("#Hidden").css("display", "none");
+                }else {
+                    $("#Hidden").css("display", "block");
+                    for (i = 0; i < data.list.length; i++) {
+                        var html = ' ';
+                        var text = data.list[i][2];
+                        var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                        html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n';
+                        /*word*/
+                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
+                        /*excel*/
+                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
+                        /*ppt*/
+                        var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
+                        if (data.list[i][5] == 0) {
+                            html = html + t1;
+                        } else if (data.list[i][5] == 1) {
+                            html = html + t2
+                        } else if (data.list[i][5] == 2) {
+                            html = html + t3
+                        }
+                        html += '<td>' + data.list[i][1] + '</td>' +
+                            '<td>' + mystr + '</td>' +
+                            '</tr>';
+                        $("#tab").append(html)
                     }
-                    html += '<td>' + data.list[i][1] + '</td>' +
-                        '<td>' + mystr + '</td>' +
-                        '</tr>';
-                    $("#tab").append(html)
+                    $("#tab").append("</tbody>");
                 }
-                $("#tab").append("</tbody>");
             }
 
             {#团队文档列表#}
@@ -468,33 +475,41 @@
             function appendTable(data){
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
-                for (i = 0; i < data.list.length; i++) {
-                    var html=' ';
-                    var text = data.list[i][6];
-                    var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                    html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n'
-                    /*word*/
-                    var t1='<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
-                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
-                    /*excel*/
-                    var t2='<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
-                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
-                    /*ppt*/
-                    var t3='<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
-                        'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
-                    if(data.list[i][8]==0){
-                        html=html+t1
-                    } else if (data.list[i][8] == 1) {
-                        html = html + t2
-                    } else if (data.list[i][8] == 2) {
-                        html = html + t3
+                if(data.status==2001){
+                    var tmp='<span style="margin:10px">'+data.message+'</span>';
+                    $("#tab").append(tmp);
+                    $("#Hidden").css("display", "none");
+                }else{
+                    $("#Hidden").css("display", "block");
+                    for (i = 0; i < data.list.length; i++) {
+                        var html = ' ';
+                        var text = data.list[i][6];
+                        var mystr = text.substring(0, 10) + "  " + text.substring(11);
+                        html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n'
+                        /*word*/
+                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
+                        /*excel*/
+                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
+                        /*ppt*/
+                        var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
+                        if (data.list[i][8] == 0) {
+                            html = html + t1
+                        } else if (data.list[i][8] == 1) {
+                            html = html + t2
+                        } else if (data.list[i][8] == 2) {
+                            html = html + t3
+                        }
+                        html += '<td>' + data.list[i][3] + '</td>' +
+                            '<td>' + mystr + '</td>' +
+                            '</tr>';
+                        $("#tab").append(html)
                     }
-                    html += '<td>' + data.list[i][3] + '</td>' +
-                        '<td>' + mystr + '</td>' +
-                        '</tr>';
-                    $("#tab").append(html)
+                    $("#tab").append("</tbody>");
                 }
-                $("#tab").append("</tbody>");
+
             }
 
             // 新建doc文档
