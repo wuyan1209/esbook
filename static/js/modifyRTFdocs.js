@@ -40,6 +40,7 @@ $(function () {
     var userId = $("#userId").val();    // 用户的id
     var teamId = $("#teamId").val();    // 团队的id
     content = $("#editor").html();  // 文档的内容
+    var fileId=$("#fileId").val()
 
     // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
@@ -50,12 +51,10 @@ $(function () {
     $("#saveedi").on("click", function () {
         if (doc_save_state == "my_doc") {
             // 保存个人版本
-            // modifyDocs(old_doc_title, doc_save_state, userId, teamId)
             saveEdition();
         } else {
             // 保存团队的版本
-            // modifyDocs(old_doc_title, doc_save_state, userId, teamId)
-            saveTeamEditor(teamId);
+            saveTeamEditor(teamId,fileId);
         }
     });
 
@@ -101,7 +100,7 @@ $(function () {
             getEdition();
         } else {
             // 查看团队的版本
-            getTeamEditor(teamId);
+            getTeamEditor(teamId,fileId);
         }
     });
 
@@ -315,7 +314,7 @@ function saveEdition() {
 }
 
 //保存团队版本
-function saveTeamEditor() {
+function saveTeamEditor(teamId,fileId) {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
     var now_doc_title = $("#docs_title").val();  //取得文档标题
@@ -338,7 +337,7 @@ function saveTeamEditor() {
                     dataType: "json",
                     data: {
                         content: doc_content,
-                        filename: now_doc_title,
+                        fileId:fileId,
                         // teanid:teamId,
                     },
                     success: function (data) {
@@ -406,17 +405,16 @@ function getEdition() {
 }
 
 //查看团队版本
-function getTeamEditor(teamId,) {
+function getTeamEditor(teamId,fileId) {
     var now_doc_title = $("#docs_title").val();  //取得文档标题
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
-
     $.ajax({
         type: 'POST',
         url: '/getTeamEdition/',
         dataType: "json",
         data: {
-            filename: now_doc_title,
+            fileId:fileId,
             teamid: teamId,
         },
         success: function (data) {
