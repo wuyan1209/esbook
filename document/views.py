@@ -646,8 +646,15 @@ def deleteAll(request):
     try:
         # 判断该文件是文档还是协作空间
         if what == '协作空间':
-            cursor.execute(
-                'delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            # 判断该协作空间是否有文件
+            cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t '
+                           'where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id '
+                           'and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
+            fileId=cursor.fetchall()
+            if fileId:
+                cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            else:
+                cursor.execute('delete mr,tm,t from member_role mr,team_member tm,team t WHERE mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
             cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
             cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
@@ -667,10 +674,9 @@ def searchFile(request):
     # 查找该用户自己的文件和加入的团队的文件
     cursor.execute(
         "select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='" + username + "' and f.file_name like '%" + searchCondition + "%' "
-                                                                                                                                                                                              "UNION "
-                                                                                                                                                                                              "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
-                                                                                                                                                                                              "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
-
+         "UNION "
+         "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
+          "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
     # 查文件
     cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
 
