@@ -39,6 +39,7 @@ $(function () {
     var doc_save_state = $("#doc_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
     var userId = $("#userId").val();    // 用户的id
     var teamId = $("#teamId").val();    // 团队的id
+    content = $("#editor").html();  // 文档的内容
 
     // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
@@ -108,18 +109,106 @@ $(function () {
     $("#closeEditor").click(function () {
         $("#myEditor").hide()
     })
+
+    // 页面加载时隐藏版本框
     $("#myEditor").hide()
 
 
-
+    // 文档改变即保存文档
     $("#editor").bind("DOMSubtreeModified", function () {
         setTimeout(function () {
             modifyDocs();
+            if (doc_save_state != "my_doc") {
+                sendWebsocket(doc_content)
+            }
         }, 0);
     });
 
 
 });
+// socket客户端
+var ws;
+
+// 连接sock
+function init() {
+    ws = new WebSocket("ws://localhost:9001/");
+
+    // 连接WebSocket服务器成功，打开成功
+    ws.onopen = function () {
+        console.log("onopen");
+    };
+
+    // 收到WebSocket服务器数据
+    ws.onmessage = function (e) {
+        // e.data contains received string.
+
+        // 团队中修改的文件的id
+
+        var data = e.data;
+        data = data.replace(/'/g, '"');
+        data = $.parseJSON(data);
+        var cooperation_fileId = data.fileId;
+        var cooperation_userId = data.userId;
+        var cooperation_content = data.doc_content;
+
+        // 获取当前用户和文件的id
+        var fileId = $("#fileId").val()
+        var userId = $("#userId").val()
+
+        if (cooperation_fileId == fileId && cooperation_userId != userId) {
+            // 团队成员打开了同一个文件
+            $.ajax({
+                url: "/cooperation_edite/",
+                type: "POST",
+                data: {fileId: cooperation_fileId},
+                dataType: "json",
+                success: function (data) {
+                    var db_doc_content = data.doc_content;
+                    console.log(doc_content);
+                    console.log(cooperation_content);
+                    if (content != "" && content != cooperation_content) {
+                        content = $("#editor").html()
+                        $("#editor").html("");
+                        $("#editor").html(doc_content);
+                    }
+                }
+            })
+            // alert("我来了")
+        }
+    };
+
+    // 关闭WebSocket连接
+    ws.onclose = function () {
+        console.log("onclose");
+    };
+
+    // WebSocket连接出现错误
+    ws.onerror = function (e) {
+        console.log("onerror");
+        console.log(e)
+    };
+}
+
+// 发送内容到websocket
+function sendWebsocket(doc_content) {
+    var doc_content = $("#editor").html();
+    if (doc_content == content) {
+        return
+    }
+    // 1:文件已自动保存，团队成员更新页面
+    var fileId = $("#fileId").val()
+    var userId = $("#userId").val()
+    var send_message = {'fileId': fileId, 'userId': userId, 'doc_content': encodeURIComponent(doc_content)}
+    ws.send(JSON.stringify(send_message))
+}
+
+// 在界面上显示接收到的数据，将替换掉一些需要转义的字符
+function output(str) {
+
+    var log = document.getElementById("log");
+    var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
+    log.innerHTML = escaped + "<br>" + log.innerHTML;
+}
 
 // 回显文档数据
 doc_content();

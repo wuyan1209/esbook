@@ -98,7 +98,7 @@ urlpatterns = [
     path("team_upload_file/", views.team_upload_file),
     # 判断导入文件名是否重复
     path('uploadexist/', views.uploadexist),
-    # 配置websocket客户端
-    path('chat/', views.chat),
+    # 协作编辑
+    path('cooperation_edite/', views.cooperation_edite),
 
 ]

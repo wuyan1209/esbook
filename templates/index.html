@@ -109,7 +109,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>admin</a>
+                            <img src="../static/assets/images/users/1.jpg" alt="user" class="profile-pic m-r-10"/>{{ request.session.username }}</a>
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
@@ -169,18 +169,51 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)">文档</a>
+                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)" data-toggle="modal"
+                           data-target="#createDocs">文档</a>
                         <a class="dropdown-item" href="#">表格</a>
                         <a class="dropdown-item" href="#">幻灯片</a>
                     </div>
                 </div>
+
+                <!-- 新建文档模态框 -->
+                <div class="modal fade" id="createDocs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel">
+                                    请输入文档名称
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="doc_name"
+                                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
+                            </div>
+
+                            <div class="modal-footer">
+                                <span style="color: red;" id="docNameExist"></span>
+                                <button id="sure_doc" type="button" class="btn btn-primary">
+                                    确定
+                                </button>
+
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+
                 <div>
-{#                    <div class="custom-file">#}
-{#                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"#}
-{#                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">#}
-{#                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>#}
-{#                    </div>#}
-                    <form method="post"  id="myform"  action="" enctype="multipart/form-data">
+                    {#                    <div class="custom-file">#}
+                    {#                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"#}
+                    {#                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">#}
+                    {#                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>#}
+                    {#                    </div>#}
+                    <form method="post" id="myform" action="" enctype="multipart/form-data">
                         <a href="javascript:;" class="file">选择文件
                             <input type="file" name="files" id="inputfiles">
                         </a>
@@ -217,6 +250,7 @@
                 cellpadding: 0px;
                 cellspacing: 0px;
             }
+
             #fenye {
                 margin-left: 65%;
                 margin-top: 10px;
@@ -238,24 +272,25 @@
                 margin-bottom: 10px;
                 background-color: #ffffff;
             }
-            #daoru{
+
+            #daoru {
                 width: 146px;
             }
+
             .file {
                 position: relative;
                 display: inline-block;
                 width: 146px;
                 background: white;
-                {#border: 1px solid lightgrey;#}
-                border-radius: 4px;
-                {#padding: 4px 12px;#}
-                overflow: hidden;
+            {#border: 1px solid lightgrey;#} border-radius: 4px;
+            {#padding: 4px 12px;#} overflow: hidden;
                 color: black;
                 text-decoration: none;
                 text-indent: 0;
                 line-height: 20px;
                 text-align: center;
             }
+
             .file input {
                 position: absolute;
                 font-size: 100px;
@@ -263,13 +298,15 @@
                 top: 0;
                 opacity: 0;
             }
+
             .file:hover {
                 background: lightgrey;
                 border-color: #78C3F3;
                 color: black;
                 text-decoration: none;
             }
-            #daoru{
+
+            #daoru {
                 border: none;
             }
         </style>
@@ -284,29 +321,29 @@
                 })
                 my_doc_file()
                 //导入文件操作
-                $("#inputfiles").on("change",function () {
+                $("#inputfiles").on("change", function () {
                     //动态改变action中的值
-                    if (saveState=='my_doc') {
+                    if (saveState == 'my_doc') {
                         $("#myform").attr("action", "/user_upload_file/");
-                    }else {
-                        $("#myform").attr("action", "/team_upload_file/?saveState="+saveState);
+                    } else {
+                        $("#myform").attr("action", "/team_upload_file/?saveState=" + saveState);
                     }
                     var files = $('#inputfiles').prop('files');//获取到文件列表
                     console.log(files[0].name)
                     //判断导入文件名是否存在
                     $.ajax({
-                        url:"/uploadexist/",
-                        data:{
-                            "filename":files[0].name,
-                            "saveState":saveState,
-                            "teamId":saveState,
+                        url: "/uploadexist/",
+                        data: {
+                            "filename": files[0].name,
+                            "saveState": saveState,
+                            "teamId": saveState,
                         },
                         type: "POST",
                         dataType: "json",
                         success: function (data) {
                             if (data.status == 200) {
                                 alert("文档名已经存在，请重新命名")
-                            }else {
+                            } else {
                                 alert("文档不存在，可以导入")
                             }
                             // 个人文件导入
@@ -339,6 +376,7 @@
                 "  </thead>" +
                 "  <tbody>"
             {#显示我的文档列表#}
+
             function my_doc_file() {
                 $("#bin").html("");
                 $("#h2").text("我的文档");
@@ -385,6 +423,7 @@
                     },
                 })
             }
+
             function appendHtml(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
@@ -403,6 +442,7 @@
             }
 
             {#团队文档列表#}
+
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#tab").html("");
@@ -412,7 +452,7 @@
                 $.ajax({
                     url: "/teamfile/",
                     type: "POST",
-                    data: {"teamName": teamName,"page":1},
+                    data: {"teamName": teamName, "page": 1},
                     dataType: "json",
                     success: function (data) {
                         //处理第一页的数据
@@ -441,7 +481,7 @@
                                     url: "/teamfile/",
                                     type: "post",
                                     dataType: "json",
-                                    data: {"teamName": teamName,"page": page},
+                                    data: {"teamName": teamName, "page": page},
                                     success: function (data) {
                                         appendTable(data);//处理数据
                                     }
@@ -452,7 +492,8 @@
                     },
                 })
             }
-            function appendTable(data){
+
+            function appendTable(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
                 for (i = 0; i < data.list.length; i++) {
@@ -469,24 +510,19 @@
                 $("#tab").append("</tbody>");
             }
 
-            // 新建doc文档
-            $("#toDocs").on("click", function () {
-                window.location.href = "/RTFdocs/?saveState=" + saveState
-            });
-
             //阻止浏览器默认右击点击事件
             $("#tab").on("contextmenu", "tr", function () {
                 return false;
             });
 
             // 绑定右击事件
-            $("#tab").on("mousedown", "tr", function (e) {
+            $("#tab").on("mousedown", "tbody tr", function (e) {
                 //右键为3
                 if (3 == e.which) {
                     var file_id = $(this).attr("file_id");
                     var team_name = $(this).attr("teamname");
-                    $("#clickMenu").attr("file_id",file_id)
-                    $("#clickMenu").attr("team_name",team_name)
+                    $("#clickMenu").attr("file_id", file_id)
+                    $("#clickMenu").attr("team_name", team_name)
 
                     $("#clickMenu").css("display", "block");
                     //var divchild = $(this).children("div");
@@ -495,6 +531,7 @@
                 }
             });
 
+            // 点击空白区域隐藏菜单
             $("body").on("click", function () {
                 $("#clickMenu").css("display", "none");
             })
@@ -998,6 +1035,7 @@
 <script src="../static/js/addTeam.js"></script>
 <script src="../static/js/modifyRTFdocs.js"></script>
 <script src="{% static 'js/search.js' %}"></script>
+<script src="{% static 'js/RTFdocs.js' %}"></script>
 
 </body>
 </html>

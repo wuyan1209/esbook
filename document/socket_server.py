@@ -1,27 +1,42 @@
+# -*- coding:utf-8 -*-
 # 加载WebsocketServer模块
+
 from websocket_server import WebsocketServer
-# Called for every client connecting (after handshake)
+import urllib
+from urllib.parse import parse_qs
+import json
 
 
+# 获取连接是调用
 def new_client(client, server):
     print("New client connected and was given id %d" % client['id'])
     # 发送给所有的连接
-    server.send_message_to_all("Hey all, a new client has joined us")
+    server.send_message_to_all("有新人进来了")
 
 
-# Called for every client disconnecting
+# 客户端关闭是调用
 def client_left(client, server):
     print("Client(%d) disconnected" % client['id'])
 
 
-# Called when a client sends a message
-def message_received(client, server, message):
-    if len(message) > 200:
-        message = message[:200] + '..'
-    print("Client(%d) said: %s" % (client['id'], message))
+# 客户端发送消息时调用
+def message_received(client, server, send_message):
+    # print((message.encode('utf-8')).decode())
+    send_message = json.loads(send_message)
+    content = send_message['doc_content']
 
+    content = urllib.parse.unquote(content)
+    send_message['doc_content'] = content
+    # print(type(send_message))
+    # print(send_message)
+    # message = urllib.parse.unquote()
+    # print("Client(%d) said: %s" % (client['id'], message))
+    # print("teamId:", teamId)
+    print("send_message:", send_message)
     # 发送给所有的连接
-    server.send_message_to_all(message)
+    send_message = str(send_message)
+    send_message = send_message.replace()
+    server.send_message_to_all()
 
 
 # Server Port
