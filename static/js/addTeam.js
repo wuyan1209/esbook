@@ -142,42 +142,105 @@ function delTeam(teamId) {
 
 };
 
+var title = "<span class='one' style='font-weight: 500;'>文件名</span>\n" +
+        "<span class='two'  style='font-weight: 500;margin-top: 15px'>删除时间</span>\n"+"<hr class='hr1'>";
 //回收站
 function bin() {
-    var title = "<span class='one' style='font-weight: 500;'>文件名</span>\n" +
-        "<span class='two'  style='font-weight: 500;margin-top: 15px'>删除时间</span>\n"+"<hr class='hr1'>";
     $.ajax({
         url: "/myBin/",
         type: "POST",
         dataType: "json",
+        data:{"page":1},
         success: function (data) {
-            /*清空之前的数据*/
-            $("#tab").html("");
-            $("#bin").html("");
-            $("#h2").text("回收站");
-            $("#bin").append(title);
-            for (i = 0; i < data.message.length; i++) {
-                var text = data.message[i][1];
-                var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                html = " <div class=\"dropdown\">\n" +
-                    " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">" + data.message[i][0] + "</span>\n" +
-                    " <span class='two'>" + mystr + "</span>\n" +
-                    "<hr class='hr1'>"+
-                    "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n" +
-                    "<li><a  class=\"dropdown-item\" href=\"javascript:void(0)\" " +
-                    "onclick = \"restore('" + data.message[i][2] + "','"+ data.message[i][3] + "')\">" +
-                    "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</a></li>\n" +
-                    "<hr style='margin-top: 0;margin-bottom: 0'/>"+
-                    "<li><a  class=\"dropdown-item\" style='color: red' href=\"javascript:void(0)\" " +
-                     "onclick = \"deleteAll('" + data.message[i][2] + "','"+ data.message[i][3] + "')\">" +
-                    "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</a></li>\n" +
-                    "</ul>" +
-                    "</div>";
-                $("#bin").append(html);
-            }
+            console.log(data.message.length)
+            console.log(data.message)
+            //处理第一页的数据
+            appendBin(data);
+            var options = {//根据后台返回的分页相关信息，设置插件参数
+                bootstrapMajorVersion: 3, //如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
+                currentPage: data.page, //当前页数
+                totalPages: data.totalPage, //总页数
+                numberOfPages: data.pageSize,//每页记录数
+                itemTexts: function (type, page, current) {//设置分页按钮显示字体样式
+                    switch (type) {
+                        case "first":
+                            return "首页";
+                        case "prev":
+                            return "上一页";
+                        case "next":
+                            return "下一页";
+                        case "last":
+                            return "末页";
+                        case "page":
+                            return page;
+                    }
+                },
+                onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
+                    $.ajax({//根据page去后台加载数据
+                        url: "/myBin/",
+                        type: "post",
+                        dataType: "json",
+                        data: {"page": page},
+                        success: function (data) {
+                            appendBin(data);//处理数据
+                        }
+                    });
+                }
+            };
+            $('#mypage').bootstrapPaginator(options);//设置分页
         },
     })
 };
+function appendBin(data) {
+    /*清空之前的数据*/
+    $("#tab").html("");
+    $("#bin").html("");
+    $("#h2").text("回收站");
+    $("#bin").append(title);
+    if (data.status == 2001) {
+        var tmp = '<span style="margin:18px">' + data.message + '</span>';
+        $("#bin").append(tmp);
+        $("#Hidden").css("display", "none");
+    } else {
+        $("#Hidden").css("display", "block");
+        for (i = 0; i < data.message.length; i++) {
+            var html = " ";
+            var text = data.message[i][1];
+            var mystr = text.substring(0, 10) + "  " + text.substring(11);
+            html += " <div class=\"dropdown\">\n"
+            /*协作空间*/
+            var t1 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><i class=\"icon-search icon-home\"></i>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            /*word*/
+            var t2 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/word.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            /*excel*/
+            var t3 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/excel.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            /*ppt*/
+            var t4 = " <span class='one' id=\"dropdownMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"><img style='width: 17px' src='/static/assets/images/ppt.png'/>&nbsp;&nbsp;" + data.message[i][0] + "</span>\n"
+            if (data.message[i][3] == '协作空间') {
+                html = html + t1;
+            } else if (data.message[i][3] == 0) {
+                html = html + t2
+            } else if (data.message[i][3] == 1) {
+                html = html + t3
+            } else if (data.message[i][3] == 2) {
+                html = html + t4
+            }
+            html += " <span class='two'>" + mystr + "</span>\n" +
+                "<hr class='hr1'>" +
+                "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n" +
+                "<li><a  class=\"dropdown-item\" href=\"javascript:void(0)\" " +
+                "onclick = \"restore('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
+                "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</a></li>\n" +
+                "<hr style='margin-top: 0;margin-bottom: 0'/>" +
+                "<li><a  class=\"dropdown-item\" style='color: red' href=\"javascript:void(0)\" " +
+                "onclick = \"deleteAll('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
+                "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</a></li>\n" +
+                "</ul>" +
+                "</div>";
+            $("#bin").append(html);
+        }
+    }
+}
 
 //回收站里恢复文件
 function restore(id,w) {

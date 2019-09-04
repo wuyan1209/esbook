@@ -285,20 +285,23 @@ def fileList(request):
                    'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"')
     count = cursor.fetchone()[0]  # 总条数
     totalPage = count / pageSize  # 总页数
-    if count % pageSize != 0:
-        totalPage = totalPage + 1
-    # 当页数大于总页数，直接返回
-    if int(page) > totalPage:
-        return JsonResponse({"status": 2001})
-    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
-    cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id '
-                   'from user u,file f,user_file uf '
-                   'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"'
-                                                                                                                              ' order by f.cre_date desc limit %s,%s',
-                   [offset, pageSize])
-    row = cursor.fetchall()
-    cursor.close()
-    return JsonResponse({"page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": row})
+    if count != 0:
+        if count % pageSize != 0:
+            totalPage = totalPage + 1
+            # 当页数大于总页数，直接返回
+        if int(page) > totalPage:
+            return JsonResponse({"status": 2002})
+        offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
+        cursor.execute('select f.file_name,u.user_name,f.cre_date,u.user_id,f.file_id,f.type '
+                       'from user u,file f,user_file uf '
+                       'where u.user_id=uf.user_id and f.file_state = 0 and f.file_id=uf.file_id and u.user_name ="' + username + '"'
+                                                                                                                                  ' order by f.cre_date desc limit %s,%s',
+                       [offset, pageSize])
+        list = cursor.fetchall()
+        cursor.close()
+        return JsonResponse(
+            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list})
+    return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 
 # 修改doc文档
@@ -549,19 +552,23 @@ def teamfile(request):
                    'and  t.team_name ="' + teamname + '" ')
     count = cursor.fetchone()[0]  # 总条数
     totalPage = count / pageSize  # 总页数
-    if count % pageSize != 0:
-        totalPage = totalPage + 1
-    # 当页数大于总页数，直接返回
-    if int(page) > totalPage:
-        return JsonResponse({"status": 2001})
-    offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
-    cursor.execute('select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id '
-                   'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
-                   ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
-                   'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s', [offset, pageSize])
-    list = cursor.fetchall()
-    cursor.close()
-    return JsonResponse({"page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list})
+    if count != 0:
+        if count % pageSize != 0:
+            totalPage = totalPage + 1
+            # 当页数大于总页数，直接返回
+        if int(page) > totalPage:
+            return JsonResponse({"status": 2002})
+        offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
+        cursor.execute(
+            'select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id,f.type '
+            'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
+            ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
+            'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s', [offset, pageSize])
+        list = cursor.fetchall()
+        cursor.close()
+        return JsonResponse(
+            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list})
+    return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 
 # 登录页面
@@ -571,11 +578,13 @@ def login(requset):
 
 # 我的回收站
 def myBin(request):
+    page = request.POST['page']
     # 获取session的用户
     username = request.session['username']
-    # 获取状态为1的属于此用户的文件和团队
+    # 每页显示条数
+    pageSize = 10
     cursor = connection.cursor()
-    cursor.execute('select * from( '
+    cursor.execute('select count(*) from( '
                    '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
                                                                                                                             ' UNION'
@@ -586,9 +595,31 @@ def myBin(request):
                                                                                                                                                                                  ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
                                                                                                                                                                                  ' and f.file_state=1 and u.user_name="' + username + '")'
                                                                                                                                                                                                                                       ' )t ORDER BY time DESC')
-    result = cursor.fetchall()
-    return JsonResponse({'status': 200, 'message': result})
-
+    count = cursor.fetchone()[0]  # 总条数
+    totalPage = count / pageSize  # 总页数
+    if count != 0:
+        if count % pageSize != 0:
+            totalPage = totalPage + 1
+            # 当页数大于总页数，直接返回
+        if int(page) > totalPage:
+            return JsonResponse({"status": 2002})
+        offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
+        # 获取状态为1的属于此用户的文件和团队
+        cursor.execute('select * from( '
+                       '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
+                       ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
+                       ' UNION'
+                       ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                       ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                       ' and f.file_state=1 and u.user_name="' + username + '")'
+                       ' UNION'
+                       ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                        ' and f.file_state=1 and u.user_name="' + username + '")'
+                        ' )t ORDER BY time DESC limit %s,%s',[offset, pageSize])
+        result = cursor.fetchall()
+        cursor.close()
+        return JsonResponse( {'status': 200, 'message': result, "page": int(page), "pageSize": pageSize, "totalPage": totalPage})
+    return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 # 回收站恢复文件
 def restore(request):
@@ -615,15 +646,20 @@ def deleteAll(request):
     try:
         # 判断该文件是文档还是协作空间
         if what == '协作空间':
-            cursor.execute(
-                'delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            # 判断该协作空间是否有文件
+            cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t '
+                           'where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id '
+                           'and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
+            fileId=cursor.fetchall()
+            if fileId:
+                cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            else:
+                cursor.execute('delete mr,tm,t from member_role mr,team_member tm,team t WHERE mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
             cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
             cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
-        cursor.close()
         return JsonResponse({'status': 200, 'message': '删除成功'})
     except:
-        cursor.close()
         return JsonResponse({'status': 4004, 'message': '删除失败'})
 
 
@@ -638,10 +674,9 @@ def searchFile(request):
     # 查找该用户自己的文件和加入的团队的文件
     cursor.execute(
         "select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='" + username + "' and f.file_name like '%" + searchCondition + "%' "
-                                                                                                                                                                                              "UNION "
-                                                                                                                                                                                              "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
-                                                                                                                                                                                              "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
-
+         "UNION "
+         "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
+          "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
     # 查文件
     cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
 
@@ -838,8 +873,8 @@ def delectEdition(request):
 # 还原时保存文档
 @transaction.atomic
 def saveEditionRTFdoc(request):
-    content = request.POST.get('content')  # 文档内容  <p>三大</p><p>大叔大婶</p><p>123</p>
-    fileName = request.POST.get('fileName')  # 当前文档标题   爱迪生
+    content = request.POST.get('content')  # 文档内容
+    fileName = request.POST.get('fileName')  # 当前文档标题
 
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
@@ -848,16 +883,20 @@ def saveEditionRTFdoc(request):
     cursor = connection.cursor()
     try:
         cursor.execute('select file_id from file where file_name="' + fileName + '"')
-        fileId = cursor.fetchone()  # 25
+        fileId = cursor.fetchone()
         cursor.execute("update file f set f.content = %s, f.cre_date = %s where f.file_id = %s",
                        [content, formatTime, fileId])
-        return_param['saveStatus'] = "success";
+        # 成功的话保存
+        status = 200
+        message = '已经内容还原到该版本'
         transaction.savepoint_commit(sid)
     except Exception as e:
         # 数据库更新失败
-        return_param['saveStatus'] = "fail"
+        # 失败
+        status = 4001
+        message = '还原失败，请重新操作'
         transaction.savepoint_rollback(sid)
-    return HttpResponse(json.dumps(return_param))
+    return JsonResponse({'status': status, 'message': message})
 
 
 # 跳转到注册页面
@@ -1056,6 +1095,8 @@ def getcontent(file_path):
             content += "<h1>" + doc_test + "</h1>"
         elif styles == 'Heading 2':  # 二级标题
             content += "<h2>" + doc_test + "</h2>"
+        if styles == 'Normal':  # 正常的纯文本
+            content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
 
@@ -1136,8 +1177,7 @@ def team_upload_file(request):
             localTime = time.localtime(time.time())
             formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
             # 调用方法
-            getcontent(file_path)
-
+            content = getcontent(file_path)
             sid = transaction.savepoint()
             try:
                 # 在数据库中存储路径
