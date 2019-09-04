@@ -7,15 +7,21 @@
 
 .span1 {
     margin-left: 13%;
+    vertical-align: middle;
 }
 
 .span2 {
     margin-left: 3%;
+    display: inline-block;
+    vertical-align: middle;
+    width: 70%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .span3 {
     position: absolute;
-    margin-left: 27%;
     background-color: white;
     border: none;
 }
@@ -24,7 +30,7 @@
     background-color: white;
     color: #7a7d81;
     display: inline-block;
-    width: 50%;
+    width: 80%;
 }
 
 .aaaaa:hover {

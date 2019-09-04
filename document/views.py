@@ -72,7 +72,7 @@ def editTeam(request):
         # 空间名是唯一的，查询是否在数据库里存在
         try:
             cursor = connection.cursor()
-            cursor.execute('select team_id from Team where team_name=%s', [teamName])
+            cursor.execute('select team_id from team where team_name=%s', [teamName])
             tid = cursor.fetchone()
             if tid:
                 return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
@@ -657,15 +657,56 @@ def deleteAll(request):
                            'where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id '
                            'and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
             fileId = cursor.fetchall()
+            # 有文件
             if fileId:
-                cursor.execute(
-                    'delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+                # 判断文件是否有版本
+                cursor.execute('select me.edi_id from edition e,member_edition me,file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
+                               'and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
+                               'and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
+                ediId=cursor.fetchall()
+                print(ediId)
+                # 有版本
+                if ediId:
+                    cursor.execute(
+                        'delete e,me,mf,f,mr,tm,t from edition e,member_edition me,file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
+                # 无版本
+                else:
+                    cursor.execute(
+                        'delete mf,f,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            # 无文件
             else:
                 cursor.execute(
                     'delete mr,tm,t from member_role mr,team_member tm,team t WHERE mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
-            cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
-            cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
+            # 判断文件是私有文件还是团队文件
+            cursor.execute('select mf.mem_file_id from member_file mf,file f where mf.file_id=f.file_id and f.file_id='+id)
+            result=cursor.fetchall()
+            # 团队文件
+            if result:
+                # 判断文件是否有版本
+                cursor.execute('select me.edi_id from edition e,member_edition me,member_file mf,file f '
+                               'where mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id'
+                               'and f.file_id='+id)
+                ediId=cursor.fetchall()
+                # 有版本
+                if ediId:
+                    cursor.execute('delete e,me,mf,f from edition e,member_edition me,member_file mf,file f where mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and f.file_id=' + id)
+                # 无版本，只删除文件
+                else:
+                    cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
+            # 私有文件
+            else:
+                # 判断文件是否有版本
+                cursor.execute('select ue.edi_id from user_file uf,file f,user_edition ue,edition e'
+                               'where uf.file_id=f.file_id and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id'
+                               'and f.file_id='+id)
+                ediId = cursor.fetchall()
+                # 有版本
+                if ediId:
+                    cursor.execute('delete e,ue,uf,f from edition e,user_edition ue,user_file uf,file f where uf.file_id=f.file_id and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id=' + id)
+                # 无版本，只删除文件
+                else:
+                    cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
         return JsonResponse({'status': 200, 'message': '删除成功'})
     except:
         return JsonResponse({'status': 4004, 'message': '删除失败'})
@@ -807,7 +848,7 @@ def saveTeamEdition(request):
     # 获取成员名、版本内容、文件名
     member = request.session.get('username')
     content = request.POST.get('content')
-    filename = request.POST.get('filename')
+    fileId=request.POST.get('fileId')
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
@@ -817,8 +858,7 @@ def saveTeamEdition(request):
         # 获取userid和fileid
         cursor.execute('select user_id from user where user_name="' + member + '"')
         userid = cursor.fetchone()
-        cursor.execute("select file_id from file where file_name = %s", [filename])
-        fileId = cursor.fetchone()
+
         # 保存版本
         cursor.execute('insert into edition (save_date,content) values(% s, % s)', [formatTime, content])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
@@ -848,13 +888,12 @@ def getTeamEdition(request):
     teamid = request.POST.get('teamid')
     cursor.execute('select team_name from team where team_id="' + teamid + '"')
     teamname = cursor.fetchone()
-    filename = request.POST.get('filename')
-    cursor.execute('select file_id from file where file_name="' + filename + '"')
-    fileid = cursor.fetchone()
+    fileId = request.POST.get('fileId')
     cursor.execute(
-        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
+        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id '
+        'from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
         'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
-        'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileid])
+        'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileId])
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
