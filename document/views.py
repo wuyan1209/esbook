@@ -608,18 +608,21 @@ def myBin(request):
         cursor.execute('select * from( '
                        '(select distinct t.team_name, t.date time,t.team_id,t.what from user u, team t, team_member tm'
                        ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
-                       ' UNION'
-                       ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
-                       ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                       ' and f.file_state=1 and u.user_name="' + username + '")'
-                       ' UNION'
-                       ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
-                        ' and f.file_state=1 and u.user_name="' + username + '")'
-                        ' )t ORDER BY time DESC limit %s,%s',[offset, pageSize])
+                                                                                                                                ' UNION'
+                                                                                                                                ' (select f.file_name, f.cre_date time,f.file_id,f.type from file f, user u, user_file uf'
+                                                                                                                                ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                                                                                                                                ' and f.file_state=1 and u.user_name="' + username + '")'
+                                                                                                                                                                                     ' UNION'
+                                                                                                                                                                                     ' (select f.file_name, f.cre_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
+                                                                                                                                                                                     ' and f.file_state=1 and u.user_name="' + username + '")'
+                                                                                                                                                                                                                                          ' )t ORDER BY time DESC limit %s,%s',
+                       [offset, pageSize])
         result = cursor.fetchall()
         cursor.close()
-        return JsonResponse( {'status': 200, 'message': result, "page": int(page), "pageSize": pageSize, "totalPage": totalPage})
+        return JsonResponse(
+            {'status': 200, 'message': result, "page": int(page), "pageSize": pageSize, "totalPage": totalPage})
     return JsonResponse({'status': 2001, 'message': '暂无数据'})
+
 
 # 回收站恢复文件
 def restore(request):
@@ -649,12 +652,14 @@ def deleteAll(request):
             # 判断该协作空间是否有文件
             cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t '
                            'where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id '
-                           'and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id='+id)
-            fileId=cursor.fetchall()
+                           'and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            fileId = cursor.fetchall()
             if fileId:
-                cursor.execute('delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+                cursor.execute(
+                    'delete f,mf,mr,tm,t from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
             else:
-                cursor.execute('delete mr,tm,t from member_role mr,team_member tm,team t WHERE mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+                cursor.execute(
+                    'delete mr,tm,t from member_role mr,team_member tm,team t WHERE mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
             cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
             cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
@@ -674,9 +679,9 @@ def searchFile(request):
     # 查找该用户自己的文件和加入的团队的文件
     cursor.execute(
         "select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='" + username + "' and f.file_name like '%" + searchCondition + "%' "
-         "UNION "
-         "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
-          "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
+                                                                                                                                                                                              "UNION "
+                                                                                                                                                                                              "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
+                                                                                                                                                                                              "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
     # 查文件
     cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
 
@@ -1245,12 +1250,16 @@ def uploadexist(request):
                 message = "文件不存在，可以导入该文件"
     return JsonResponse({"status": status, "message": message})
 
+
 # 协作编辑
 def cooperation_edite(request):
     fileId = request.POST.get("fileId")
     cursor = connection.cursor()
-
     cursor.execute("select content from file where file_id = %s", [fileId])
     doc_content = cursor.fetchone()[0]
-    print("doc_content:",doc_content)
+    print("doc_content:", doc_content)
     return JsonResponse({'doc_content': doc_content})
+
+
+def showrxcel(request):
+    return render(request, "excel.html")
