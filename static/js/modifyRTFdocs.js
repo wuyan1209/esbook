@@ -1,3 +1,4 @@
+var EDITOR = null;
 // 导入CKEditor
 DecoupledEditor
     .create(document.querySelector('#editor'), {
@@ -23,6 +24,7 @@ DecoupledEditor
         }
     )
     .then(editor => {
+        EDITOR = editor
         const toolbarContainer = document.querySelector('#toolbar-container');
 
         toolbarContainer.appendChild(editor.ui.view.toolbar.element);
@@ -113,14 +115,6 @@ $(function () {
     // 页面加载时隐藏版本框
     $("#myEditor").hide()
 
-    /*var doc = $("b.facility");
-    var doc = $("#editor");
-    doc.bind('DOMNodeInserted', function (e) {
-
-        alert('element now contains: ' + $(e.target).html());
-
-    });*/
-
     // 文档改变即保存文档
     $("#editor").bind("DOMSubtreeModified", function () {
         setTimeout(function () {
@@ -157,6 +151,7 @@ function init() {
 
         var data = e.data;
         data = data.replace(/'/g, '"');
+        console.log(data);
         data = $.parseJSON(data);
         var cooperation_fileId = data.fileId;   //  被修改的文件的id
         var cooperation_userId = data.userId;   //  修改文件用户的id
@@ -170,8 +165,7 @@ function init() {
             // 团队成员打开了同一个文件
             if (content != "" && content != cooperation_content) {
                 content = cooperation_content;
-                $("#editor").html("");
-                $("#editor").html(cooperation_content);
+                EDITOR.setData(cooperation_content);
             }
             /*$.ajax({
                 url: "/cooperation_edite/",
@@ -234,30 +228,15 @@ doc_content();
 // 回显数据
 function doc_content() {
     var doc_content = $("#get_doc_content").val()
-    $("#editor").html("");
-    $("#editor").html(doc_content);
+    // console.log(doc_content);
+    // EDITOR.setData(doc_content);
+    $("#editor").html(doc_content)
 }
 
 // 打开已存在文档
 function docs_modify(name, id, saveState, fileId) {
     window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + name +
         "&user_id=" + id + "&fileId=" + fileId;
-    /*$.ajax({
-        url: '/docsModify/',
-        type: 'post',
-        data: {
-            file_name: name,
-            user_id: id,
-            saveState: saveState,
-            fileId: fileId
-        },
-        dataType: 'json',
-        success: function (data) {
-            if (data.data == "success") {
-                window.location.href = "/modifyRTFdocs/?saveState=" + saveState;
-            }
-        }
-    });*/
 }
 
 // 保存文档
@@ -472,8 +451,8 @@ function delectEdition(ediId) {
             },
             success: function (data) {
                 alert(data.message);
-                window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + doc_name +
-        "&user_id="+userId+"&fileId="+fileId;
+                window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + doc_name +
+                    "&user_id=" + userId + "&fileId=" + fileId;
                 ;
             },
         });
@@ -488,14 +467,8 @@ function passName(filename, time, content) {
 
 //还原版本
 function getoldEdition(content) {
-    var saveState = $("#doc_save_state").val();
-    var userId = $("#userId").val();
-    var fileId = $("#fileId").val();
-
     if (window.confirm("您确定要还原到该版本吗？")) {
-
-        window.location.href = "/getoldEdition/?saveState=" + saveState + "&content=" + content +
-            "&user_id=" + userId + "&fileId=" + fileId;
-
+        console.log(content);
+        EDITOR.setData(content)
     }
 }
