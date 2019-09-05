@@ -136,7 +136,7 @@ var ws;
 
 // 连接sock
 function init() {
-    ws = new WebSocket("ws://localhost:9001/");
+    ws = new WebSocket("ws://47.105.172.29:9001/");
 
     // 连接WebSocket服务器成功，打开成功
     ws.onopen = function () {
@@ -424,14 +424,14 @@ function getTeamEditor(teamId, fileId) {
 
 //删除版本
 function delectEdition(ediId) {
-     var saveState = $("#doc_save_state").val();
+    var saveState = $("#doc_save_state").val();
     var userId = $("#userId").val();
     var fileId = $("#fileId").val();
 
     if (window.confirm("您确定要删除该版本吗？删除之后将无法还原！")) {
 
         window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
-            "&user_id=" + userId + "&fileId=" + fileId+ "&ediId=" + ediId;
+            "&user_id=" + userId + "&fileId=" + fileId + "&ediId=" + ediId;
 
     }
     // if (window.confirm("您确定要删除该版本吗？")) {
