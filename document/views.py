@@ -133,12 +133,11 @@ def addMember(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限添加
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         try:
-            cursor = connection.cursor()
             # 查询用户id和协作空间id
             cursor.execute('select user_id from user where user_name="' + userName + '"')
             userId = cursor.fetchall()
@@ -395,12 +394,13 @@ def serachTeamAdmin(request):
 def editMemberRole(request):
     roleName = request.POST.get('roleName')  # 角色名
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST['teamName']
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         # 创建保存点
@@ -429,12 +429,13 @@ def editMemberRole(request):
 def editAdminRole(request):
     roleName = request.POST.get('roleName')  # 角色名
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST.get("teamName")
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '超级管理员':
         # 创建保存点
@@ -462,12 +463,13 @@ def editAdminRole(request):
 @transaction.atomic
 def delMemberRole(request):
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST['teamName']
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         # 创建保存点
@@ -495,12 +497,13 @@ def delMemberRole(request):
 @transaction.atomic
 def delAdminRole(request):
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST['teamName']
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '超级管理员':
         # 创建保存点

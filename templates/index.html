@@ -642,7 +642,7 @@
             <div class="modal-content" style="width: 600px;height: 600px">
                 <div class="modal-header">
                     <h3 class="modal-title" id="myModalLabel" style="width: 80%;word-break:break-all">
-                        协作空间 &nbsp;&nbsp;&nbsp;&nbsp; <span id="tName">1234</span>
+                        协作空间 &nbsp;&nbsp;&nbsp;&nbsp; <span id="tName"></span>
                     </h3>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         &times;
@@ -777,6 +777,7 @@
                             </table>
                         </div>
                         <script>
+
                             //获取协作空间的普通协作者
                             function searchTeamUser() {
                                 //清空表内数据
@@ -842,15 +843,17 @@
 
                             //select值改变时调用函数 参数：option的值、成员角色的id
                             function Change1(value, memRoleId) {
+                                 //获取协作空间名
+                            var teamName = $("#tName").text();
                                 if (value == "移除") {
-                                    del(memRoleId);
+                                    del(memRoleId,teamName);
                                 } else {
-                                    editMemberRole(value, memRoleId);
+                                    editMemberRole(value, memRoleId,teamName);
                                 }
                             }
 
                             //角色修改
-                            function editMemberRole(value, memRoleId) {
+                            function editMemberRole(value, memRoleId,teamName) {
                                 $.ajax({
                                     url: "/editMemberRole/",
                                     type: "POST",
@@ -859,6 +862,7 @@
                                         //角色名和协作者角色id
                                         "roleName": value,
                                         "memRoleId": memRoleId,
+                                        "teamName":teamName,
                                     },
                                     success: function (data) {
                                         searchTeamUser();
@@ -869,7 +873,7 @@
                             }
 
                             //角色移除
-                            function del(memRoleId) {
+                            function del(memRoleId,teamName) {
                                 if (confirm("确认要删除？")) {
                                     $.ajax({
                                         url: "/delMemberRole/",
@@ -878,6 +882,7 @@
                                         data: {
                                             //协作者角色id
                                             "memRoleId": memRoleId,
+                                            "teamName":teamName,
                                         },
                                         success: function (data) {
                                             searchTeamUser();
@@ -894,6 +899,7 @@
                             </table>
                         </div>
                         <script>
+
                             //获取协作空间的管理员
                             function searchTeamAdmin() {
                                 //清空表内数据
@@ -952,15 +958,17 @@
 
                             //select值改变时调用函数 参数：option的值、成员角色的id
                             function Change2(value, memRoleId) {
+                                 //获取协作空间名
+                                var teamName = $("#tName").text();
                                 if (value == "移除") {
-                                    delAdminRole(memRoleId)
+                                    delAdminRole(memRoleId,teamName)
                                 } else {
-                                    editAdminRole(value, memRoleId);
+                                    editAdminRole(value, memRoleId,teamName);
                                 }
                             }
 
                             //管理员角色移除，改为可编辑
-                            function delAdminRole(memRoleId) {
+                            function delAdminRole(memRoleId,teamName) {
                                 $.ajax({
                                     url: "/delAdminRole/",
                                     type: "POST",
@@ -968,6 +976,7 @@
                                     data: {
                                         //协作者角色id
                                         "memRoleId": memRoleId,
+                                        "teamName":teamName,
                                     },
                                     success: function (data) {
                                         searchTeamUser();
@@ -978,7 +987,7 @@
                             }
 
                             //角色修改为超管
-                            function editAdminRole(value, memRoleId) {
+                            function editAdminRole(value, memRoleId,teamName) {
                                 $.ajax({
                                     url: "/editAdminRole/",
                                     type: "POST",
@@ -987,6 +996,7 @@
                                         //角色名和协作者角色id
                                         "roleName": value,
                                         "memRoleId": memRoleId,
+                                        "teamName":teamName,
                                     },
                                     success: function (data) {
                                         alert(data.message)
