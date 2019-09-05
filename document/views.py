@@ -145,10 +145,6 @@ def addMember(request):
             teamId = cursor.fetchall()
             # 创建保存点
             save_id = transaction.savepoint()
-
-
-
-            
             # 把用户添加到协作空间里
             cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [teamId[0], userId[0]])
             # 查询插入的协作空间成员的id
