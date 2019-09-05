@@ -26,12 +26,6 @@ $(function () {
         }
     });
 
-    // 搜索栏失去焦点隐藏搜索结果
-    // $("#search-bar").on("blur", function () {
-    //     closeSearchReasult()
-    // })
-
-
 });
 
 // 动态查询文件
@@ -66,7 +60,7 @@ function searchFile(searchCondition) {
                         "                    <div>\n" +
                         "                        <div>";
                     if (data[i].type == 0) {
-                        html += "<span><img src=\"/static/assets/images/802格式_文档docx.png\" width=\"20px\"\n" +
+                        html += "<span><img src=\"/static/assets/images/word.png\" width=\"20px\"\n" +
                             "                                       height=\"20px\"></span>"
                     }
                     html += "<span>" + data[i].file_name + "</span>\n" +
@@ -86,11 +80,6 @@ function searchFile(searchCondition) {
 
         }
     })
-}
-
-// 关闭搜索结果框
-function closeSearchReasult() {
-    $("#search-results").css("display", "none")
 }
 
 // 处理查询结果
