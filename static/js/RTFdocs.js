@@ -30,7 +30,7 @@ $(function () {
                     modify_flag = true
                 }
             }
-        })
+        });
 
         // 文件名不重复，可以创建文档
         if (modify_flag) {
@@ -68,8 +68,6 @@ $(function () {
                 })
             }
         }
-
-
     });
 
     // 输入框获得焦点清除提示内容
@@ -90,35 +88,9 @@ $(function () {
     $('#search-bar').on('compositionend', function () {
         flag = true;
     });
-
-    $("#doc_name").on("input", function () {
-        var doc_name = $("#doc_name").val();
-        setTimeout(function () {
-            if (flag) {
-
-            }
-        }, 0)
-    })
 });
 
 function toModify(doc_name, userId, fileId) {
     window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + doc_name +
         "&user_id="+userId+"&fileId="+fileId;
-
-   /* $.ajax({
-        url: '/docsModify/',
-        type: 'post',
-        data: {
-            file_name: doc_name,
-            user_id: userId,
-            saveState: saveState,
-            fileId: fileId
-        },
-        dataType: 'json',
-        success: function (data) {
-            if (data.data == "success") {
-
-            }
-        }
-    });*/
 }

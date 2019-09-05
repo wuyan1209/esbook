@@ -167,23 +167,6 @@ function init() {
                 content = cooperation_content;
                 EDITOR.setData(cooperation_content);
             }
-            /*$.ajax({
-                url: "/cooperation_edite/",
-                type: "POST",
-                data: {fileId: cooperation_fileId},
-                dataType: "json",
-                success: function (data) {
-                    var db_doc_content = data.doc_content;  // 从数据库中获取的文档内容
-                    console.log(doc_content);
-                    console.log(cooperation_content);
-                    if (content != "" && content != cooperation_content) {
-                        content = $("#editor").html();
-                        $("#editor").html("");
-                        $("#editor").html(db_doc_content);
-                    }
-                }
-            })*/
-            // alert("我来了")
         }
 
         if (cooperation_fileId == fileId && cooperation_userId == userId) {
@@ -441,22 +424,30 @@ function getTeamEditor(teamId, fileId) {
 
 //删除版本
 function delectEdition(ediId) {
-    if (window.confirm("您确定要删除吗？")) {
-        $.ajax({
-            url: "/delectEdition/",
-            type: "POST",
-            dataType: "json",
-            data: {
-                "ediId": ediId,
-            },
-            success: function (data) {
-                alert(data.message);
-                window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + doc_name +
-                    "&user_id=" + userId + "&fileId=" + fileId;
-                ;
-            },
-        });
+     var saveState = $("#doc_save_state").val();
+    var userId = $("#userId").val();
+    var fileId = $("#fileId").val();
+
+    if (window.confirm("您确定要删除该版本吗？删除之后将无法还原！")) {
+
+        window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
+            "&user_id=" + userId + "&fileId=" + fileId+ "&ediId=" + ediId;
+
     }
+    // if (window.confirm("您确定要删除该版本吗？")) {
+    //     $.ajax({
+    //         url: "/delectEdition/",
+    //         type: "POST",
+    //         dataType: "json",
+    //         data: {
+    //             "ediId": ediId,
+    //         },
+    //         success: function (data) {
+    //             alert(data.message);
+    //
+    //         },
+    //     });
+    // }
 }
 
 //版本预览 给模态框传值
@@ -468,7 +459,6 @@ function passName(filename, time, content) {
 //还原版本
 function getoldEdition(content) {
     if (window.confirm("您确定要还原到该版本吗？")) {
-        console.log(content);
         EDITOR.setData(content)
     }
 }

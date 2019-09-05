@@ -133,12 +133,11 @@ def addMember(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限添加
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         try:
-            cursor = connection.cursor()
             # 查询用户id和协作空间id
             cursor.execute('select user_id from user where user_name="' + userName + '"')
             userId = cursor.fetchall()
@@ -146,6 +145,10 @@ def addMember(request):
             teamId = cursor.fetchall()
             # 创建保存点
             save_id = transaction.savepoint()
+
+
+
+            
             # 把用户添加到协作空间里
             cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [teamId[0], userId[0]])
             # 查询插入的协作空间成员的id
@@ -156,7 +159,6 @@ def addMember(request):
             roleId = cursor.fetchall()
             # 把人员与角色绑定
             cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], roleId[0]])
-            cursor.close()
             # 成功的话保存
             status = 200
             message = '添加成功'
@@ -395,12 +397,13 @@ def serachTeamAdmin(request):
 def editMemberRole(request):
     roleName = request.POST.get('roleName')  # 角色名
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST['teamName']
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         # 创建保存点
@@ -429,12 +432,13 @@ def editMemberRole(request):
 def editAdminRole(request):
     roleName = request.POST.get('roleName')  # 角色名
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST.get("teamName")
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '超级管理员':
         # 创建保存点
@@ -462,12 +466,13 @@ def editAdminRole(request):
 @transaction.atomic
 def delMemberRole(request):
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST['teamName']
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         # 创建保存点
@@ -495,12 +500,13 @@ def delMemberRole(request):
 @transaction.atomic
 def delAdminRole(request):
     memRoleId = request.POST.get('memRoleId')  # 成员角色id
+    teamName = request.POST['teamName']
     # 获取session里存放的username
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ' +
-                   'where r.role_id=mr.role_id and mr.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id and u.user_name="' + username + '"')
+    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
     result = cursor.fetchone()
     if result[0] == '超级管理员':
         # 创建保存点
@@ -896,28 +902,9 @@ def getTeamEdition(request):
     return JsonResponse({'status': 200, "list": list})
 
 
-# 删除版本
-def delectEdition(request):
-    # 版本的id
-    editionid = request.POST.get("ediId")
-    try:
-        cursor = connection.cursor()
-        cursor.execute('delete from edition where edi_id=' + editionid)
-        cursor.close()
-        # 成功的话保存
-        status = 200
-        message = '删除成功'
-    except:
-        # 失败
-        status = 4001
-        message = '删除失败'
-    return JsonResponse({'status': status, 'message': message})
-
-
 # 跳转到注册页面
 def register(request):
     return render(request, 'register.html');
-
 
 # 注册
 def registerUser(request):
@@ -1099,19 +1086,28 @@ def getcontent(file_path):
         doc_test = para.text
         styles = para.style.name
         fonts = para.runs
-        for f in fonts:
-            if (f.bold):  # 加粗
-                content += "<p><strong>" + doc_test + "</strong></p>"
-            if (f.italic):  # 斜体
-                content += "<p><i>" + doc_test + "</i></p>"
-            if (f.underline):  # 下划线
-                content += "<p><u>" + doc_test + "</u></p>"
         if styles == 'Heading 1':  # 一级标题
             content += "<h1>" + doc_test + "</h1>"
         elif styles == 'Heading 2':  # 二级标题
             content += "<h2>" + doc_test + "</h2>"
+        elif styles == 'Heading 3':  # 3级标题
+            content += "<h3>" + doc_test + "</h3>"
+        elif styles == 'Heading 4':  # 4级标题
+            content += "<h4>" + doc_test + "</h4>"
+        elif styles == 'Heading 5':  # 5级标题
+            content += "<h5>" + doc_test + "</h5>"
+        elif styles == 'Heading 6':  # 6级标题
+            content += "<h6>" + doc_test + "</h6>"
         if styles == 'Normal':  # 正常的纯文本
-            content += "<p>" + doc_test + "</p>"
+            for f in fonts:
+                if (f.bold):  # 加粗
+                    content += "<p><strong>" + doc_test + "</strong></p>"
+                if (f.italic):  # 斜体
+                    content += "<p><i>" + doc_test + "</i></p>"
+                if (f.underline):  # 下划线
+                    content += "<p><u>" + doc_test + "</u></p>"
+                if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
+                    content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
 
@@ -1274,6 +1270,7 @@ def cooperation_edite(request):
 def showrxcel(request):
     return render(request, "excel.html")
 
+#还原版本
 def getoldEdition(request):
     saveState = request.GET.get("saveState")
     content = request.GET.get("content")
@@ -1286,6 +1283,26 @@ def getoldEdition(request):
                    [fileId])
     file_name = cursor.fetchone()[0]
     cursor.execute("update file set content = %s where file_id = %s",[content, fileId])
+
+    request.session["file_name"] = file_name
+    request.session["doc_content"] = content
+    request.session["file_id"] = fileId
+    return render(request, "modify_RTFdocs.html", {"saveState": saveState})
+
+#删除版本
+def delectEdition(request):
+    saveState = request.GET.get("saveState")
+    content = request.GET.get("content")
+    user_id = request.GET.get("user_id")
+    fileId = request.GET.get("fileId")
+    editionid=request.GET.get("ediId")
+
+    cursor = connection.cursor()
+    cursor.execute('select file_name from file f '
+                   'where f.file_id = %s',
+                   [fileId])
+    file_name = cursor.fetchone()[0]
+    cursor.execute('delete from edition where edi_id=' + editionid)
 
     request.session["file_name"] = file_name
     request.session["doc_content"] = content

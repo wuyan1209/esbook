@@ -26,12 +26,6 @@ $(function () {
         }
     });
 
-    // 搜索栏失去焦点隐藏搜索结果
-    $("#search-bar").on("blur", function () {
-        closeSearchReasult()
-    })
-
-
 });
 
 // 动态查询文件
@@ -88,11 +82,6 @@ function searchFile(searchCondition) {
     })
 }
 
-// 关闭搜索结果框
-// function closeSearchReasult() {
-//     $("#search-results").css("display", "none")
-// }
-
 // 处理查询结果
 function process_result(data, searchCondition) {
     data = data.replace(/<[^>]+>/g, ""); //截取html标签
@@ -106,6 +95,16 @@ function process_result(data, searchCondition) {
     data = data.replace(searchCondition, "<mark style=\"background-color:#0af34a\">" + searchCondition + "</mark>");
     return data
 }
+
+// 点击查询结果框以外的地方关闭查询结果框
+window.onload = function () {
+    document.onclick = function (e) {
+        var ele = e ? e.target : window.event.srcElement;
+        if (ele.id !== 'search-results' && ele.id != "search-bar") {
+            document.getElementById('search-results').style.display = 'none';
+        }
+    };
+};
 
 // 打开搜索到的文件
 function openFile(fileId) {
