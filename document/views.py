@@ -138,7 +138,6 @@ def addMember(request):
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         try:
-            cursor = connection.cursor()
             # 查询用户id和协作空间id
             cursor.execute('select user_id from user where user_name="' + userName + '"')
             userId = cursor.fetchall()
@@ -146,6 +145,10 @@ def addMember(request):
             teamId = cursor.fetchall()
             # 创建保存点
             save_id = transaction.savepoint()
+
+
+
+            
             # 把用户添加到协作空间里
             cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [teamId[0], userId[0]])
             # 查询插入的协作空间成员的id
@@ -156,7 +159,6 @@ def addMember(request):
             roleId = cursor.fetchall()
             # 把人员与角色绑定
             cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], roleId[0]])
-            cursor.close()
             # 成功的话保存
             status = 200
             message = '添加成功'

@@ -27,9 +27,9 @@ $(function () {
     });
 
     // 搜索栏失去焦点隐藏搜索结果
-    $("#search-bar").on("blur", function () {
-        closeSearchReasult()
-    })
+    // $("#search-bar").on("blur", function () {
+    //     closeSearchReasult()
+    // })
 
 
 });
@@ -107,7 +107,7 @@ function process_result(data, searchCondition) {
     return data
 }
 
-/*// 点击查询结果框以外的地方关闭查询结果框
+// 点击查询结果框以外的地方关闭查询结果框
 window.onload = function () {
     document.onclick = function (e) {
         var ele = e ? e.target : window.event.srcElement;
@@ -115,7 +115,7 @@ window.onload = function () {
             document.getElementById('search-results').style.display = 'none';
         }
     };
-};*/
+};
 
 // 打开搜索到的文件
 function openFile(fileId) {
