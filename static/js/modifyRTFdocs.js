@@ -41,7 +41,7 @@ $(function () {
     var teamId = $("#teamId").val();    // 团队的id
     content = $("#editor").html();  // 页面加载时获取的文档内容
     content = $("#editor").html();  // 页面加载时获取的文档内容
-    var fileId=$("#fileId").val()
+    var fileId = $("#fileId").val()
 
     // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
@@ -55,7 +55,7 @@ $(function () {
             saveEdition();
         } else {
             // 保存团队的版本
-            saveTeamEditor(teamId,fileId);
+            saveTeamEditor(teamId, fileId);
         }
     });
 
@@ -101,7 +101,7 @@ $(function () {
             getEdition();
         } else {
             // 查看团队的版本
-            getTeamEditor(teamId,fileId);
+            getTeamEditor(teamId, fileId);
         }
     });
 
@@ -240,8 +240,8 @@ function doc_content() {
 
 // 打开已存在文档
 function docs_modify(name, id, saveState, fileId) {
-    window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + name +
-        "&user_id="+id+"&fileId="+fileId;
+    window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + name +
+        "&user_id=" + id + "&fileId=" + fileId;
     /*$.ajax({
         url: '/docsModify/',
         type: 'post',
@@ -335,7 +335,7 @@ function saveEdition() {
 }
 
 //保存团队版本
-function saveTeamEditor(teamId,fileId) {
+function saveTeamEditor(teamId, fileId) {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
     var now_doc_title = $("#docs_title").val();  //取得文档标题
@@ -358,7 +358,7 @@ function saveTeamEditor(teamId,fileId) {
                     dataType: "json",
                     data: {
                         content: doc_content,
-                        fileId:fileId,
+                        fileId: fileId,
                         // teanid:teamId,
                     },
                     success: function (data) {
@@ -377,14 +377,6 @@ function saveTeamEditor(teamId,fileId) {
 
 }
 
-//获取字符串中“的位置
-function findstr(str, cha, num) {
-    var x = str.indexOf(cha);
-    for (var i = 0; i < num; i++) {
-        x = str.indexOf(cha, x + 1);
-    }
-    return x;
-}
 
 //查看个人版本
 function getEdition() {
@@ -427,7 +419,7 @@ function getEdition() {
 }
 
 //查看团队版本
-function getTeamEditor(teamId,fileId) {
+function getTeamEditor(teamId, fileId) {
     var now_doc_title = $("#docs_title").val();  //取得文档标题
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容
@@ -436,7 +428,7 @@ function getTeamEditor(teamId,fileId) {
         url: '/getTeamEdition/',
         dataType: "json",
         data: {
-            fileId:fileId,
+            fileId: fileId,
             teamid: teamId,
         },
         success: function (data) {
@@ -470,20 +462,30 @@ function getTeamEditor(teamId,fileId) {
 
 //删除版本
 function delectEdition(ediId) {
-    if (window.confirm("您确定要删除吗？")) {
-        $.ajax({
-            url: "/delectEdition/",
-            type: "POST",
-            dataType: "json",
-            data: {
-                "ediId": ediId,
-            },
-            success: function (data) {
-                alert(data.message);
-                window.location.href = '/index/';
-            },
-        });
+     var saveState = $("#doc_save_state").val();
+    var userId = $("#userId").val();
+    var fileId = $("#fileId").val();
+
+    if (window.confirm("您确定要删除该版本吗？删除之后将无法还原！")) {
+
+        window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
+            "&user_id=" + userId + "&fileId=" + fileId+ "&ediId=" + ediId;
+
     }
+    // if (window.confirm("您确定要删除该版本吗？")) {
+    //     $.ajax({
+    //         url: "/delectEdition/",
+    //         type: "POST",
+    //         dataType: "json",
+    //         data: {
+    //             "ediId": ediId,
+    //         },
+    //         success: function (data) {
+    //             alert(data.message);
+    //
+    //         },
+    //     });
+    // }
 }
 
 //版本预览 给模态框传值
@@ -494,27 +496,14 @@ function passName(filename, time, content) {
 
 //还原版本
 function getoldEdition(content) {
-    var doc_title = $("#docs_title").val();  //取得当前文档标题
-    if (window.confirm("您确定要还原到该版本吗？")) {
-        //获取文件名、版本内容
-        $.ajax({
-            type: 'POST',
-            url: '/saveEditionRTFdoc/',
-            dataType: "json",
-            data: {
-                content: content,
-                fileName: doc_title,
-            },
-            success: function (data) {
-                if (data.status == 200) {
-                    // 成功
-                    alert(data.message)
-                    window.location.href = '/index/';
-                } else {
-                    // 失败
-                    alert(data.message)
-                }
-            }
-        })
+    var saveState = $("#doc_save_state").val();
+    var userId = $("#userId").val();
+    var fileId = $("#fileId").val();
+
+    if (window.confirm("您确定要将内容还原到该版本吗？")) {
+
+        window.location.href = "/getoldEdition/?saveState=" + saveState + "&content=" + content +
+            "&user_id=" + userId + "&fileId=" + fileId;
+
     }
 }
