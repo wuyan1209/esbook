@@ -43,6 +43,18 @@ $(function () {
     content = $("#editor").html();  // 页面加载时获取的文档内容
     var fileId = $("#fileId").val()
 
+
+
+    // 用户角色为只读时，不能对文件进行修改，不能保存、删除、还原版本
+    var roleName=$("#roleName").val()
+    if(roleName=='只读'){
+        $("#docs_title").attr("readOnly", true); //文件名不能修改
+        $("#editor").attr("contenteditable", false);     //编辑器内容不能修改
+        $("#saveedi").attr("disabled", true);    // 版本保存按钮不可点击
+    }
+
+
+
     // 点击保存按钮保存
     $("#CKEditor_data_modify").on("click", function () {
         modifyDocs(old_doc_title, doc_save_state, userId, teamId);
@@ -126,7 +138,6 @@ $(function () {
             }
         }, 0);
     });
-
 
 });
 // socket客户端
@@ -221,9 +232,9 @@ function doc_content() {
 }
 
 // 打开已存在文档
-function docs_modify(name, id, saveState, fileId) {
+function docs_modify(name, id, saveState, fileId,roleName) {
     window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + name +
-        "&user_id=" + id + "&fileId=" + fileId;
+        "&user_id=" + id + "&fileId=" + fileId + "&roleName=" + roleName;
 }
 
 // 保存文档
@@ -413,10 +424,14 @@ function getTeamEditor(teamId, fileId) {
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
                         "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
                         "<span style='display:block'>" + data.list[i][1] + "保存&nbsp;&nbsp;&nbsp;&nbsp;" +
-                        "<a href= \"javascript:void (0)\"data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][2] + "','" + updatetime + "'," + str + ")\">预览</a>" +
-                        "&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick=\"getoldEdition(" + str + ")\">还原</a>&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</a></span>\n" +
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][2] + "','" + updatetime + "'," + str + ")\">预览</button>" +
+                        "&nbsp;&nbsp;&nbsp;<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>&nbsp;&nbsp;&nbsp;<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</button></span>\n" +
                         "</div>"
                     $("#myEditor").append(html);
+                }
+                if($("#roleName").val()=='只读'){
+                    $(".reduction").attr("disabled", true);
+                    $(".del").attr("disabled", true);
                 }
             } else {
                 // 失败

@@ -225,11 +225,12 @@
             <div id="box2">
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 1.5%">我的文档</h2>
+                    <input type="hidden" id="roleName" />
                     <table id="tab" class="table table-hover">
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
                         <ul class="list-group">
-                            <li class="list-group-item" style="width: 100px" onclick="delFiles()">删除</li>
+                            <li class="list-group-item" style="width: 100px"><button id="btnDel" style="background: 0 0;border: 0;" onclick="delFiles()">删除</button></li>
                         </ul>
                     </div>
                     <div id="bin"></div>
@@ -312,6 +313,7 @@
                 border: none;
             }
         </style>
+
         <script>
             $(function () {
                 saveState = "my_doc";
@@ -375,8 +377,8 @@
                 "      <th style=\"width: 10 %\">更新时间</th>\n" +
                 "    </tr>\n" +
                 "  </thead>"
-            {#显示我的文档列表#}
 
+            {#显示我的文档列表#}
             function my_doc_file() {
                 $("#bin").html("");
                 $("#h2").text("我的文档");
@@ -423,7 +425,6 @@
                     },
                 })
             }
-
             function appendHtml(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
@@ -464,7 +465,6 @@
             }
 
             {#团队文档列表#}
-
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#bin").html("");
@@ -512,8 +512,8 @@
                     },
                 })
             }
-
             function appendTable(data) {
+                $("#roleName").val(data.roleName);
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
                 if (data.status == 2001) {
@@ -528,13 +528,13 @@
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
                         html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n'
                         /*word*/
-                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*excel*/
-                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*ppt*/
-                        var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\')\"' +
+                        var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         if (data.list[i][8] == 0) {
                             html = html + t1
@@ -570,6 +570,9 @@
                     //var divchild = $(this).children("div");
                     $("#clickMenu").css("left", e.clientX - 250);
                     $("#clickMenu").css("top", e.clientY - 50);
+                }
+                if( $("#roleName").val()=='只读'){
+                    $("#btnDel").attr("disabled",true)
                 }
             });
 
