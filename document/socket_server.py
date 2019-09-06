@@ -42,7 +42,7 @@ def message_received(client, server, send_message):
 # Server Port
 PORT = 9001
 # 创建Websocket Server
-server = WebsocketServer(PORT, host="47.105.172.29")
+server = WebsocketServer(PORT, host="0.0.0.0")
 # 有设备连接上了
 server.set_fn_new_client(new_client)
 # 断开连接
