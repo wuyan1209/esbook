@@ -308,6 +308,7 @@ def docsModify(request):
     fileId = request.GET.get("fileId")  # 获取文件id
     saveState = request.GET.get("saveState")  # 获取文件状态
     user_id = request.GET.get("user_id")  # 获取文件状态
+    roleName=request.GET.get("roleName")  # 获取该用户对此文件的角色
 
     cursor = connection.cursor()
     cursor.execute('select content from file f '
@@ -317,6 +318,7 @@ def docsModify(request):
     request.session["file_name"] = file_name
     request.session["doc_content"] = doc_content
     request.session["file_id"] = fileId
+    request.session["roleName"] = roleName
     # return HttpResponse(json.dumps({'data': 'success'}))
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
 
@@ -548,14 +550,22 @@ def delTeam(request):
 def teamfile(request):
     teamname = request.POST.get("teamName")
     page = request.POST['page']
+    # 获取session的name
+    username=request.session['username']
     # 每页显示条数
     pageSize = 10
     cursor = connection.cursor()
+    # 用户在此协作空间的角色
+    cursor.execute('select r.role_name from user u,team t,team_member tm,member_role mr,role r where u.user_id=tm.user_id '
+                    ' and tm.team_id=t.team_id and tm.team_mem_id=mr.team_mem_id and mr.role_id=r.role_id '
+                   ' and u.user_name=%s and t.team_name=%s',[username,teamname])
+    roleName=cursor.fetchone()[0]
+    # 总条数
     cursor.execute('select count(*) '
-                   'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
+                   ' from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
                    ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
-                   'and  t.team_name ="' + teamname + '" ')
-    count = cursor.fetchone()[0]  # 总条数
+                   ' and  t.team_name ="' + teamname + '" ')
+    count = cursor.fetchone()[0]
     totalPage = count / pageSize  # 总页数
     if count != 0:
         if count % pageSize != 0:
@@ -566,13 +576,13 @@ def teamfile(request):
         offset = (int(page) - 1) * pageSize  # 计算sql需要的起始索引
         cursor.execute(
             'select t.team_id,t.team_name,u.user_id,u.user_name,mf.file_id,f.file_name,f.cre_date,f.file_id,f.type '
-            'from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
+            ' from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
             ' and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id '
-            'and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s', [offset, pageSize])
+            ' and  t.team_name ="' + teamname + '"order by f.cre_date desc limit %s,%s', [offset, pageSize])
         list = cursor.fetchall()
         cursor.close()
         return JsonResponse(
-            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list})
+            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list,"roleName":roleName})
     return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 
@@ -656,14 +666,14 @@ def deleteAll(request):
         if what == '协作空间':
             # 判断该协作空间是否有文件
             cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
-                           'and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+                           ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
             fileId = cursor.fetchall()
             # 有文件
             if fileId:
                 # 判断文件是否有版本
                 cursor.execute('select me.edi_id from edition e,member_edition me,file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
-                               'and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
-                               'and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
+                               ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
+                               ' and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
                 ediId=cursor.fetchall()
                 print(ediId)
                 # 有版本
@@ -698,7 +708,7 @@ def deleteAll(request):
             else:
                 # 判断文件是否有版本
                 cursor.execute('select ue.edi_id from user_file uf,file f,user_edition ue,edition e where uf.file_id=f.file_id '
-                               'and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id='+id)
+                               ' and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id='+id)
                 ediId = cursor.fetchall()
                 # 有版本
                 if ediId:

@@ -52,8 +52,7 @@
                 {#                <p style="color: white;font-family: 新宋体;font-size: 18px;color: black">#}
                 {#                    无标题文档</p>#}
                 <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档"
-                       value="{{ request.session.file_name }}"
-                       placeholder="无标题文档">
+                       value="{{ request.session.file_name }}">
                 <!-- ============================================================== -->
 
                 <!-- 下拉按钮 -->
@@ -64,8 +63,8 @@
                     版本
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a id="saveedi" class="dropdown-item" href="javascript:void(0);">保存</a>
-                    <a id="showEditor" class="dropdown-item" href="javascript:void(0);">查看</a>
+                    <button id="saveedi" class="dropdown-item">保存</button>
+                    <button id="showEditor" class="dropdown-item">查看</button>
                 </div>
             </div>
 
@@ -100,7 +99,7 @@
 </header>
 {# 富文本ui按钮 #}
 <div id="toolbar-container" style="margin-top: 2px"></div>
-
+<input type="hidden" id="roleName" value="{{ request.session.roleName }}">
 <input type="hidden" id="get_doc_content" value="{{ request.session.doc_content }}">
 <input type="hidden" id="doc_save_state" value="{{ saveState }}">
 <input type="hidden" id="userId" value="{{ request.session.userId }}">
@@ -114,6 +113,16 @@
 <div id="myEditor" class="alert">
     <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
 </div>
+<style>
+    .btn0{
+        width: 50px;
+        display: inline-block;
+        text-align: center;
+        background: 0 0;
+        border: 0;
+        color: #0275d8;
+    }
+</style>
 <!-- 预览模态框 -->
 <div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="margin: 35px 0 0 290px">
