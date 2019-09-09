@@ -1186,7 +1186,7 @@ def user_upload_file(request):
             # 调用方法
             handle_uploaded_file(file_obj, ext)
             filename = "%s%s" % (name, ext)
-            localurl = "static\\pic\\"
+            localurl = "static/pic/"
             file_path = os.path.join(BASE_DIR, localurl, filename)
             # 获取当前时间
             localTime = time.localtime(time.time())
@@ -1232,7 +1232,7 @@ def team_upload_file(request):
             # 调用方法
             handle_uploaded_file(file_obj, ext)
             filename = "%s%s" % (name, ext)
-            localurl = "static\\pic\\"
+            localurl = "static/pic/"
             file_path = os.path.join(BASE_DIR, localurl, filename)
             # 获取当前时间
             localTime = time.localtime(time.time())
