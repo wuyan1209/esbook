@@ -28,11 +28,6 @@
     <script type="text/javascript" src="../static/js/jquery-1.8.3.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="../static/css/loginDialog.css"/>
     <link href="../static/css/index.css" rel="stylesheet">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <![endif]-->
 </head>
 
 <body class="fix-header fix-sidebar card-no-border">
@@ -58,16 +53,9 @@
             <!-- ============================================================== -->
             <div class="navbar-header">
                 <a class="navbar-brand" href="/index/">
-                    <!-- Logo icon --><b>
-                    <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-
-                    <!-- Light Logo icon -->
-                    <img src="../static/assets/images/logo-light-icon.png" alt="homepage" class="light-logo"/>
-                </b>
-                    <!--End Logo icon -->
-                    <!-- Logo text -->
-
-                    <!-- Light Logo text -->
+                    <b>
+                        <img src="../static/assets/images/logo-light-icon.png" alt="homepage" class="light-logo"/>
+                    </b>
                     esbook </a>
             </div>
             <!-- ============================================================== -->
@@ -89,19 +77,12 @@
                            href="javascript:void(0)">
                             <i class="ti-search"></i>
                         </a>
-                        {#                        <form class="app-search">#}
                         <input id="search-bar" type="text" placeholder="搜索文件名、文件内容"
                                onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
                                autocomplete="off">
-                        {#                            <a class="srh-btn" onclick="closeSearchReasult()"><i class="ti-close"></i></a>#}
-                        {#                            </input>#}
-                        {#                        </form>#}
 
                     </li>
                 </ul>
-                <!-- ============================================================== -->
-                <!-- User profile and search -->
-                <!-- ============================================================== -->
                 <ul class="navbar-nav my-lg-0">
                     <!-- ============================================================== -->
                     <!-- Profile -->
@@ -110,7 +91,7 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user"
-                                 class="profile-pic m-r-10"/>{{ request.session.username }}</a>
+                                 class="profile-pic m-r-10"/><span id="user">{{ request.session.username }}</span></a>
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
@@ -152,16 +133,7 @@
                     class="icon-search icon-trash"></i>&nbsp;&nbsp;<span>回收站</span></a>
         </div>
     </aside>
-    <!-- ============================================================== -->
-    <!-- End Left Sidebar - style you can find in sidebar.scss  -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Page wrapper  -->
-    <!-- ============================================================== -->
     <div class="page-wrapper">
-        <!-- ============================================================== -->
-        <!-- Container fluid  -->
-        <!-- ============================================================== -->
         <div id="box">
             <div id="box1">
                 <div class="dropdown">
@@ -170,10 +142,10 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a id="toDocs" class="dropdown-item" href="javascript:void(0)" data-toggle="modal"
+                        <a id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal"
                            data-target="#createDocs">文档</a>
-                        <a class="dropdown-item" href="#">表格</a>
-                        <a class="dropdown-item" href="#">幻灯片</a>
+                        <a class="dropdown-item Setup" href="#">表格</a>
+                        <a class="dropdown-item Setup" href="#">幻灯片</a>
                     </div>
                 </div>
 
@@ -207,17 +179,11 @@
                         </div><!-- /.modal-content -->
                     </div><!-- /.modal -->
                 </div>
-
                 <div>
-                    {#                    <div class="custom-file">#}
-                    {#                        <input type="file" class="custom-file-input" id="inputGroupFile02" style="display: none"#}
-                    {#                               accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">#}
-                    {#                        <label class="custom-file-label" for="inputGroupFile02" id="btn2">导入</label>#}
-                    {#                    </div>#}
                     <form method="post" id="myform" action="" enctype="multipart/form-data">
-                        <a href="javascript:;" class="file">选择文件
+                        <button class="file" >选择文件
                             <input type="file" name="files" id="inputfiles">
-                        </a>
+                        </button>
                         <input type="submit" value="导入" id="daoru">
                     </form>
                 </div>
@@ -225,12 +191,12 @@
             <div id="box2">
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 1.5%">我的文档</h2>
-                    <input type="hidden" id="roleName" />
+                    <input hidden id="roleName" />
                     <table id="tab" class="table table-hover">
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
                         <ul class="list-group">
-                            <li class="list-group-item" style="width: 100px"><button id="btnDel" style="background: 0 0;border: 0;" onclick="delFiles()">删除</button></li>
+                            <li class="list-group-item" style="width: 100px"><button id="btnDel"  style="background: 0 0;border: 0;" onclick="delFiles()">删除</button></li>
                         </ul>
                     </div>
                     <div id="bin"></div>
@@ -266,6 +232,7 @@
 
             .two {
                 display: inline-block;
+                width: 15%;
             }
 
             .hr1 {
@@ -284,14 +251,15 @@
                 display: inline-block;
                 width: 146px;
                 background: white;
-            {#border: 1px solid lightgrey;#} border-radius: 4px;
-            {#padding: 4px 12px;#} overflow: hidden;
+                border-radius: 4px;
+                overflow: hidden;
                 color: black;
                 height: 26px;
                 text-decoration: none;
                 text-indent: 0;
                 line-height: 26px;
                 text-align: center;
+                border: none;
             }
 
             .file input {
@@ -349,23 +317,6 @@
                             } else {
                                 alert("文档不存在，可以导入")
                             }
-                            // 个人文件导入
-                            {#$.ajax({#}
-                            {#    url:"/user_upload_file/",#}
-                            {#    data:{"saveState":saveState,"fileobj":files[0]},#}
-                            {#    type: "POST",#}
-                            {#    dataType: "json",#}
-                            {#    success: function (data) {#}
-                            {#        if (data.status == 200) {#}
-                            {#            // 保存成功#}
-                            {#            alert(data.message);#}
-                            {#        } else {#}
-                            {#            // 保存失败#}
-                            {#            alert(data.message);#}
-                            {#        }#}
-                            {#    }#}
-                            {# })#}
-
                         }
                     })
                 })
@@ -548,10 +499,26 @@
                             '</tr>';
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
+                     //只读角色不能导入
+                    if("只读"==data.roleName){
+                        $("#inputfiles").attr("disabled",true)
+                        $("#daoru").attr("disabled",true)
+                    }else{
+                        $("#inputfiles").removeAttr("disabled")
+                        $("#daoru").removeAttr("disabled")
+                    }
                 }
 
             }
-
+            //只读角色不能新建
+            $("#dropdownMenuButton").on("click", function () {
+                 var roleName=$("#roleName").val();
+                 if(roleName=='只读'){
+                     $(".Setup").addClass("disabled");
+                 }else{
+                     $(".Setup").removeClass("disabled")
+                 }
+            })
             //阻止浏览器默认右击点击事件
             $("#tab").on("contextmenu", "tr", function () {
                 return false;
@@ -572,7 +539,7 @@
                     $("#clickMenu").css("top", e.clientY - 50);
                 }
                 if( $("#roleName").val()=='只读'){
-                    $("#btnDel").attr("disabled",true)
+                    $("#btnDel").attr("disabled","disabled")
                 }
             });
 
