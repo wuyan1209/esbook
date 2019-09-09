@@ -345,9 +345,9 @@
                         dataType: "json",
                         success: function (data) {
                             if (data.status == 200) {
-                                alert("文档名已经存在，请重新命名")
+                                alert(data.message)
                             } else {
-                                alert("文档不存在，可以导入")
+                                alert(data.message)
                             }
                             // 个人文件导入
                             {#$.ajax({#}
