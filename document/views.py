@@ -7,6 +7,7 @@ from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
 import os
+from itertools import chain
 
 # 跳转到主页面
 from esbook.settings import BASE_DIR
@@ -133,8 +134,10 @@ def addMember(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限添加
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
-                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
+    cursor.execute(
+        'select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+        'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',
+        [username, teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         try:
@@ -308,7 +311,7 @@ def docsModify(request):
     fileId = request.GET.get("fileId")  # 获取文件id
     saveState = request.GET.get("saveState")  # 获取文件状态
     user_id = request.GET.get("user_id")  # 获取文件状态
-    roleName=request.GET.get("roleName")  # 获取该用户对此文件的角色
+    roleName = request.GET.get("roleName")  # 获取该用户对此文件的角色
 
     cursor = connection.cursor()
     cursor.execute('select content from file f '
@@ -400,8 +403,10 @@ def editMemberRole(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
-                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
+    cursor.execute(
+        'select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+        'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',
+        [username, teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         # 创建保存点
@@ -435,8 +440,10 @@ def editAdminRole(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
-                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
+    cursor.execute(
+        'select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+        'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',
+        [username, teamName])
     result = cursor.fetchone()
     if result[0] == '超级管理员':
         # 创建保存点
@@ -469,8 +476,10 @@ def delMemberRole(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
-                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
+    cursor.execute(
+        'select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+        'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',
+        [username, teamName])
     result = cursor.fetchone()
     if result[0] == '管理员' or result[0] == '超级管理员':
         # 创建保存点
@@ -503,8 +512,10 @@ def delAdminRole(request):
     username = request.session.get('username')
     # 判断此登录的用户是否是管理员或者超级管理员，只有角色是管理员才有权限修改
     cursor = connection.cursor()
-    cursor.execute('select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
-                   'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',[username,teamName])
+    cursor.execute(
+        'select DISTINCT role_name from role r,member_role mr,team_member tm,user u ,team t where r.role_id=mr.role_id '
+        'and mr.team_mem_id=tm.team_mem_id and t.team_id=tm.team_id and tm.user_id=u.user_id and u.user_name=%s and t.team_name=%s',
+        [username, teamName])
     result = cursor.fetchone()
     if result[0] == '超级管理员':
         # 创建保存点
@@ -551,15 +562,16 @@ def teamfile(request):
     teamname = request.POST.get("teamName")
     page = request.POST['page']
     # 获取session的name
-    username=request.session['username']
+    username = request.session['username']
     # 每页显示条数
     pageSize = 10
     cursor = connection.cursor()
     # 用户在此协作空间的角色
-    cursor.execute('select r.role_name from user u,team t,team_member tm,member_role mr,role r where u.user_id=tm.user_id '
-                    ' and tm.team_id=t.team_id and tm.team_mem_id=mr.team_mem_id and mr.role_id=r.role_id '
-                   ' and u.user_name=%s and t.team_name=%s',[username,teamname])
-    roleName=cursor.fetchone()[0]
+    cursor.execute(
+        'select r.role_name from user u,team t,team_member tm,member_role mr,role r where u.user_id=tm.user_id '
+        ' and tm.team_id=t.team_id and tm.team_mem_id=mr.team_mem_id and mr.role_id=r.role_id '
+        ' and u.user_name=%s and t.team_name=%s', [username, teamname])
+    roleName = cursor.fetchone()[0]
     # 总条数
     cursor.execute('select count(*) '
                    ' from team t,team_member tm,member_file mf,file f ,user u where f.file_state = 0 and t.team_id=tm.team_id'
@@ -582,7 +594,8 @@ def teamfile(request):
         list = cursor.fetchall()
         cursor.close()
         return JsonResponse(
-            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list,"roleName":roleName})
+            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list,
+             "roleName": roleName})
     return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 
@@ -665,16 +678,18 @@ def deleteAll(request):
         # 判断该文件是文档还是协作空间
         if what == '协作空间':
             # 判断该协作空间是否有文件
-            cursor.execute('select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
-                           ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
+            cursor.execute(
+                'select mf.file_id from file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
+                ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
             fileId = cursor.fetchall()
             # 有文件
             if fileId:
                 # 判断文件是否有版本
-                cursor.execute('select me.edi_id from edition e,member_edition me,file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
-                               ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
-                               ' and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
-                ediId=cursor.fetchall()
+                cursor.execute(
+                    'select me.edi_id from edition e,member_edition me,file f,member_file mf,member_role mr,team_member tm,team t where f.file_id=mf.file_id '
+                    ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
+                    ' and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
+                ediId = cursor.fetchall()
                 print(ediId)
                 # 有版本
                 if ediId:
@@ -690,32 +705,39 @@ def deleteAll(request):
                     'delete mr,tm,t from member_role mr,team_member tm,team t WHERE mr.team_mem_id=tm.team_mem_id and tm.team_id=t.team_id and t.team_id=' + id)
         else:
             # 判断文件是私有文件还是团队文件
-            cursor.execute('select mf.mem_file_id from member_file mf,file f where mf.file_id=f.file_id and f.file_id='+id)
-            result=cursor.fetchall()
+            cursor.execute(
+                'select mf.mem_file_id from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
+            result = cursor.fetchall()
             # 团队文件
             if result:
                 # 判断文件是否有版本
-                cursor.execute('select me.edi_id from edition e,member_edition me,member_file mf,file f where mf.file_id=f.file_id '
-                               'and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and f.file_id='+id)
-                ediId=cursor.fetchall()
-                # 有版本
-                if ediId:
-                    cursor.execute('delete e,me,mf,f from edition e,member_edition me,member_file mf,file f where mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and f.file_id=' + id)
-                # 无版本，只删除文件
-                else:
-                    cursor.execute('delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
-            # 私有文件
-            else:
-                # 判断文件是否有版本
-                cursor.execute('select ue.edi_id from user_file uf,file f,user_edition ue,edition e where uf.file_id=f.file_id '
-                               ' and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id='+id)
+                cursor.execute(
+                    'select me.edi_id from edition e,member_edition me,member_file mf,file f where mf.file_id=f.file_id '
+                    'and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and f.file_id=' + id)
                 ediId = cursor.fetchall()
                 # 有版本
                 if ediId:
-                    cursor.execute('delete e,ue,uf,f from edition e,user_edition ue,user_file uf,file f where uf.file_id=f.file_id and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id=' + id)
+                    cursor.execute(
+                        'delete e,me,mf,f from edition e,member_edition me,member_file mf,file f where mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id and f.file_id=' + id)
                 # 无版本，只删除文件
                 else:
-                    cursor.execute('delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
+                    cursor.execute(
+                        'delete mf,f from member_file mf,file f where mf.file_id=f.file_id and f.file_id=' + id)
+            # 私有文件
+            else:
+                # 判断文件是否有版本
+                cursor.execute(
+                    'select ue.edi_id from user_file uf,file f,user_edition ue,edition e where uf.file_id=f.file_id '
+                    ' and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id=' + id)
+                ediId = cursor.fetchall()
+                # 有版本
+                if ediId:
+                    cursor.execute(
+                        'delete e,ue,uf,f from edition e,user_edition ue,user_file uf,file f where uf.file_id=f.file_id and uf.user_file_id=ue.user_file_id and ue.edi_id=e.edi_id and f.file_id=' + id)
+                # 无版本，只删除文件
+                else:
+                    cursor.execute(
+                        'delete uf,f from user_file uf,file f where uf.file_id=f.file_id and f.file_id=' + id)
         return JsonResponse({'status': 200, 'message': '删除成功'})
     except:
         return JsonResponse({'status': 4004, 'message': '删除失败'})
@@ -729,29 +751,41 @@ def searchFile(request):
     files = {}
     # 获取username
     username = request.session['username']
-    # 查找该用户自己的文件和加入的团队的文件
+    # 用户加入的团队的文件
+    userId = request.session["userId"]
+    cursor.execute("select team_id from team_member where user_id = %s", [userId])
+    teamId = cursor.fetchall()
+    teamId = list(chain.from_iterable(teamId))
+    cursor.execute("select team_mem_id from team_member where team_id in %s", [teamId])
+    team_mem_id = cursor.fetchall()
     cursor.execute(
-        "select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='" + username + "' and f.file_name like '%" + searchCondition + "%' "
-                                                                                                                                                                                              "UNION "
-                                                                                                                                                                                              "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
-                                                                                                                                                                                              "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
-    # 查文件
-    cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
-
+        "select f.file_id from member_file mf, file f where mf.file_id = f.file_id and mf.team_mem_id in %s and f.file_state = 0",
+        [list(chain.from_iterable(team_mem_id))])
+    myFileIds = cursor.fetchall()
+    myFileIds = list(chain.from_iterable(myFileIds))
+    # 用户自己的文件
+    cursor.execute("select file_id from user_file where user_id = %s", [userId])
     fileIds = cursor.fetchall()
-    for fileId in fileIds:
-        # 根据查询到的fileID来获取file的详细数据
-        cursor.execute(
-            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
-            [fileId[0], 0])
-        searchList = cursor.fetchone()
-        if searchList:
-            files['file_name'] = searchList[0]
-            files['content'] = searchList[1]
-            files['type'] = searchList[2]
-            files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
-            files['file_id'] = searchList[4]
-            searchedFiles.append(files.copy())
+    myFileIds.extend(list(chain.from_iterable(fileIds)))
+    # 查文件
+    cursor.execute(
+        "select file_id from file where file_name like '%" + searchCondition + "%'")
+
+    selFileIds = cursor.fetchall()
+    for fileId in selFileIds:
+        if fileId[0] in myFileIds:
+            # 根据查询到的fileID来获取file的详细数据
+            cursor.execute(
+                "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
+                [fileId[0], 0])
+            searchList = cursor.fetchone()
+            if searchList:
+                files['file_name'] = searchList[0]
+                files['content'] = searchList[1]
+                files['type'] = searchList[2]
+                files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
+                files['file_id'] = searchList[4]
+                searchedFiles.append(files.copy())
     return HttpResponse(json.dumps(searchedFiles))
 
 
@@ -857,7 +891,7 @@ def saveTeamEdition(request):
     # 获取成员名、版本内容、文件名
     member = request.session.get('username')
     content = request.POST.get('content')
-    fileId=request.POST.get('fileId')
+    fileId = request.POST.get('fileId')
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
@@ -911,6 +945,7 @@ def getTeamEdition(request):
 # 跳转到注册页面
 def register(request):
     return render(request, 'register.html');
+
 
 # 注册
 def registerUser(request):
@@ -1112,7 +1147,7 @@ def getcontent(file_path):
                     content += "<p><i>" + doc_test + "</i></p>"
                 if (f.underline):  # 下划线
                     content += "<p><u>" + doc_test + "</u></p>"
-                if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
+                if (f.bold == False and f.italic == False and f.underline == False):  # 没有字体样式
                     content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
@@ -1276,7 +1311,8 @@ def cooperation_edite(request):
 def showrxcel(request):
     return render(request, "excel.html")
 
-#还原版本
+
+# 还原版本
 def getoldEdition(request):
     saveState = request.GET.get("saveState")
     content = request.GET.get("content")
@@ -1288,20 +1324,21 @@ def getoldEdition(request):
                    'where f.file_id = %s',
                    [fileId])
     file_name = cursor.fetchone()[0]
-    cursor.execute("update file set content = %s where file_id = %s",[content, fileId])
+    cursor.execute("update file set content = %s where file_id = %s", [content, fileId])
 
     request.session["file_name"] = file_name
     request.session["doc_content"] = content
     request.session["file_id"] = fileId
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
 
-#删除版本
+
+# 删除版本
 def delectEdition(request):
     saveState = request.GET.get("saveState")
     content = request.GET.get("content")
     user_id = request.GET.get("user_id")
     fileId = request.GET.get("fileId")
-    editionid=request.GET.get("ediId")
+    editionid = request.GET.get("ediId")
 
     cursor = connection.cursor()
     cursor.execute('select file_name from file f '
