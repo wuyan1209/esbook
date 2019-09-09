@@ -101,5 +101,7 @@ urlpatterns = [
     path('excel/',views.showrxcel),
     # 还原
     path('getoldEdition/', views.getoldEdition),
+    # 重命名文件
+    path('renameFiles/', views.renameFiles),
 
 ]
