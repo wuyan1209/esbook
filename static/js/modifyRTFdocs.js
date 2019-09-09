@@ -20,13 +20,12 @@ DecoupledEditor
                 },
                 uploadUrl: '/static/upload'
 
-            }
+            },
         }
     )
     .then(editor => {
         EDITOR = editor
         const toolbarContainer = document.querySelector('#toolbar-container');
-
         toolbarContainer.appendChild(editor.ui.view.toolbar.element);
     })
     .catch(error => {
@@ -45,15 +44,13 @@ $(function () {
     var fileId = $("#fileId").val()
 
 
-
     // 用户角色为只读时，不能对文件进行修改，不能保存、删除、还原版本
-    var roleName=$("#roleName").val()
-    if(roleName=='只读'){
+    var roleName = $("#roleName").val()
+    if (roleName == '只读') {
         $("#docs_title").attr("readOnly", true); //文件名不能修改
         $("#editor").attr("contenteditable", false);     //编辑器内容不能修改
         $("#saveedi").attr("disabled", true);    // 版本保存按钮不可点击
     }
-
 
 
     // 点击保存按钮保存
@@ -133,6 +130,8 @@ $(function () {
             if (doc_content == content) {
                 return
             }
+            $("#auto_save").attr("src", "../static/assets/images/5-121204194032-50.gif");
+            $("#auto_save_span").text("正在保存");
             modifyDocs();
             if (doc_save_state != "my_doc") {
                 sendWebsocket(doc_content)
@@ -161,11 +160,13 @@ function init() {
 
         var data = e.data;
         data = data.replace(/'/g, '"');
-        console.log(data);
+        // data = data.replace(/\<br data-cke-filler=\"true\"\>/g, '\<br data-cke-filler=\\\"true\\\"\>');
+        // console.log(data)
         data = $.parseJSON(data);
         var cooperation_fileId = data.fileId;   //  被修改的文件的id
         var cooperation_userId = data.userId;   //  修改文件用户的id
         var cooperation_content = data.doc_content;     //  修改的内容
+        // cooperation_content = cooperation_content.replace(/\<p\>\<\/p\>/g, '\<p data-cke-filler=\"true\"\>\<\/p\>');
 
         // 获取当前用户和文件的id
         var fileId = $("#fileId").val()
@@ -203,6 +204,12 @@ function sendWebsocket(doc_content) {
     // 1:文件已自动保存，团队成员更新页面
     var fileId = $("#fileId").val()
     var userId = $("#userId").val()
+
+    doc_content = doc_content.replace(/\u200B/g, '');
+
+    // doc_content = doc_content.replace(/\<br data-cke-filler=\"true\"\>/g, '');
+    // doc_content = doc_content.replace(/\<br\>/g, '');
+    // console.log(doc_content)
     var send_message = {'fileId': fileId, 'userId': userId, 'doc_content': encodeURIComponent(doc_content)}
     ws.send(JSON.stringify(send_message))
 }
@@ -221,13 +228,11 @@ doc_content();
 // 回显数据
 function doc_content() {
     var doc_content = $("#get_doc_content").val()
-    // console.log(doc_content);
-    // EDITOR.setData(doc_content);
     $("#editor").html(doc_content)
 }
 
 // 打开已存在文档
-function docs_modify(name, id, saveState, fileId,roleName) {
+function docs_modify(name, id, saveState, fileId, roleName) {
     window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + name +
         "&user_id=" + id + "&fileId=" + fileId + "&roleName=" + roleName;
 }
@@ -255,7 +260,13 @@ function modifyDocs() {
         success: function (data) {
             if (data.saveStatus == "success") {
                 // 保存成功
-                //alert("保存成功了");
+                var now = new Date();
+                // var hour = now.getHours();
+                // if (hour < 10){}
+                // var min = now.getMinutes();
+                var time = now.toLocaleTimeString()
+                $("#auto_save").attr("src", "../static/assets/images/完成.png");
+                $("#auto_save_span").text("最近保存 " + time);
             } else {
                 // 保存失败
                 alert("保存失败了");
@@ -424,7 +435,7 @@ function getTeamEditor(teamId, fileId) {
                         "</div>"
                     $("#myEditor").append(html);
                 }
-                if($("#roleName").val()=='只读'){
+                if ($("#roleName").val() == '只读') {
                     $(".reduction").attr("disabled", true);
                     $(".del").attr("disabled", true);
                 }

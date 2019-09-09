@@ -293,13 +293,17 @@
                 })
                 my_doc_file()
                 //导入文件操作
-                $("#inputfiles").on("change", function () {
-                    //动态改变action中的值
-                    if (saveState == 'my_doc') {
-                        $("#myform").attr("action", "/user_upload_file/");
+                //判断form提交有内容吗 有提交，没有提示不能点击按钮
+                $("#daoru").on('click', function() {
+                    var word_file = $("#inputfiles").val();
+                    if (word_file == "" || word_file.length == 0) {
+                        alert("没有文件导入，请选择文件路径！");
+                        return false;
                     } else {
-                        $("#myform").attr("action", "/team_upload_file/?saveState=" + saveState);
+                        return true;
                     }
+                });
+                $("#inputfiles").on("change", function () {
                     var files = $('#inputfiles').prop('files');//获取到文件列表
                     //判断导入文件名是否存在
                     $.ajax({
@@ -312,10 +316,17 @@
                         type: "POST",
                         dataType: "json",
                         success: function (data) {
-                            if (data.status == 200) {
-                                alert("文档名已经存在，请重新命名")
+                            if (data.status == 2001) {
+                                alert(data.message)
+                                //动态改变action中的值
+                                if (saveState == 'my_doc') {
+                                    $("#myform").attr("action", "/user_upload_file/");
+                                } else {
+                                    $("#myform").attr("action", "/team_upload_file/?saveState=" + saveState);
+                                }
                             } else {
-                                alert("文档不存在，可以导入")
+                                alert(data.message)
+                                window.location.href="/index/"
                             }
                         }
                     })

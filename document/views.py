@@ -7,6 +7,7 @@ from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
 import os
+from itertools import chain
 
 # 跳转到主页面
 from esbook.settings import BASE_DIR
@@ -178,24 +179,27 @@ def RTFdocs_save(request):
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
     return_param = {}
-    sid = transaction.savepoint()
+    # 创建保存点
+    save_id = transaction.savepoint()
     try:
         # 数据库更新
         cursor = connection.cursor()
         cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,0)",
                        [doc_title, doc_content, formatTime])
-        cursor.execute("select file_id from file where file_name = %s", [doc_title])
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [doc_title])
         file_id = cursor.fetchone()
 
         cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, file_id])
         return_param['saveStatus'] = "success"
         return_param['userId'] = userId
         return_param['fileId'] = file_id[0]
-        transaction.savepoint_commit(sid)
+        transaction.savepoint_commit(save_id)
     except Exception as e:
         # 数据库更新失败
         return_param['saveStatus'] = "fail"
-        transaction.savepoint_rollback(sid)
+        transaction.savepoint_rollback(save_id)
     return HttpResponse(json.dumps(return_param))
 
 
@@ -215,13 +219,17 @@ def saveTeamDoc(request):
         # 向file表中插入文件数据
         cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
                        [doc_title, doc_content, formatTime])
+
         # 获取文件id
-        cursor.execute("select file_id from file where file_name = %s", [doc_title])
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [doc_title])
         file_id = cursor.fetchone()[0]
 
         # 获取团队成员id
         cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [userId, teamId])
         team_mem_id = cursor.fetchone()
+
         # 保存团队文件
         cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
         return_param['saveStatus'] = "success"
@@ -308,7 +316,7 @@ def docsModify(request):
     fileId = request.GET.get("fileId")  # 获取文件id
     saveState = request.GET.get("saveState")  # 获取文件状态
     user_id = request.GET.get("user_id")  # 获取文件状态
-    roleName=request.GET.get("roleName")  # 获取该用户对此文件的角色
+    roleName = request.GET.get("roleName")  # 获取该用户对此文件的角色
 
     cursor = connection.cursor()
     cursor.execute('select content from file f '
@@ -556,7 +564,7 @@ def teamfile(request):
     teamname = request.POST.get("teamName")
     page = request.POST['page']
     # 获取session的name
-    username=request.session['username']
+    username = request.session['username']
     # 每页显示条数
     pageSize = 10
     cursor = connection.cursor()
@@ -587,7 +595,8 @@ def teamfile(request):
         list = cursor.fetchall()
         cursor.close()
         return JsonResponse(
-            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list,"roleName":roleName})
+            {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list,
+             "roleName": roleName})
     return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 
@@ -734,29 +743,41 @@ def searchFile(request):
     files = {}
     # 获取username
     username = request.session['username']
-    # 查找该用户自己的文件和加入的团队的文件
+    # 用户加入的团队的文件
+    userId = request.session["userId"]
+    cursor.execute("select team_id from team_member where user_id = %s", [userId])
+    teamId = cursor.fetchall()
+    teamId = list(chain.from_iterable(teamId))
+    cursor.execute("select team_mem_id from team_member where team_id in %s", [teamId])
+    team_mem_id = cursor.fetchall()
     cursor.execute(
-        "select f.file_id from file f,user u,user_file uf where f.file_id=uf.file_id and u.user_id=uf.user_id and u.user_name='" + username + "' and f.file_name like '%" + searchCondition + "%' "
-                                                                                                                                                                                              "UNION "
-                                                                                                                                                                                              "select f.file_id from file f,user u,team_member tm,member_file mf where f.file_id=mf.file_id and  mf.team_mem_id=tm.team_mem_id and tm.user_id=u.user_id "
-                                                                                                                                                                                              "and user_name='" + username + "' and file_name like '%" + searchCondition + "%'")
-    # 查文件
-    cursor.execute("select file_id from file where file_name like '%" + searchCondition + "%'")
-
+        "select f.file_id from member_file mf, file f where mf.file_id = f.file_id and mf.team_mem_id in %s and f.file_state = 0",
+        [list(chain.from_iterable(team_mem_id))])
+    myFileIds = cursor.fetchall()
+    myFileIds = list(chain.from_iterable(myFileIds))
+    # 用户自己的文件
+    cursor.execute("select file_id from user_file where user_id = %s", [userId])
     fileIds = cursor.fetchall()
-    for fileId in fileIds:
-        # 根据查询到的fileID来获取file的详细数据
-        cursor.execute(
-            "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
-            [fileId[0], 0])
-        searchList = cursor.fetchone()
-        if searchList:
-            files['file_name'] = searchList[0]
-            files['content'] = searchList[1]
-            files['type'] = searchList[2]
-            files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
-            files['file_id'] = searchList[4]
-            searchedFiles.append(files.copy())
+    myFileIds.extend(list(chain.from_iterable(fileIds)))
+    # 查文件
+    cursor.execute(
+        "select file_id from file where file_name like '%" + searchCondition + "%'")
+
+    selFileIds = cursor.fetchall()
+    for fileId in selFileIds:
+        if fileId[0] in myFileIds:
+            # 根据查询到的fileID来获取file的详细数据
+            cursor.execute(
+                "select file_name,content,type,cre_date,file_id from file where file_id = %s and file_state = %s",
+                [fileId[0], 0])
+            searchList = cursor.fetchone()
+            if searchList:
+                files['file_name'] = searchList[0]
+                files['content'] = searchList[1]
+                files['type'] = searchList[2]
+                files['cre_date'] = searchList[3].strftime("%Y-%m-%d %H:%M:%S")
+                files['file_id'] = searchList[4]
+                searchedFiles.append(files.copy())
     return HttpResponse(json.dumps(searchedFiles))
 
 
@@ -862,7 +883,7 @@ def saveTeamEdition(request):
     # 获取成员名、版本内容、文件名
     member = request.session.get('username')
     content = request.POST.get('content')
-    fileId=request.POST.get('fileId')
+    fileId = request.POST.get('fileId')
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
@@ -1074,7 +1095,7 @@ def personal(request):
 def handle_uploaded_file(file_obj, ext):
     name = os.path.splitext(file_obj.name)[0]
     filename = "%s%s" % (name, ext)
-    localurl = "static\\pic\\"
+    localurl = "static/pic/"
     file_path = os.path.join(BASE_DIR, localurl, filename)
     print(file_path)
     with open(file_path, 'wb+') as f:
@@ -1112,7 +1133,8 @@ def getcontent(file_path):
                     content += "<p><i>" + doc_test + "</i></p>"
                 if (f.underline):  # 下划线
                     content += "<p><u>" + doc_test + "</u></p>"
-                if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
+                if (f.bold==None and f.italic==None and f.underline==None):  # 没有字体样式
+                # if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
                     content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
@@ -1142,7 +1164,7 @@ def user_upload_file(request):
             # 调用方法
             handle_uploaded_file(file_obj, ext)
             filename = "%s%s" % (name, ext)
-            localurl = "static\\pic\\"
+            localurl = "static/pic/"
             file_path = os.path.join(BASE_DIR, localurl, filename)
             # 获取当前时间
             localTime = time.localtime(time.time())
@@ -1188,7 +1210,7 @@ def team_upload_file(request):
             # 调用方法
             handle_uploaded_file(file_obj, ext)
             filename = "%s%s" % (name, ext)
-            localurl = "static\\pic\\"
+            localurl = "static/pic/"
             file_path = os.path.join(BASE_DIR, localurl, filename)
             # 获取当前时间
             localTime = time.localtime(time.time())
@@ -1226,6 +1248,7 @@ def team_upload_file(request):
 
 
 # 判断导入的文件名是否重复
+@transaction.atomic
 def uploadexist(request):
     name = request.POST.get('filename')
     userid = request.session.get("userId")
@@ -1243,9 +1266,9 @@ def uploadexist(request):
                 status = 200
                 message = "文件名存在，请重新命名"
                 break
-        else:
-            status = 2001
-            message = "文件不存在，可以导入该文件"
+            else:
+                status = 2001
+                message = "文件不存在，可以导入该文件"
     else:
         # 团队文档的名称是否重复
         cursor.execute("select file_name from file f, member_file mf "
@@ -1276,7 +1299,8 @@ def cooperation_edite(request):
 def showrxcel(request):
     return render(request, "excel.html")
 
-#还原版本
+
+# 还原版本
 def getoldEdition(request):
     saveState = request.GET.get("saveState")
     content = request.GET.get("content")
@@ -1288,20 +1312,21 @@ def getoldEdition(request):
                    'where f.file_id = %s',
                    [fileId])
     file_name = cursor.fetchone()[0]
-    cursor.execute("update file set content = %s where file_id = %s",[content, fileId])
+    cursor.execute("update file set content = %s where file_id = %s", [content, fileId])
 
     request.session["file_name"] = file_name
     request.session["doc_content"] = content
     request.session["file_id"] = fileId
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
 
-#删除版本
+
+# 删除版本
 def delectEdition(request):
     saveState = request.GET.get("saveState")
     content = request.GET.get("content")
     user_id = request.GET.get("user_id")
     fileId = request.GET.get("fileId")
-    editionid=request.GET.get("ediId")
+    editionid = request.GET.get("ediId")
 
     cursor = connection.cursor()
     cursor.execute('select file_name from file f '

@@ -54,9 +54,12 @@
                 <input type="text" id="docs_title" class="form-control" autocomplete="off" placeholder="无标题文档"
                        value="{{ request.session.file_name }}">
                 <!-- ============================================================== -->
-
+                <img src="../static/assets/images/完成.png" id="auto_save" width="20" height="20" alt="finish"
+                     class="light-logo" style="margin-top: 2px">
+                <span id="auto_save_span"> 保存完成</span>
                 <!-- 下拉按钮 -->
             </ul>
+
             <div class="dropdown" style="margin-left: 10px">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
