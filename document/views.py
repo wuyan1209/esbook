@@ -1155,7 +1155,8 @@ def getcontent(file_path):
                     content += "<p><i>" + doc_test + "</i></p>"
                 if (f.underline):  # 下划线
                     content += "<p><u>" + doc_test + "</u></p>"
-                if (f.bold == False and f.italic == False and f.underline == False):  # 没有字体样式
+                if (f.bold==None and f.italic==None and f.underline==None):  # 没有字体样式
+                # if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
                     content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
@@ -1269,6 +1270,7 @@ def team_upload_file(request):
 
 
 # 判断导入的文件名是否重复
+@transaction.atomic
 def uploadexist(request):
     name = request.POST.get('filename')
     userid = request.session.get("userId")
@@ -1286,9 +1288,9 @@ def uploadexist(request):
                 status = 200
                 message = "文件名存在，请重新命名"
                 break
-        else:
-            status = 2001
-            message = "文件不存在，可以导入该文件"
+            else:
+                status = 2001
+                message = "文件不存在，可以导入该文件"
     else:
         # 团队文档的名称是否重复
         cursor.execute("select file_name from file f, member_file mf "
