@@ -35,7 +35,6 @@ def message_received(client, server, send_message):
 
     # 发送给所有的连接
     send_message = str(send_message)
-    print("send_message:", send_message)
     server.send_message_to_all(send_message)
 
 
