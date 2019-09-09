@@ -1117,7 +1117,7 @@ def personal(request):
 def handle_uploaded_file(file_obj, ext):
     name = os.path.splitext(file_obj.name)[0]
     filename = "%s%s" % (name, ext)
-    localurl = "static\\pic\\"
+    localurl = "static/pic/"
     file_path = os.path.join(BASE_DIR, localurl, filename)
     print(file_path)
     with open(file_path, 'wb+') as f:
