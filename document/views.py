@@ -181,24 +181,28 @@ def RTFdocs_save(request):
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
     return_param = {}
-    sid = transaction.savepoint()
+    # 创建保存点
+    save_id = transaction.savepoint()
     try:
         # 数据库更新
         cursor = connection.cursor()
-        cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,0)",
+
+        cursor.execute("insert into file(file_name,content,cre_date,type,del_user) values(%s,%s,%s,0,0)",
                        [doc_title, doc_content, formatTime])
-        cursor.execute("select file_id from file where file_name = %s", [doc_title])
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [doc_title])
         file_id = cursor.fetchone()
 
         cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, file_id])
         return_param['saveStatus'] = "success"
         return_param['userId'] = userId
         return_param['fileId'] = file_id[0]
-        transaction.savepoint_commit(sid)
+        transaction.savepoint_commit(save_id)
     except Exception as e:
         # 数据库更新失败
         return_param['saveStatus'] = "fail"
-        transaction.savepoint_rollback(sid)
+        transaction.savepoint_rollback(save_id)
     return HttpResponse(json.dumps(return_param))
 
 
@@ -218,13 +222,17 @@ def saveTeamDoc(request):
         # 向file表中插入文件数据
         cursor.execute("insert into file(file_name,content,cre_date) values(%s,%s,%s)",
                        [doc_title, doc_content, formatTime])
+
         # 获取文件id
-        cursor.execute("select file_id from file where file_name = %s", [doc_title])
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [doc_title])
         file_id = cursor.fetchone()[0]
 
         # 获取团队成员id
         cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [userId, teamId])
         team_mem_id = cursor.fetchone()
+
         # 保存团队文件
         cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
         return_param['saveStatus'] = "success"
