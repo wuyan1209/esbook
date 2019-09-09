@@ -150,6 +150,8 @@ class File(models.Model):
     cre_date = models.DateTimeField()
     type = models.IntegerField()
     file_state = models.IntegerField()
+    del_date = models.DateTimeField()
+    del_user = models.IntegerField()
 
     class Meta:
         managed = False
@@ -219,8 +221,11 @@ class Team(models.Model):
     team_name = models.CharField(max_length=50)
     team_state = models.IntegerField(blank=True, null=True)
     user_id = models.IntegerField()
-    date = models.DateTimeField()
+    cre_date = models.DateTimeField()
     what = models.CharField(max_length=10)
+    del_date = models.DateTimeField()
+    del_user = models.IntegerField()
+
 
     class Meta:
         managed = False

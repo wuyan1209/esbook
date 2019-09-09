@@ -143,6 +143,7 @@ function delTeam(teamId) {
 };
 
 var title = "<span class='one' style='font-weight: 500;'>文件名</span>\n" +
+        "<span class='two' style='font-weight: 500;'>删除者</span>\n" +
         "<span class='two'  style='font-weight: 500;margin-top: 15px'>删除时间</span>\n"+"<hr class='hr1'>";
 //回收站
 function bin() {
@@ -190,6 +191,7 @@ function bin() {
     })
 };
 function appendBin(data) {
+    var username=$("#user").text()
     /*清空之前的数据*/
     $("#tab").html("");
     $("#bin").html("");
@@ -223,17 +225,29 @@ function appendBin(data) {
             } else if (data.message[i][3] == 2) {
                 html = html + t4
             }
-            html += " <span class='two'>" + mystr + "</span>\n" +
+            html += " <span class='two'>" + data.message[i][4] + "</span>\n" +
+                " <span class='two'>" + mystr + "</span>\n" +
                 "<hr class='hr1'>" +
-                "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n" +
-                "<li><a  class=\"dropdown-item\" href=\"javascript:void(0)\" " +
+                "<ul class=\"dropdown-menu\"  aria-labelledby=\"dropdownMenu\">\n"
+            if(username==data.message[i][4] ){
+                 html+= "<li><button  class=\"dropdown-item\" " +
                 "onclick = \"restore('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
-                "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</a></li>\n" +
+                "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</button></li>\n" +
                 "<hr style='margin-top: 0;margin-bottom: 0'/>" +
-                "<li><a  class=\"dropdown-item\" style='color: red' href=\"javascript:void(0)\" " +
+                "<li><button class=\"dropdown-item\" style='color: red'  " +
                 "onclick = \"deleteAll('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
-                "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</a></li>\n" +
-                "</ul>" +
+                "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</button></li>\n"
+            }else{
+                  html+= "<li><button  class=\"dropdown-item\" disabled='disabled' " +
+                "onclick = \"restore('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
+                "<img style='width: 20px;height: auto' src='/static/assets/images/undo.png'/>&nbsp;&nbsp;恢复文件</button></li>\n" +
+                "<hr style='margin-top: 0;margin-bottom: 0'/>" +
+                "<li><button disabled='disabled' class=\"dropdown-item\" style='color: red'  " +
+                "onclick = \"deleteAll('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
+                "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</button></li>\n"
+            }
+
+            html+= "</ul>" +
                 "</div>";
             $("#bin").append(html);
         }
@@ -279,7 +293,6 @@ function deleteAll(id,w) {
              success: function (data) {
                  if (data.status == 200) {
                      alert(data.message);
-                     //window.location.href = '/index/';
                      bin()
                  } else {
                      alert(data.message);
