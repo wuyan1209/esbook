@@ -325,13 +325,8 @@
                 })
                 my_doc_file()
                 //导入文件操作
+
                 $("#inputfiles").on("change", function () {
-                    //动态改变action中的值
-                    if (saveState == 'my_doc') {
-                        $("#myform").attr("action", "/user_upload_file/");
-                    } else {
-                        $("#myform").attr("action", "/team_upload_file/?saveState=" + saveState);
-                    }
                     var files = $('#inputfiles').prop('files');//获取到文件列表
                     //判断导入文件名是否存在
                     $.ajax({
@@ -344,10 +339,17 @@
                         type: "POST",
                         dataType: "json",
                         success: function (data) {
-                            if (data.status == 200) {
+                            if (data.status == 2001) {
                                 alert(data.message)
+                                //动态改变action中的值
+                                if (saveState == 'my_doc') {
+                                    $("#myform").attr("action", "/user_upload_file/");
+                                } else {
+                                    $("#myform").attr("action", "/team_upload_file/?saveState=" + saveState);
+                                }
                             } else {
                                 alert(data.message)
+                                window.location.href="/index/"
                             }
                             // 个人文件导入
                             {#$.ajax({#}
