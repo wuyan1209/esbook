@@ -821,8 +821,10 @@ def editionExits(request):
 @transaction.atomic
 def saveEdition(request):
     # 获取用户名,版本内容,获取文件名称
-    username = request.session.get('username')
+
+    userId = request.session.get('userId')
     content = request.POST.get('content')
+    fileId=request.POST.get('fileId')
     edi_name = request.POST.get('filename')
     # 获取当前时间
     localTime = time.localtime(time.time())
@@ -830,11 +832,6 @@ def saveEdition(request):
     sid = transaction.savepoint()
     try:
         cursor = connection.cursor()
-        # 获取用户名、id
-        cursor.execute('select user_id from user where user_name="' + username + '"')
-        userid = cursor.fetchone()
-        cursor.execute("select file_id from file where file_name = %s", [edi_name])
-        fileId = cursor.fetchone()
         # 保存版本
         cursor.execute('insert into edition (save_date,content,edi_name) values(%s, %s, %s)',
                        [formatTime, content, edi_name])
@@ -854,7 +851,7 @@ def saveEdition(request):
         status = 2001
         message = '个人版本保存失败'
         transaction.savepoint_rollback(sid)
-    return JsonResponse({'status': 200, "message": message})
+    return JsonResponse({'status': status, "message": message})
 
 
 # 查看个人版本
@@ -923,7 +920,7 @@ def getTeamEdition(request):
     teamname = cursor.fetchone()
     fileId = request.POST.get('fileId')
     cursor.execute(
-        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id '
+        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name '
         'from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
         'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
         'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileId])
@@ -1131,8 +1128,8 @@ def getcontent(file_path):
                     content += "<p><i>" + doc_test + "</i></p>"
                 if (f.underline):  # 下划线
                     content += "<p><u>" + doc_test + "</u></p>"
-                if (f.bold==None and f.italic==None and f.underline==None):  # 没有字体样式
-                # if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
+                if (f.bold == None and f.italic == None and f.underline == None):  # 没有字体样式
+                    # if (f.bold==False and f.italic==False and f.underline==False):  # 没有字体样式
                     content += "<p>" + doc_test + "</p>"
         if doc_test == "":
             content += "<p></p>"
@@ -1337,3 +1334,17 @@ def delectEdition(request):
     request.session["doc_content"] = content
     request.session["file_id"] = fileId
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
+
+
+# 重命名文件
+def renameFiles(request):
+    fileId = request.POST.get("file_id")
+    fileName = request.POST.get("fileName")
+    return_param = {}
+    try:
+        cursor = connection.cursor()
+        cursor.execute("update file set file_name = %s where file_id = %s", [fileName, fileId])
+        return_param['flag'] = "success"
+    except Exception as e:
+        return_param['flag'] = "fail"
+    return HttpResponse(json.dumps(return_param))

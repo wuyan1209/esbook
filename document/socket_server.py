@@ -24,9 +24,13 @@ def message_received(client, server, send_message):
     # print((message.encode('utf-8')).decode())
     send_message = json.loads(send_message)
     content = send_message['doc_content']
-
-    content = urllib.parse.unquote(content)
-    send_message['doc_content'] = content
+    if content == "":
+        team_name = send_message['team_name']
+        team_name = urllib.parse.unquote(team_name)
+        send_message['team_name'] = team_name
+    else:
+        content = urllib.parse.unquote(content)
+        send_message['doc_content'] = content
     # print(type(send_message))
     # print(send_message)
     # message = urllib.parse.unquote()

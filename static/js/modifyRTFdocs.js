@@ -286,6 +286,7 @@ function saveEdition() {
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //获取当前版本内容
     var now_doc_title = $("#docs_title").val();  //取得当前文档标题
+    var fileId = $("#fileId").val()
 
     //判断版本是否存在
     $.ajax({
@@ -305,7 +306,8 @@ function saveEdition() {
                     dataType: "json",
                     data: {
                         content: doc_content,
-                        filename: now_doc_title
+                        filename: now_doc_title,
+                        fileId:fileId,
                     },
                     success: function (data) {
                         if (data.status == 200) {
@@ -391,9 +393,11 @@ function getEdition() {
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px;\">\n" +
                         " <span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
-                        " <span style='display:block'>" + data.list[i][0] + "保存&nbsp;&nbsp;&nbsp;&nbsp;" +
-                        "<a href= \'javascript:void (0)\' data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + str + ")\">预览</a>" +
-                        "&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0)\" onclick=\"getoldEdition(" + str + ")\">还原</a>&nbsp;&nbsp;&nbsp;<a href= \"javascript:void (0) \" onclick='delectEdition(" + data.list[i][4] + ")'>删除</a></span>\n" +
+                        "<span style='display:block'>" +
+                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + str + ")\">预览</button>" +
+                        "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
+                        "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][4] + ")'>删除</button></span></span>\n" +
                         " </div>"
                     $("#myEditor").append(html);
                 }
@@ -433,9 +437,12 @@ function getTeamEditor(teamId, fileId) {
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
                         "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
-                        "<span style='display:block'>" + data.list[i][1] + "保存&nbsp;&nbsp;&nbsp;&nbsp;" +
-                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][2] + "','" + updatetime + "'," + str + ")\">预览</button>" +
-                        "&nbsp;&nbsp;&nbsp;<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>&nbsp;&nbsp;&nbsp;<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</button></span>\n" +
+                        "<span style='display:block'>" +
+                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][6] + "','" + updatetime + "'," + str + ")\">预览</button>" +
+                        "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
+                        "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</button></span></span>\n" +
                         "</div>"
                     $("#myEditor").append(html);
                 }

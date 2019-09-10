@@ -1,12 +1,13 @@
 $(function () {
     // 创建文档
     $("#sure_doc").on("click", function () {
+
         var doc_name = $("#doc_name").val();
         var modify_flag = false
         // 判断文档名称是否为空
         if (doc_name == "" || doc_name == null) {
             alert("请输入文件名")
-            return
+            return;
         }
 
         // 判断文档名称是否重复
@@ -62,6 +63,7 @@ $(function () {
                     dataType: "json",
                     success: function (data) {
                         if (data.saveStatus == "success") {
+                            sendWebsocket(saveState, data.fileId)
                             toModify(doc_name, 0, data.fileId)
                         }
                     }
@@ -88,9 +90,70 @@ $(function () {
     $('#search-bar').on('compositionend', function () {
         flag = true;
     });
+
+    socketInit()
 });
 
 function toModify(doc_name, userId, fileId) {
-    window.location.href = "/docsModify/?saveState=" + saveState+"&file_name=" + doc_name +
-        "&user_id="+userId+"&fileId="+fileId;
+    window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + doc_name +
+        "&user_id=" + userId + "&fileId=" + fileId;
+}
+
+function socketInit() {
+    ws = new WebSocket("ws://47.105.172.29:9001/");
+
+    // 连接WebSocket服务器成功，打开成功
+    ws.onopen = function () {
+        console.log("onopen");
+    };
+
+    // 收到WebSocket服务器数据
+    ws.onmessage = function (e) {
+        // e.data contains received string.
+
+        // 团队中修改的文件的id
+        var data = e.data;
+        data = data.replace(/'/g, '"');
+
+        data = $.parseJSON(data);
+        var cooperation_team_name = data.team_name;   //  团队名称
+        var cooperation_teamId = data.teamId;   //  团队id
+        var cooperation_userId = data.userId;     //  修改的内容
+
+        // 获取当前用户和文件的id
+        var userId = $("#user").attr("userId")
+
+        if (cooperation_teamId == saveState && cooperation_userId != userId) {
+            // 同一个团队的不同用户
+            // 更新文档页面
+            team_file(cooperation_team_name)
+        }
+    };
+
+    // 关闭WebSocket连接
+    ws.onclose = function () {
+        console.log("onclose");
+    };
+
+    // WebSocket连接出现错误
+    ws.onerror = function (e) {
+        console.log("onerror");
+        console.log(e)
+    };
+}
+
+// 发送内容到websocket
+function sendWebsocket(teamId, fileId) {
+
+    // 1:文件已自动保存，团队成员更新页面
+    var userId = $("#user").attr("userId");
+    var team_name = $("#h2").text();
+
+    var send_message = {
+        'team_name': encodeURIComponent(team_name),
+        'userId': userId,
+        'teamId': teamId,
+        'doc_content': ""
+    };
+    ws.send(JSON.stringify(send_message))
 }
