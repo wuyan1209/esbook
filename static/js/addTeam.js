@@ -147,6 +147,7 @@ var title = "<span class='one' style='font-weight: 500;'>文件名</span>\n" +
         "<span class='two'  style='font-weight: 500;margin-top: 15px'>删除时间</span>\n"+"<hr class='hr1'>";
 //回收站
 function bin() {
+    saveState = "my_doc";
     $.ajax({
         url: "/myBin/",
         type: "POST",
@@ -191,6 +192,7 @@ function bin() {
     })
 };
 function appendBin(data) {
+    $("#roleName").val("超级管理员");
     var username=$("#user").text()
     /*清空之前的数据*/
     $("#tab").html("");
@@ -246,11 +248,12 @@ function appendBin(data) {
                 "onclick = \"deleteAll('" + data.message[i][2] + "','" + data.message[i][3] + "')\">" +
                 "<span class=\"icon-search icon-trash\" style='margin-left: 2%'></span>&nbsp;&nbsp;&nbsp;彻底删除</button></li>\n"
             }
-
             html+= "</ul>" +
                 "</div>";
             $("#bin").append(html);
         }
+        $("#inputfiles").removeAttr("disabled")
+        $("#daoru").removeAttr("disabled")
     }
 }
 

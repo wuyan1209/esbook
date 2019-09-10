@@ -142,10 +142,9 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <a id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal"
-                           data-target="#createDocs">文档</a>
-                        <a class="dropdown-item Setup" href="#">表格</a>
-                        <a class="dropdown-item Setup" href="#">幻灯片</a>
+                        <button id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createDocs">文档</button>
+                        <button class="dropdown-item Setup" href="#">表格</button>
+                        <button class="dropdown-item Setup" href="#">幻灯片</button>
                     </div>
                 </div>
 
@@ -169,7 +168,7 @@
 
                             <div class="modal-footer">
                                 <span style="color: red;" id="docNameExist"></span>
-                                <button id="sure_doc" type="button" class="btn btn-primary">
+                                <button id="sure_doc" type="button" class="btn btn-primary" onclick="addFile()">
                                     确定
                                 </button>
 
@@ -388,6 +387,7 @@
                 })
             }
             function appendHtml(data) {
+                $("#roleName").val("超级管理员");
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
                 if (data.status == 2001) {
@@ -422,6 +422,8 @@
                             '</tr>';
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
+                    $("#inputfiles").removeAttr("disabled")
+                    $("#daoru").removeAttr("disabled")
                 }
 
             }
@@ -512,10 +514,10 @@
                     $("#tab").append("<tbody>" + html + "</tbody>");
                      //只读角色不能导入
                     if("只读"==data.roleName){
-                        $("#inputfiles").attr("disabled",true)
+                        $("#inputfiles").attr("disabled",true);
                         $("#daoru").attr("disabled",true)
                     }else{
-                        $("#inputfiles").removeAttr("disabled")
+                        $("#inputfiles").removeAttr("disabled");
                         $("#daoru").removeAttr("disabled")
                     }
                 }
@@ -525,9 +527,9 @@
             $("#dropdownMenuButton").on("click", function () {
                  var roleName=$("#roleName").val();
                  if(roleName=='只读'){
-                     $(".Setup").addClass("disabled");
+                     $(".Setup").attr("disabled",true);
                  }else{
-                     $(".Setup").removeClass("disabled")
+                     $(".Setup").removeAttr("disabled");
                  }
             })
             //阻止浏览器默认右击点击事件

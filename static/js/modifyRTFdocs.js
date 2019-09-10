@@ -40,7 +40,7 @@ $(function () {
     var userId = $("#userId").val();    // 用户的id
     var teamId = $("#teamId").val();    // 团队的id
     content = $("#editor").html();  // 页面加载时获取的文档内容
-    content = $("#editor").html();  // 页面加载时获取的文档内容
+    fileName = $("#docs_title").val();  // 页面加载时获取的文档标题
     var fileId = $("#fileId").val()
 
 
@@ -80,6 +80,9 @@ $(function () {
     // 修改文档名称不能重复
     $("#docs_title").change(function () {
         var docsName = $(this).val();
+        if (docsName == old_doc_title){
+            return
+        }
         $.ajax({
             url: '/docNameExist/',
             type: 'post',
@@ -94,6 +97,9 @@ $(function () {
                 if (data.Exist == "YES") {
                     $("#docs_title").val(old_doc_title);
                     alert("文档名字不能重复，请重新填写")
+                } else {
+                    // 文档名称该表自动保存
+                    modifyDocs()
                 }
             }
         });
@@ -138,7 +144,6 @@ $(function () {
             }
         }, 0);
     });
-
 });
 // socket客户端
 var ws;
@@ -359,7 +364,6 @@ function saveTeamEditor(teamId, fileId) {
     })
 
 }
-
 
 //查看个人版本
 function getEdition() {
