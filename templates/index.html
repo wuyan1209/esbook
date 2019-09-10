@@ -16,8 +16,6 @@
     <!-- chartist CSS -->
     <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">
     <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">
-    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
-          rel="stylesheet">
     <!--This page css - Morris CSS -->
     <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -30,7 +28,7 @@
     <link href="../static/css/index.css" rel="stylesheet">
 </head>
 
-<body class="fix-header fix-sidebar card-no-border">
+<body class="fix-header fix-sidebar card-no-border" onload="socketInit()">
 <!-- ============================================================== -->
 <!-- Preloader - style you can find in spinners.css -->
 <!-- ============================================================== -->
@@ -91,7 +89,7 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user"
-                                 class="profile-pic m-r-10"/><span id="user">{{ request.session.username }}</span></a>
+                                 class="profile-pic m-r-10"/><span id="user" userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
@@ -181,7 +179,7 @@
                 </div>
                 <div>
                     <form method="post" id="myform" action="" enctype="multipart/form-data">
-                        <button class="file" >选择文件
+                        <button class="file">选择文件
                             <input type="file" name="files" id="inputfiles">
                         </button>
                         <input type="submit" value="导入" id="daoru">
@@ -334,7 +332,7 @@
                 my_doc_file()
                 //导入文件操作
                 //判断form提交有内容吗 有提交，没有提示不能点击按钮
-                $("#daoru").on('click', function() {
+                $("#daoru").on('click', function () {
                     var word_file = $("#inputfiles").val();
                     if (word_file == "" || word_file.length == 0) {
                         alert("没有文件导入，请选择文件路径！");
@@ -366,7 +364,7 @@
                                 }
                             } else {
                                 alert(data.message)
-                                window.location.href="/index/"
+                                window.location.href = "/index/"
                             }
                         }
                     })
@@ -554,25 +552,26 @@
                             '</tr>';
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
-                     //只读角色不能导入
-                    if("只读"==data.roleName){
-                        $("#inputfiles").attr("disabled",true)
-                        $("#daoru").attr("disabled",true)
-                    }else{
+                    //只读角色不能导入
+                    if ("只读" == data.roleName) {
+                        $("#inputfiles").attr("disabled", true)
+                        $("#daoru").attr("disabled", true)
+                    } else {
                         $("#inputfiles").removeAttr("disabled")
                         $("#daoru").removeAttr("disabled")
                     }
                 }
 
             }
+
             //只读角色不能新建
             $("#dropdownMenuButton").on("click", function () {
-                 var roleName=$("#roleName").val();
-                 if(roleName=='只读'){
-                     $(".Setup").addClass("disabled");
-                 }else{
-                     $(".Setup").removeClass("disabled")
-                 }
+                var roleName = $("#roleName").val();
+                if (roleName == '只读') {
+                    $(".Setup").addClass("disabled");
+                } else {
+                    $(".Setup").removeClass("disabled")
+                }
             })
             //阻止浏览器默认右击点击事件
             $("#tab").on("contextmenu", "tr", function () {
@@ -593,8 +592,8 @@
                     $("#clickMenu").css("left", e.clientX - 250);
                     $("#clickMenu").css("top", e.clientY - 50);
                 }
-                if( $("#roleName").val()=='只读'){
-                    $("#btnDel").attr("disabled","disabled")
+                if ($("#roleName").val() == '只读') {
+                    $("#btnDel").attr("disabled", "disabled")
                 }
             });
 
@@ -630,7 +629,7 @@
             function renameFiles() {
                 var file_id = $("#clickMenu").attr("file_id");
                 var fileName = $("#renameFile").val();
-
+                var team_name = $("#clickMenu").attr("team_name")
                 var modify_flag = false
                 // 判断文档名称是否为空
                 if (fileName == "" || fileName == null) {
@@ -1152,7 +1151,6 @@
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <!--分页插件-->
 <script src="../static/assets/plugins/bootstrap/js/bootstrap-paginator.js"></script>
-<script src="https://cdn.bootcss.com/tooltip.js/1.3.0/esm/tooltip.min.js"></script>
 <!-- slimscrollbar scrollbar JavaScript -->
 <script src="../static/js/jquery.slimscroll.js"></script>
 <!--Wave Effects -->
