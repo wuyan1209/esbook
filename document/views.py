@@ -38,22 +38,20 @@ def addTeam(request):
             tid = cursor.fetchone()
             if tid:
                 return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
-            # 从session里获取当前登录用户
-            username = request.session.get('username')
-            # 通过用户名获取该用户的id
-            userId = User.objects.get(user_name=username).user_id
+            # 从session里获取当前登录用户的id
+            userId =  request.session.get('userId')
             # 创建保存点
             save_id = transaction.savepoint()
             # 添加协作空间
-            cursor.execute('insert into team(team_name,user_id,date) value(%s,%s,%s)', [teamName, userId, formatTime])
+            cursor.execute('insert into team(team_name,user_id,cre_date) values(%s,%s,%s)', [teamName, userId, formatTime])
             # 把创建协作空间的人员与协作空间关联到第三张表 team_member表
             cursor.execute('select team_id from team  order by team_id desc limit 1')
             row = cursor.fetchall()
-            cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [row[0], userId])
+            cursor.execute('insert into team_member(team_id,user_id) values(%s,%s)', [row[0], userId])
             # 把人员与角色绑定
             cursor.execute('select team_mem_id from team_member order by team_mem_id desc limit 1')
             tmid = cursor.fetchall()
-            cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], 4])
+            cursor.execute('insert into member_role(team_mem_id,role_id) values(%s,%s)', [tmid[0], 4])
             cursor.close()
             # 成功的话保存
             transaction.savepoint_commit(save_id)
@@ -147,7 +145,7 @@ def addMember(request):
             # 创建保存点
             save_id = transaction.savepoint()
             # 把用户添加到协作空间里
-            cursor.execute('insert into team_member(team_id,user_id) value(%s,%s)', [teamId[0], userId[0]])
+            cursor.execute('insert into team_member(team_id,user_id) values(%s,%s)', [teamId[0], userId[0]])
             # 查询插入的协作空间成员的id
             cursor.execute('select team_mem_id from team_member order by team_mem_id desc limit 1')
             tmid = cursor.fetchall()
@@ -155,7 +153,7 @@ def addMember(request):
             cursor.execute('select role_id from role where role_name="' + roleName + '"')
             roleId = cursor.fetchall()
             # 把人员与角色绑定
-            cursor.execute('insert into member_role(team_mem_id,role_id) value(%s,%s)', [tmid[0], roleId[0]])
+            cursor.execute('insert into member_role(team_mem_id,role_id) values(%s,%s)', [tmid[0], roleId[0]])
             # 成功的话保存
             status = 200
             message = '添加成功'
