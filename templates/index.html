@@ -86,7 +86,7 @@
                     <!-- Profile -->
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
+                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="/personal/"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="../static/assets/images/users/1.jpg" alt="user"
                                  class="profile-pic m-r-10"/><span id="user" userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
@@ -192,17 +192,15 @@
                     <table id="tab" class="table table-hover">
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
-                        <ul class="list-group" style="width: 120px">
+                        <ul class="list-group" style="width: 140px">
                             <li class="list-group-item">
-                                <span class="icon-search icon-trash" style='margin-left: 2%'></span>
                                 <button id="btnDel" style="background: 0 0;border: 0;" onclick="delFiles()">
-                                    删除
+                                    <span class="icon-search icon-trash"></span>&nbsp;&nbsp;删除
                                 </button>
                             </li>
                             <li class="list-group-item">
-                                <img src="../static/assets/images/重命名.png" width="16px" height="16px" alt="重命名">
-                                <button id="btnRename" style="background: 0 0;border: 0;" data-toggle="modal"
-                                        data-target="#renameModel">重命名
+                                <button id="btnRename" style="background: 0 0;border: 0;" data-toggle="modal" data-target="#renameModel">
+                                    <img src="../static/assets/images/重命名.png" width="16px" height="16px" alt="重命名">&nbsp;&nbsp;重命名
                                 </button>
                             </li>
                         </ul>
@@ -597,6 +595,10 @@
                 }
                 if ($("#roleName").val() == '只读') {
                     $("#btnDel").attr("disabled", "disabled")
+                    $("#btnRename").attr("disabled", "disabled")
+                }else{
+                    $("#btnDel").removeAttr("disabled")
+                    $("#btnRename").removeAttr("disabled")
                 }
             });
 
