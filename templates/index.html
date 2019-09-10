@@ -191,15 +191,55 @@
             <div id="box2">
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 1.5%">我的文档</h2>
-                    <input hidden id="roleName" />
+                    <input type="hidden" id="roleName"/>
                     <table id="tab" class="table table-hover">
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
-                        <ul class="list-group">
-                            <li class="list-group-item" style="width: 100px"><button id="btnDel"  style="background: 0 0;border: 0;" onclick="delFiles()">删除</button></li>
+                        <ul class="list-group" style="width: 120px">
+                            <li class="list-group-item">
+                                <span class="icon-search icon-trash" style='margin-left: 2%'></span>
+                                <button id="btnDel" style="background: 0 0;border: 0;" onclick="delFiles()">
+                                    删除
+                                </button>
+                            </li>
+                            <li class="list-group-item">
+                                <img src="../static/assets/images/重命名.png" width="16px" height="16px" alt="重命名">
+                                <button id="btnRename" style="background: 0 0;border: 0;" data-toggle="modal"
+                                        data-target="#renameModel">重命名
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <div id="bin"></div>
+                </div>
+                <div class="modal fade" id="renameModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+
+                                <h4 class="modal-title" id="myModalLabel">
+                                    请输入文档标题
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-hidden="true">×
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="renameFile"
+                                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
+                            </div>
+                            <div class="modal-footer">
+                                <span style="color: red;" id="renameExist"></span>
+                                <button type="button" class="btn btn-primary" onclick="renameFiles()">
+                                    重命名
+                                </button>
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
                 </div>
                 <!-- 分页容器： 显示分页按钮-->
                 <div class="fenye" id="Hidden">
@@ -341,6 +381,7 @@
                 "  </thead>"
 
             {#显示我的文档列表#}
+
             function my_doc_file() {
                 $("#bin").html("");
                 $("#h2").text("我的文档");
@@ -387,6 +428,7 @@
                     },
                 })
             }
+
             function appendHtml(data) {
                 $("#tab").html("");
                 $("#tab").append(tableTitle);
@@ -427,6 +469,7 @@
             }
 
             {#团队文档列表#}
+
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#bin").html("");
@@ -474,6 +517,7 @@
                     },
                 })
             }
+
             function appendTable(data) {
                 $("#roleName").val(data.roleName);
                 $("#tab").html("");
@@ -580,6 +624,72 @@
                         }
                     }
                 })
+            }
+
+            //重命名文件
+            function renameFiles() {
+                var file_id = $("#clickMenu").attr("file_id");
+                var fileName = $("#renameFile").val();
+
+                var modify_flag = false
+                // 判断文档名称是否为空
+                if (fileName == "" || fileName == null) {
+                    alert("请输入文件名")
+                    return
+                }
+
+                // 判断文档名称是否重复
+                var teamId = 0
+                if (saveState != "my_doc") {
+                    teamId = saveState;
+                }
+                $.ajax({
+                    url: "/docNameExist/",
+                    type: "POST",
+                    async: false,
+                    data: {docsName: fileName, saveState: saveState, teamId: teamId},
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.Exist == "YES") {
+                            $("#renameExist").text("文件名已存在，请重新输入")
+                            $("#doc_name").val("")
+
+                        } else {
+                            $("#renameExist").text("")
+                            modify_flag = true
+                        }
+                    }
+                });
+                // 文件名不重复，可以创建文档
+                if (modify_flag) {
+                    $.ajax({
+                        url: "/renameFiles/",
+                        type: "post",
+                        data: {file_id: file_id, fileName: fileName},
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.flag == "success") {
+                                $('#renameModel').modal('hide')
+                                if (saveState == "my_doc") {
+                                    // 个人文档刷新
+                                    my_doc_file()
+                                } else {
+                                    // 团队文档刷新
+                                    team_file(team_name)
+                                }
+                            }
+                        }
+                    })
+                }
+                // 关闭模态框清空文档名称
+                $('#renameModel').on('hide.bs.modal', function () {
+                    $("#renameFile").val("")
+                })
+
+                // 输入框获得焦点清除提示内容
+                $("#renameFile").focus(function () {
+                    $("#renameExist").text("")
+                });
             }
 
             // 改变保存状态的值
@@ -824,17 +934,17 @@
 
                             //select值改变时调用函数 参数：option的值、成员角色的id
                             function Change1(value, memRoleId) {
-                                 //获取协作空间名
-                            var teamName = $("#tName").text();
+                                //获取协作空间名
+                                var teamName = $("#tName").text();
                                 if (value == "移除") {
-                                    del(memRoleId,teamName);
+                                    del(memRoleId, teamName);
                                 } else {
-                                    editMemberRole(value, memRoleId,teamName);
+                                    editMemberRole(value, memRoleId, teamName);
                                 }
                             }
 
                             //角色修改
-                            function editMemberRole(value, memRoleId,teamName) {
+                            function editMemberRole(value, memRoleId, teamName) {
                                 $.ajax({
                                     url: "/editMemberRole/",
                                     type: "POST",
@@ -843,7 +953,7 @@
                                         //角色名和协作者角色id
                                         "roleName": value,
                                         "memRoleId": memRoleId,
-                                        "teamName":teamName,
+                                        "teamName": teamName,
                                     },
                                     success: function (data) {
                                         searchTeamUser();
@@ -854,7 +964,7 @@
                             }
 
                             //角色移除
-                            function del(memRoleId,teamName) {
+                            function del(memRoleId, teamName) {
                                 if (confirm("确认要删除？")) {
                                     $.ajax({
                                         url: "/delMemberRole/",
@@ -863,7 +973,7 @@
                                         data: {
                                             //协作者角色id
                                             "memRoleId": memRoleId,
-                                            "teamName":teamName,
+                                            "teamName": teamName,
                                         },
                                         success: function (data) {
                                             searchTeamUser();
@@ -939,17 +1049,17 @@
 
                             //select值改变时调用函数 参数：option的值、成员角色的id
                             function Change2(value, memRoleId) {
-                                 //获取协作空间名
+                                //获取协作空间名
                                 var teamName = $("#tName").text();
                                 if (value == "移除") {
-                                    delAdminRole(memRoleId,teamName)
+                                    delAdminRole(memRoleId, teamName)
                                 } else {
-                                    editAdminRole(value, memRoleId,teamName);
+                                    editAdminRole(value, memRoleId, teamName);
                                 }
                             }
 
                             //管理员角色移除，改为可编辑
-                            function delAdminRole(memRoleId,teamName) {
+                            function delAdminRole(memRoleId, teamName) {
                                 $.ajax({
                                     url: "/delAdminRole/",
                                     type: "POST",
@@ -957,7 +1067,7 @@
                                     data: {
                                         //协作者角色id
                                         "memRoleId": memRoleId,
-                                        "teamName":teamName,
+                                        "teamName": teamName,
                                     },
                                     success: function (data) {
                                         searchTeamUser();
@@ -968,7 +1078,7 @@
                             }
 
                             //角色修改为超管
-                            function editAdminRole(value, memRoleId,teamName) {
+                            function editAdminRole(value, memRoleId, teamName) {
                                 $.ajax({
                                     url: "/editAdminRole/",
                                     type: "POST",
@@ -977,7 +1087,7 @@
                                         //角色名和协作者角色id
                                         "roleName": value,
                                         "memRoleId": memRoleId,
-                                        "teamName":teamName,
+                                        "teamName": teamName,
                                     },
                                     success: function (data) {
                                         alert(data.message)
