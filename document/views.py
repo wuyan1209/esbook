@@ -608,20 +608,23 @@ def myBin(request):
     page = request.POST['page']
     # 获取session的用户
     username = request.session['username']
+    userId = request.session['userId']
     # 每页显示条数
     pageSize = 10
     cursor = connection.cursor()
+    cursor.execute('select file_id from member_file where team_mem_id in(SELECT team_mem_id from team_member where team_id IN (SELECT team_id from team_member where user_id=%s))',[userId])
+    fileIds=cursor.fetchall()
+    fileId=list(chain.from_iterable(fileIds))
+    print(fileId)
     cursor.execute('select count(*) from( '
-                   '(select distinct t.team_name, t.del_date time,t.team_id,t.what from user u, team t, team_member tm'
+                   '(select distinct t.team_name from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
-                                                                                                                            ' UNION'
-                                                                                                                            ' (select f.file_name, f.del_date time,f.file_id,f.type from file f, user u, user_file uf'
-                                                                                                                            ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
-                                                                                                                            ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                 ' UNION'
-                                                                                                                                                                                 ' (select f.file_name, f.del_date time,f.file_id,f.type from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
-                                                                                                                                                                                 ' and f.file_state=1 and u.user_name="' + username + '")'
-                                                                                                                                                                                                                                      ' )t ORDER BY time DESC')
+                   ' UNION'
+                   ' (select f.file_name from file f, user u, user_file uf'
+                   ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
+                    ' and f.file_state=1 and u.user_name="' + username + '")'
+                    ' UNION'
+                    ' (select file_name from file where file_state=1 and file_id in %s))t',[fileId])
     count = cursor.fetchone()[0]  # 总条数
     totalPage = count / pageSize  # 总页数
     if count != 0:
@@ -640,10 +643,8 @@ def myBin(request):
                         ' where f.file_id=uf.file_id and u.user_id=uf.user_id'
                          ' and f.file_state=1 and u.user_name="' + username + '")'
                          ' UNION'
-                        ' (select f.file_name, f.del_date time,f.file_id,f.type,(select user_name from user where user_id=f.del_user) from user u,team_member tm,member_file mf,file f where u.user_id=tm.user_id and tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id'
-                          ' and f.file_state=1 and u.user_name="' + username + '")'
-                          ' )t ORDER BY time DESC limit %s,%s',
-                       [offset, pageSize])
+                        ' (select file_name, del_date time,file_id,type,(select user_name from user where user_id=del_user)from file where file_state=1 and file_id in %s)'
+                       ' )t ORDER BY time DESC limit %s,%s',[fileId, offset, pageSize])
         result = cursor.fetchall()
         cursor.close()
         return JsonResponse(
@@ -1348,3 +1349,8 @@ def renameFiles(request):
     except Exception as e:
         return_param['flag'] = "fail"
     return HttpResponse(json.dumps(return_param))
+
+
+# 上传图片
+def uploadImg(request):
+    return 1
