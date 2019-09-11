@@ -39,7 +39,7 @@ def addTeam(request):
             if tid:
                 return JsonResponse({'status': 10023, 'message': '协作空间名字已被占用，请换个名字'})
             # 从session里获取当前登录用户的id
-            userId =  request.session.get('userId')
+            userId = request.session.get('userId')
             # 创建保存点
             save_id = transaction.savepoint()
             # 添加协作空间
@@ -539,7 +539,7 @@ def delTeam(request):
     # 协作空间的id
     teamId = request.POST.get("teamId")
     # 获取session的用户id
-    userId=request.session['userId']
+    userId = request.session['userId']
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
@@ -825,7 +825,7 @@ def saveEdition(request):
 
     userId = request.session.get('userId')
     content = request.POST.get('content')
-    fileId=request.POST.get('fileId')
+    fileId = request.POST.get('fileId')
     edi_name = request.POST.get('filename')
     # 获取当前时间
     localTime = time.localtime(time.time())
@@ -939,7 +939,7 @@ def register(request):
 def delFiles(request):
     file_id = request.POST.get("file_id")
     # 获取session的userId
-    userId=request.session['userId']
+    userId = request.session['userId']
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
