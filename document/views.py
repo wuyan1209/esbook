@@ -615,7 +615,6 @@ def myBin(request):
     cursor.execute('select file_id from member_file where team_mem_id in(SELECT team_mem_id from team_member where team_id IN (SELECT team_id from team_member where user_id=%s))',[userId])
     fileIds=cursor.fetchall()
     fileId=list(chain.from_iterable(fileIds))
-    print(fileId)
     cursor.execute('select count(*) from( '
                    '(select distinct t.team_name from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
@@ -688,7 +687,6 @@ def deleteAll(request):
                                ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
                                ' and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
                 ediId=cursor.fetchall()
-                print(ediId)
                 # 有版本
                 if ediId:
                     cursor.execute(
@@ -1093,7 +1091,6 @@ def handle_uploaded_file(file_obj, ext):
     filename = "%s%s" % (name, ext)
     localurl = "static/pic/"
     file_path = os.path.join(BASE_DIR, localurl, filename)
-    print(file_path)
     with open(file_path, 'wb+') as f:
         for chunk in file_obj.chunks():
             f.write(chunk)
@@ -1142,12 +1139,6 @@ def getcontent(file_path):
 @transaction.atomic
 def user_upload_file(request):
     userid = request.session.get("userId")
-    # fileobj=request.POST.get('fileobj')
-    # print(fileobj)
-    # filename=fileobj.name
-    # print(filename)
-    # name = fileobj.name.split('.')[0]
-    # print(filename)
     if request.method == "POST":
         files = request.FILES
         if len(files) == 0:
@@ -1298,7 +1289,6 @@ def cooperation_edite(request):
     cursor = connection.cursor()
     cursor.execute("select content from file where file_id = %s", [fileId])
     doc_content = cursor.fetchone()[0]
-    print("doc_content:", doc_content)
     return JsonResponse({'doc_content': doc_content})
 
 

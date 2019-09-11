@@ -282,7 +282,6 @@ $(function () {
             success: function (data) {
                 if (data.flag == "success") {
                     var filePath = data.DocURL;
-                    alert(filePath)
                     window.location.href = "/" + filePath
                 } else {
                     alert("导出失败")
