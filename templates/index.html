@@ -139,8 +139,8 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <button id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createDocs">文档</button>
-                        <button class="dropdown-item Setup" href="#">表格</button>
+                        <button id="toDocs" class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createDocs">文档</button>
+                        <button id="toExcel" class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createExcel">表格</button>
                         <button class="dropdown-item Setup" href="#">幻灯片</button>
                     </div>
                 </div>
@@ -165,7 +165,37 @@
 
                             <div class="modal-footer">
                                 <span style="color: red;" id="docNameExist"></span>
-                                <button id="sure_doc" type="button" class="btn btn-primary" onclick="addFile()">
+                                <button id="sure_doc" type="button" class="btn btn-primary">
+                                    确定
+                                </button>
+
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+                <!-- 新建excel模态框 -->
+                <div class="modal fade" id="createExcel" tabindex="-1" role="dialog" aria-labelledby="myexcelLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myexcelLabel">
+                                    请输入文档名称
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="excel_name"
+                                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
+                            </div>
+
+                            <div class="modal-footer">
+                                <span style="color: red;" id="excelNameExist"></span>
+                                <button id="sure_excel" type="button" class="btn btn-primary">
                                     确定
                                 </button>
 

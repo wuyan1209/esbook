@@ -103,5 +103,9 @@ urlpatterns = [
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
     path('renameFiles/', views.renameFiles),
+    #判断表格名称是否重复
+    path('excelNameExist/',views.excelNameExist),
+    #保存个人excel
+    path('saveuserExcel/',views.saveuserExcel)
 
 ]
