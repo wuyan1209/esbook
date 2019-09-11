@@ -37,6 +37,7 @@ $(function () {
         if (modify_flag) {
             $("#doc_name").val("");
             if (saveState == "my_doc") {
+                // 个人文档
                 $.ajax({
                     url: "/saveDocTest/",
                     type: "POST",
@@ -52,6 +53,7 @@ $(function () {
                     }
                 })
             } else {
+                // 团队文档
                 $.ajax({
                     url: "/saveTeamDoc/",
                     type: "POST",
@@ -177,8 +179,157 @@ $(function () {
     });
 
     socketInit()
+
+    // 删除文件
+    $("#btnDel").on("click", function () {
+        var file_id = $("#clickMenu").attr("file_id");
+        alert(file_id)
+        var team_name = $("#clickMenu").attr("team_name");
+        $.ajax({
+            url: "/delFiles/",
+            type: "post",
+            data: {file_id: file_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.flag == "success") {
+                    // 个人文档刷新
+                    if (saveState == "my_doc") {
+                        my_doc_file()
+                    } else {
+                        // 团队文档刷新
+                        team_file(team_name)
+                    }
+                }
+            }
+        })
+    });
+
+    //重命名文件
+    $("#confirmRename").on("click", function () {
+        var file_id = $("#clickMenu").attr("file_id");
+        alert(file_id)
+        var fileName = $("#renameFile").val();
+        var team_name = $("#clickMenu").attr("team_name")
+        var modify_flag = false
+        // 判断文档名称是否为空
+        if (fileName == "" || fileName == null) {
+            alert("请输入文件名")
+            return
+        }
+
+        // 判断文档名称是否重复
+        var teamId = 0
+        if (saveState != "my_doc") {
+            teamId = saveState;
+        }
+        $.ajax({
+            url: "/docNameExist/",
+            type: "POST",
+            async: false,
+            data: {docsName: fileName, saveState: saveState, teamId: teamId},
+            dataType: "json",
+            success: function (data) {
+                if (data.Exist == "YES") {
+                    $("#renameExist").text("文件名已存在，请重新输入")
+                    $("#doc_name").val("")
+
+                } else {
+                    $("#renameExist").text("")
+                    modify_flag = true
+                }
+            }
+        });
+        // 文件名不重复，可以创建文档
+        if (modify_flag) {
+            $.ajax({
+                url: "/renameFiles/",
+                type: "post",
+                data: {file_id: file_id, fileName: fileName},
+                dataType: "json",
+                success: function (data) {
+                    if (data.flag == "success") {
+                        $('#renameModel').modal('hide')
+                        if (saveState == "my_doc") {
+                            // 个人文档刷新
+                            my_doc_file()
+                        } else {
+                            // 团队文档刷新
+                            team_file(team_name)
+                        }
+                    }
+                }
+            })
+        }
+        // 关闭模态框清空文档名称
+        $('#renameModel').on('hide.bs.modal', function () {
+            $("#renameFile").val("")
+        })
+
+        // 输入框获得焦点清除提示内容
+        $("#renameFile").focus(function () {
+            $("#renameExist").text("")
+        });
+    })
+
+    // 导出文件
+    $("#btnExport").on("click", function () {
+        var file_id = $("#clickMenu").attr("file_id");  // 文件的id
+        $.ajax({
+            url: "/createDocs/",
+            type: "POST",
+            data: {file_id: file_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.flag == "success") {
+                    var filePath = data.DocURL;
+                    alert(filePath)
+                    window.location.href = "/" + filePath
+                } else {
+                    alert("导出失败")
+                }
+            }
+        })
+    });
+
+    //阻止浏览器默认右击点击事件
+    $("#tab").on("contextmenu", "tr", function () {
+        return false;
+    });
+
+    // 绑定右击事件
+    $("#tab").on("mousedown", "tbody tr", function (e) {
+        //右键为3
+        if (3 == e.which) {
+            var file_id = $(this).attr("file_id");
+            var team_name = $(this).attr("teamname");
+            var fileState = $(this).attr("fileState");
+            $("#clickMenu").attr("file_id", file_id);
+            $("#clickMenu").attr("team_name", team_name);
+            $("#clickMenu").attr("fileState", fileState);
+
+            $("#clickMenu").css("display", "block");
+            //var divchild = $(this).children("div");
+            $("#clickMenu").css("left", e.clientX - 250);
+            $("#clickMenu").css("top", e.clientY - 50);
+        }
+        if ($("#roleName").val() == '只读') {
+            $("#btnDel").attr("disabled", "disabled")
+            $("#btnRename").attr("disabled", "disabled")
+            $("#btnExport").attr("disabled", "disabled")
+        } else {
+            $("#btnDel").removeAttr("disabled")
+            $("#btnRename").removeAttr("disabled")
+            $("#btnExport").removeAttr("disabled")
+        }
+    });
+
+    // 点击空白区域隐藏菜单
+    $("body").on("click", function () {
+        $("#clickMenu").css("display", "none");
+    });
 });
 
+// 打开已存在文档
 function toModify(doc_name, userId, fileId) {
     window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + doc_name +
         "&user_id=" + userId + "&fileId=" + fileId;
@@ -231,6 +382,8 @@ function socketInit() {
         console.log("onerror");
         console.log(e)
     };
+
+
 }
 
 // 发送内容到websocket

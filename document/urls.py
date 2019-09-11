@@ -1,5 +1,6 @@
 from django.urls import path
 from document import views
+from document import mkdirDocs
 
 urlpatterns = [
     # 主页面
@@ -103,9 +104,7 @@ urlpatterns = [
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
     path('renameFiles/', views.renameFiles),
-    #判断表格名称是否重复
-    path('excelNameExist/',views.excelNameExist),
-    #保存个人excel
-    path('saveuserExcel/',views.saveuserExcel)
+    # 创建文件
+    path('createDocs/', mkdirDocs.createDocs),
 
 ]
