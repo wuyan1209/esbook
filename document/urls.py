@@ -103,5 +103,8 @@ urlpatterns = [
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
     path('renameFiles/', views.renameFiles),
-
+    # 上传图片
+    path('uploadImg/', views.uploadImg),
+    # 获取个人信息
+    path('getUser/',views.getUser),
 ]
