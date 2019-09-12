@@ -615,7 +615,6 @@ def myBin(request):
     cursor.execute('select file_id from member_file where team_mem_id in(SELECT team_mem_id from team_member where team_id IN (SELECT team_id from team_member where user_id=%s))',[userId])
     fileIds=cursor.fetchall()
     fileId=list(chain.from_iterable(fileIds))
-    print(fileId)
     cursor.execute('select count(*) from( '
                    '(select distinct t.team_name from user u, team t, team_member tm'
                    ' where u.user_id=tm.user_id and t.team_id=tm.team_id and t.team_state=1 and u.user_name="' + username + '")'
@@ -688,7 +687,6 @@ def deleteAll(request):
                                ' and mf.team_mem_id=tm.team_mem_id and mr.team_mem_id=tm.team_mem_id and mf.mem_file_id=me.mem_file_id '
                                ' and me.edi_id=e.edi_id and tm.team_id=t.team_id and t.team_id=' + id)
                 ediId=cursor.fetchall()
-                print(ediId)
                 # 有版本
                 if ediId:
                     cursor.execute(
@@ -1095,7 +1093,6 @@ def handle_uploaded_file(file_obj, ext):
     filename = "%s%s" % (name, ext)
     localurl = "static/pic/"
     file_path = os.path.join(BASE_DIR, localurl, filename)
-    print(file_path)
     with open(file_path, 'wb+') as f:
         for chunk in file_obj.chunks():
             f.write(chunk)
@@ -1144,12 +1141,6 @@ def getcontent(file_path):
 @transaction.atomic
 def user_upload_file(request):
     userid = request.session.get("userId")
-    # fileobj=request.POST.get('fileobj')
-    # print(fileobj)
-    # filename=fileobj.name
-    # print(filename)
-    # name = fileobj.name.split('.')[0]
-    # print(filename)
     if request.method == "POST":
         files = request.FILES
         if len(files) == 0:
@@ -1259,29 +1250,39 @@ def uploadexist(request):
         cursor.execute('select file_name from file f where f.file_id in'
                        ' (select file_id from user_file where user_id = %s)', [userid])
         fileNamas = cursor.fetchall()
-        for fileName in fileNamas:
-            if str(fileName[0]) == filename:
-                status = 200
-                message = "文件名存在，请重新命名"
-                break
-            else:
-                status = 2001
-                message = "文件不存在，可以导入该文件"
+        # 空间没有文件 直接导入
+        if (fileNamas == ()):
+            status = 2001
+            message = "文件不存在，可以导入该文件"
+        else:
+            for fileName in fileNamas:
+                if str(fileName[0]) == filename:
+                    status = 200
+                    message = "文件名存在，请重新命名"
+                    break
+                else:
+                    status = 2001
+                    message = "文件不存在，可以导入该文件"
     else:
         # 团队文档的名称是否重复
         cursor.execute("select file_name from file f, member_file mf "
                        "where f.file_id = mf.file_id and mf.team_mem_id in "
                        "(select team_mem_id from team_member where team_id = %s)", [teamId])
         fileNamas = cursor.fetchall()
-        for fileName in fileNamas:
-            if str(fileName[0]) == filename:
-                status = 200
-                message = "文件名存在，请重新命名"
-                break
-            else:
-                status = 2001
-                message = "文件不存在，可以导入该文件"
-    return JsonResponse({"status": status, "message": message})
+        if (fileNamas == ()):
+            status = 2001
+            message = "文件不存在，可以导入该文件"
+            return JsonResponse({"status": status, "message": message})
+        else:
+            for fileName in fileNamas:
+                if str(fileName[0]) == filename:
+                    status = 200
+                    message = "文件名存在，请重新命名"
+                    break
+                else:
+                    status = 2001
+                    message = "文件不存在，可以导入该文件"
+            return JsonResponse({"status": status, "message": message})
 
 
 # 协作编辑
@@ -1290,7 +1291,6 @@ def cooperation_edite(request):
     cursor = connection.cursor()
     cursor.execute("select content from file where file_id = %s", [fileId])
     doc_content = cursor.fetchone()[0]
-    print("doc_content:", doc_content)
     return JsonResponse({'doc_content': doc_content})
 
 
@@ -1381,3 +1381,90 @@ def getUser(request):
     cursor.execute('select user_id, user_name, email, phone, icon, cre_date from user where user_id=%s',[userId])
     result=cursor.fetchone()
     return JsonResponse({"result":result})
+
+#判断excel名字是否重复
+def excelNameExist(request):
+    excelName = request.POST.get('excelName')  # 获取文档标题
+    saveState = request.POST.get('saveState')  # 获取文档状态
+    userId = request.session.get('userId')
+    teamId = request.POST.get('teamId')  # 获取团队Id
+
+    return_param = {}
+    # 从数据库中查询文档标题
+    cursor = connection.cursor()
+    if saveState == "my_doc":
+        # 个人文档的名称是否重复
+        cursor.execute('select file_name,type from file f where f.file_id in'
+                       ' (select file_id from user_file where user_id = %s )', [userId])
+        fileNamas = cursor.fetchall()
+        for fileName in fileNamas:
+            if str(fileName[0]) == excelName:
+                return_param['Exist'] = "YES"
+                break
+            else:
+                return_param['Exist'] = "No"
+    else:
+        # 团队文档的名称是否重复
+        cursor.execute("select file_name,type from file f, member_file mf "
+                       "where f.file_id = mf.file_id and mf.team_mem_id in "
+                       "(select team_mem_id from team_member where team_id = %s)", [teamId])
+        fileNamas = cursor.fetchall()
+        for fileName in fileNamas:
+            if str(fileName[0]) == excelName:
+                return_param['Exist'] = "YES"
+                break
+            else:
+                return_param['Exist'] = "No"
+    return HttpResponse(json.dumps(return_param))
+
+#保存个人excel
+@transaction.atomic
+def saveuserExcel(request):
+    excel_content = request.POST.get('excel_content')  # 文档内容
+    excel_title = request.POST.get('excel_title')  # 文档标题
+    userId = request.session.get("userId")
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    return_param = {}
+    # 创建保存点
+    save_id = transaction.savepoint()
+    try:
+        # 数据库更新
+        cursor = connection.cursor()
+        cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,1)",
+                       [excel_title, excel_content, formatTime])
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [excel_title])
+        file_id = cursor.fetchone()
+
+        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, file_id])
+        return_param['saveStatus'] = "success"
+        return_param['userId'] = userId
+        return_param['fileId'] = file_id[0]
+        transaction.savepoint_commit(save_id)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(save_id)
+    return HttpResponse(json.dumps(return_param))
+
+# 修改excel
+def excelModify(request):
+    file_name = request.GET.get("file_name")  # 获取文件名称
+    fileId = request.GET.get("fileId")  # 获取文件id
+    saveState = request.GET.get("saveState")  # 获取文件状态
+    roleName = request.GET.get("roleName")  # 获取该用户对此文件的角色
+    user_id = request.GET.get("user_id")
+
+    cursor = connection.cursor()
+    cursor.execute('select content from file f '
+                   'where f.file_id = %s',
+                   [fileId])
+    excel_content = cursor.fetchone()[0]
+    request.session["file_name"] = file_name
+    request.session["excel_content"] = excel_content
+    request.session["file_id"] = fileId
+    request.session["roleName"] = roleName
+    return render(request, "excel.html", {"saveState": saveState})
+

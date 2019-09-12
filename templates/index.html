@@ -89,6 +89,11 @@
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="/personal/">
                             <img src="../static/assets/images/users/{{request.session.icon}}" alt="user"
                                  class="profile-pic m-r-10"/><span id="user" userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
+
+                            <img src="../static/assets/images/users/1.jpg" alt="user"
+                                 class="profile-pic m-r-10"/><span id="user"
+                                                                   userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
+
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
@@ -140,7 +145,7 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
                         <button id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createDocs">文档</button>
-                        <button class="dropdown-item Setup" href="#">表格</button>
+                        <button id="toExcel " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createExcel">表格</button>
                         <button class="dropdown-item Setup" href="#">幻灯片</button>
                     </div>
                 </div>
@@ -175,6 +180,36 @@
                         </div><!-- /.modal-content -->
                     </div><!-- /.modal -->
                 </div>
+                    <!-- 新建文档模态框 -->
+                <div class="modal fade" id="createExcel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="excel-title" id="myModalLabel">
+                                    请输入文档名称
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="excel_title"
+                                       onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
+                            </div>
+
+                            <div class="modal-footer">
+                                <span style="color: red;" id="excelNameExist"></span>
+                                <button id="sure_excel" type="button" class="btn btn-primary" >
+                                    确定
+                                </button>
+
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
                 <div>
                     <form method="post" id="myform" action="" enctype="multipart/form-data">
                         <button class="file">选择文件
@@ -193,12 +228,18 @@
                     <div id="clickMenu" style="display: none;position:absolute;">
                         <ul class="list-group" style="width: 140px">
                             <li class="list-group-item">
-                                <button id="btnDel" style="background: 0 0;border: 0;" onclick="delFiles()">
+                                <button id="btnDel" style="background: 0 0;border: 0;">
                                     <span class="icon-search icon-trash"></span>&nbsp;&nbsp;删除
                                 </button>
                             </li>
                             <li class="list-group-item">
-                                <button id="btnRename" style="background: 0 0;border: 0;" data-toggle="modal" data-target="#renameModel">
+                                <button id="btnExport" style="background: 0 0;border: 0;">
+                                    <img src="../static/assets/images/导出.png" width="16px" height="16px" alt="导出">&nbsp;&nbsp;导出
+                                </button>
+                            </li>
+                            <li class="list-group-item">
+                                <button id="btnRename" style="background: 0 0;border: 0;" data-toggle="modal"
+                                        data-target="#renameModel">
                                     <img src="../static/assets/images/重命名.png" width="16px" height="16px" alt="重命名">&nbsp;&nbsp;重命名
                                 </button>
                             </li>
@@ -225,7 +266,7 @@
                             </div>
                             <div class="modal-footer">
                                 <span style="color: red;" id="renameExist"></span>
-                                <button type="button" class="btn btn-primary" onclick="renameFiles()">
+                                <button type="button" class="btn btn-primary" id="confirmRename">
                                     重命名
                                 </button>
                                 <button type="button" class="btn btn-default"
@@ -437,7 +478,7 @@
                     for (var i = 0; i < data.list.length; i++) {
                         var text = data.list[i][2];
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                        html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\">\n';
+                        html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" fileState=\"' + data.list[i][5] + '\">\n';
                         /*word*/
                         var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
@@ -529,7 +570,7 @@
                     for (i = 0; i < data.list.length; i++) {
                         var text = data.list[i][6];
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
-                        html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\">\n'
+                        html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\" fileState=\"' + data.list[i][8] + '\">\n'
                         /*word*/
                         var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
@@ -552,11 +593,11 @@
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
 
-                     //只读角色不能导入
-                    if("只读"==data.roleName){
-                        $("#inputfiles").attr("disabled",true);
-                        $("#daoru").attr("disabled",true)
-                    }else{
+                    //只读角色不能导入
+                    if ("只读" == data.roleName) {
+                        $("#inputfiles").attr("disabled", true);
+                        $("#daoru").attr("disabled", true)
+                    } else {
                         $("#inputfiles").removeAttr("disabled");
                         $("#daoru").removeAttr("disabled")
                     }
@@ -566,134 +607,13 @@
 
             //只读角色不能新建
             $("#dropdownMenuButton").on("click", function () {
-                 var roleName=$("#roleName").val();
-                 if(roleName=='只读'){
-                     $(".Setup").attr("disabled",true);
-                 }else{
-                     $(".Setup").removeAttr("disabled");
-                 }
+                var roleName = $("#roleName").val();
+                if (roleName == '只读') {
+                    $(".Setup").attr("disabled", true);
+                } else {
+                    $(".Setup").removeAttr("disabled");
+                }
             })
-            //阻止浏览器默认右击点击事件
-            $("#tab").on("contextmenu", "tr", function () {
-                return false;
-            });
-
-            // 绑定右击事件
-            $("#tab").on("mousedown", "tbody tr", function (e) {
-                //右键为3
-                if (3 == e.which) {
-                    var file_id = $(this).attr("file_id");
-                    var team_name = $(this).attr("teamname");
-                    $("#clickMenu").attr("file_id", file_id)
-                    $("#clickMenu").attr("team_name", team_name)
-
-                    $("#clickMenu").css("display", "block");
-                    //var divchild = $(this).children("div");
-                    $("#clickMenu").css("left", e.clientX - 250);
-                    $("#clickMenu").css("top", e.clientY - 50);
-                }
-                if ($("#roleName").val() == '只读') {
-                    $("#btnDel").attr("disabled", "disabled")
-                    $("#btnRename").attr("disabled", "disabled")
-                }else{
-                    $("#btnDel").removeAttr("disabled")
-                    $("#btnRename").removeAttr("disabled")
-                }
-            });
-
-            // 点击空白区域隐藏菜单
-            $("body").on("click", function () {
-                $("#clickMenu").css("display", "none");
-            })
-
-            // 删除文件
-            function delFiles() {
-                var file_id = $("#clickMenu").attr("file_id")
-                var team_name = $("#clickMenu").attr("team_name")
-                $.ajax({
-                    url: "/delFiles/",
-                    type: "post",
-                    data: {file_id: file_id},
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.flag == "success") {
-                            // 个人文档刷新
-                            if (saveState == "my_doc") {
-                                my_doc_file()
-                            } else {
-                                // 团队文档刷新
-                                team_file(team_name)
-                            }
-                        }
-                    }
-                })
-            }
-
-            //重命名文件
-            function renameFiles() {
-                var file_id = $("#clickMenu").attr("file_id");
-                var fileName = $("#renameFile").val();
-                var team_name = $("#clickMenu").attr("team_name")
-                var modify_flag = false
-                // 判断文档名称是否为空
-                if (fileName == "" || fileName == null) {
-                    alert("请输入文件名")
-                    return
-                }
-
-                // 判断文档名称是否重复
-                var teamId = 0
-                if (saveState != "my_doc") {
-                    teamId = saveState;
-                }
-                $.ajax({
-                    url: "/docNameExist/",
-                    type: "POST",
-                    async: false,
-                    data: {docsName: fileName, saveState: saveState, teamId: teamId},
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.Exist == "YES") {
-                            $("#renameExist").text("文件名已存在，请重新输入")
-                            $("#doc_name").val("")
-
-                        } else {
-                            $("#renameExist").text("")
-                            modify_flag = true
-                        }
-                    }
-                });
-                // 文件名不重复，可以创建文档
-                if (modify_flag) {
-                    $.ajax({
-                        url: "/renameFiles/",
-                        type: "post",
-                        data: {file_id: file_id, fileName: fileName},
-                        dataType: "json",
-                        success: function (data) {
-                            if (data.flag == "success") {
-                                $('#renameModel').modal('hide')
-                                if (saveState == "my_doc") {
-                                    // 个人文档刷新
-                                    my_doc_file()
-                                } else {
-                                    // 团队文档刷新
-                                    team_file(team_name)
-                                }
-                            }
-                        }
-                    })
-                }
-                // 关闭模态框清空文档名称
-                $('#renameModel').on('hide.bs.modal', function () {
-                    $("#renameFile").val("")
-                })
-
-                // 输入框获得焦点清除提示内容
-                $("#renameFile").focus(function () {
-                    $("#renameExist").text("")
-                });
-            }
 
             // 改变保存状态的值
             function changeSaveState(teamId, teamName) {
