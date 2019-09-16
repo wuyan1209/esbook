@@ -183,7 +183,6 @@ $(function () {
     // 删除文件
     $("#btnDel").on("click", function () {
         var file_id = $("#clickMenu").attr("file_id");
-        alert(file_id)
         var team_name = $("#clickMenu").attr("team_name");
         $.ajax({
             url: "/delFiles/",
@@ -207,7 +206,6 @@ $(function () {
     //重命名文件
     $("#confirmRename").on("click", function () {
         var file_id = $("#clickMenu").attr("file_id");
-        alert(file_id)
         var fileName = $("#renameFile").val();
         var team_name = $("#clickMenu").attr("team_name")
         var modify_flag = false
