@@ -112,8 +112,14 @@
             <!-- Sidebar navigation-->
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                    <li data-id="center" class="waves-effect waves-dark"><i
-                            class="icon-search icon-book-open"></i><span>我的文档</span></li>
+                    <li data-id="center" class="waves-effect waves-dark" id="my_docs">
+                        <i class="icon-search icon-book-open"></i>
+                        <span>我的文档</span>
+                    </li>
+                    <li data-id="center" class="waves-effect waves-dark" id="my_collection">
+                        <img src="../static/assets/images/收藏夹.png" width="16px" height="16px" alt="我的收藏">
+                        <span>我的收藏</span>
+                    </li>
                 </ul>
                 <ul id="side">
                     <!--协作空间列表-->
@@ -139,8 +145,12 @@
                             style="margin-top:5px;padding: 8px 50px">新建
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center">
-                        <button id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createDocs">文档</button>
-                        <button id="toExcel " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal" data-target="#createExcel">表格</button>
+                        <button id="toDocs " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal"
+                                data-target="#createDocs">文档
+                        </button>
+                        <button id="toExcel " class="dropdown-item Setup" href="javascript:void(0)" data-toggle="modal"
+                                data-target="#createExcel">表格
+                        </button>
                         <button class="dropdown-item Setup" href="#">幻灯片</button>
                     </div>
                 </div>
@@ -175,7 +185,7 @@
                         </div><!-- /.modal-content -->
                     </div><!-- /.modal -->
                 </div>
-                    <!-- 新建文档模态框 -->
+                <!-- 新建文档模态框 -->
                 <div class="modal fade" id="createExcel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                      aria-hidden="true">
                     <div class="modal-dialog">
@@ -195,7 +205,7 @@
 
                             <div class="modal-footer">
                                 <span style="color: red;" id="excelNameExist"></span>
-                                <button id="sure_excel" type="button" class="btn btn-primary" >
+                                <button id="sure_excel" type="button" class="btn btn-primary">
                                     确定
                                 </button>
 
@@ -221,7 +231,7 @@
                     <table id="tab" class="table table-hover">
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
-                        <ul class="list-group" style="width: 140px">
+                        <ul class="list-group" style="width: 150px">
                             <li class="list-group-item">
                                 <button id="btnDel" style="background: 0 0;border: 0;">
                                     <span class="icon-search icon-trash"></span>&nbsp;&nbsp;删除
@@ -230,6 +240,13 @@
                             <li class="list-group-item">
                                 <button id="btnExport" style="background: 0 0;border: 0;">
                                     <img src="../static/assets/images/导出.png" width="16px" height="16px" alt="导出">&nbsp;&nbsp;导出
+                                </button>
+                            </li>
+                            <li class="list-group-item">
+                                <button id="btnCollection" style="background: 0 0;border: 0;">
+                                    <img id="btnColImg" src="../static/assets/images/未收藏.png" style="margin-right: 9px"
+                                         width="16px" height="16px" alt="导出">
+                                    <sapn id="flag">收藏</sapn>
                                 </button>
                             </li>
                             <li class="list-group-item">
@@ -355,13 +372,22 @@
         <script>
             $(function () {
                 saveState = "my_doc";
-                {#点击我的文档显示个人文档列表#}
-                $("#sidebarnav").on("click", function () {
+
+                //点击我的文档显示个人文档列表
+                $("#my_docs").on("click", function () {
                     // 设置保存状态
                     saveState = "my_doc";
                     my_doc_file()
-                })
-                my_doc_file()
+                });
+                my_doc_file();
+
+                //点击我的收藏显示我的收藏列表
+                $("#my_collection").on("click", function () {
+                    // 设置保存状态
+                    saveState = "my_collection";
+                    myCollectionFiles()
+                });
+
                 //导入文件操作
                 //判断form提交有内容吗 有提交，没有提示不能点击按钮
                 $("#daoru").on('click', function () {
@@ -495,13 +521,67 @@
                             '</tr>';
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
-                    $("#inputfiles").removeAttr("disabled")
-                    $("#daoru").removeAttr("disabled")
+                    if (saveState == "my_doc") {
+                        $("#dropdownMenuButton").attr("disabled", false);
+                        $("#inputfiles").removeAttr("disabled");
+                        $("#daoru").removeAttr("disabled");
+                    } else {
+                        $("#dropdownMenuButton").attr("disabled", true);
+                        $("#inputfiles").attr("disabled", true);
+                        $("#daoru").attr("disabled", true)
+                    }
+
                 }
 
             }
 
-            {#团队文档列表#}
+            function myCollectionFiles() {
+                $("#bin").html("");
+                $("#h2").text("我的收藏");
+                $.ajax({
+                    url: "/openMyCollection/",
+                    type: "POST",
+                    dataType: "json",
+                    data: {page: '1'}, //参数：当前页为1
+                    success: function (data) {
+                        appendHtml(data);
+                        var options = {//根据后台返回的分页相关信息，设置插件参数
+                            bootstrapMajorVersion: 3, //如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
+                            currentPage: data.page, //当前页数
+                            totalPages: data.totalPage, //总页数
+                            numberOfPages: data.pageSize,//每页记录数
+                            itemTexts: function (type, page, current) {//设置分页按钮显示字体样式
+                                switch (type) {
+                                    case "first":
+                                        return "首页";
+                                    case "prev":
+                                        return "上一页";
+                                    case "next":
+                                        return "下一页";
+                                    case "last":
+                                        return "末页";
+                                    case "page":
+                                        return page;
+                                }
+                            },
+                            onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
+                                $.ajax({//根据page去后台加载数据
+                                    url: "/filelist/",
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {"page": page},
+                                    success: function (data) {
+                                        appendHtml(data);//处理数据
+                                    }
+                                });
+                            }
+                        };
+                        $('#mypage').bootstrapPaginator(options);//设置分页
+                    }
+                })
+            }
+
+            //团队文档列表
 
             function team_file(teamName) {
                 //点击查询清空之前的数据
