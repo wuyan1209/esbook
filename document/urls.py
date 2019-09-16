@@ -103,6 +103,10 @@ urlpatterns = [
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
     path('renameFiles/', views.renameFiles),
+    # 上传图片
+    path('uploadImg/', views.uploadImg),
+    # 获取个人信息
+    path('getUser/',views.getUser),
     # 创建文件
     path('createDocs/', mkdirDocs.createDocs),
     # 判断表格名称是否重复

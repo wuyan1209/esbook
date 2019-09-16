@@ -122,3 +122,4 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/assets/images/users').replace("\\","/") # media即为图片上传的根路径

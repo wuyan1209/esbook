@@ -3,16 +3,16 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import connection, transaction
 from django.contrib.auth.hashers import make_password, check_password
-from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
 import os
 from itertools import chain
+from esbook.settings import BASE_DIR, MEDIA_ROOT
+import uuid
+
+
 
 # 跳转到主页面
-from esbook.settings import BASE_DIR
-
-
 def index(request):
     return render(request, 'index.html')
 
@@ -1040,7 +1040,7 @@ def userLogin(request):
     if userName.find("@") == -1:  # -1代表找不到  0代表找到
         # 手机号登录
         # 判断用户是否存在
-        cursor.execute('select user_id,user_name,password from user where phone=' + userName)
+        cursor.execute('select user_id,user_name,password,icon from user where phone=' + userName)
         user = cursor.fetchone()
         if user:
             # 判断密码是否正确
@@ -1049,6 +1049,7 @@ def userLogin(request):
                 # 用户存session
                 request.session['username'] = user[1]
                 request.session['userId'] = user[0]
+                request.session['icon'] = user[3]
                 return HttpResponseRedirect('/index/')  # 跳转到主界面
             else:
                 return render(request, 'login.html', {"error": "密码错误"})
@@ -1057,7 +1058,7 @@ def userLogin(request):
     else:
         # 邮箱登录
         # 判断用户是否存在
-        cursor.execute('select user_id,user_name,password from user where email=%s', [userName])
+        cursor.execute('select user_id,user_name,password,icon from user where email=%s', [userName])
         user = cursor.fetchone()
         if user:
             # 判断密码是否正确
@@ -1066,6 +1067,7 @@ def userLogin(request):
                 # 用户存session
                 request.session['username'] = user[1]
                 request.session['userId'] = user[0]
+                request.session['icon']=user[3]
                 return HttpResponseRedirect('/index/')  # 跳转到主界面
             else:
                 return render(request, 'login.html', {"error": "密码错误"})
@@ -1353,7 +1355,32 @@ def renameFiles(request):
 
 # 上传图片
 def uploadImg(request):
-    return 1
+    # 获取文件
+    f1 = request.FILES['pic']
+    # 通过uuid为文件重命名
+    name=str(uuid.uuid1())+"."+f1.name.split('.')[1]
+    # 项目里的绝对路径
+    fname = os.path.join(MEDIA_ROOT, name)
+    # 上传到项目
+    with open(fname, 'wb+') as pic:
+        for c in f1.chunks():
+            pic.write(c)
+    # 把头像路径添加到数据库
+    cursor=connection.cursor()
+    userId=request.session['userId']
+    cursor.execute('update user set icon=%s where user_id=%s',[name,userId])
+    cursor.close()
+    request.session['icon']=name;
+    # 重定向到个人中心
+    return HttpResponseRedirect('/personal/')
+
+# 获取个人信息
+def getUser(request):
+    userId=request.session['userId']
+    cursor=connection.cursor()
+    cursor.execute('select user_id, user_name, email, phone, icon, cre_date from user where user_id=%s',[userId])
+    result=cursor.fetchone()
+    return JsonResponse({"result":result})
 
 #判断excel名字是否重复
 def excelNameExist(request):
@@ -1440,3 +1467,4 @@ def excelModify(request):
     request.session["file_id"] = fileId
     request.session["roleName"] = roleName
     return render(request, "excel.html", {"saveState": saveState})
+

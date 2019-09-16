@@ -87,9 +87,13 @@
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="/personal/">
+                            <img src="../static/assets/images/users/{{request.session.icon}}" alt="user"
+                                 class="profile-pic m-r-10"/><span id="user" userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
+
                             <img src="../static/assets/images/users/1.jpg" alt="user"
                                  class="profile-pic m-r-10"/><span id="user"
                                                                    userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
+
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
