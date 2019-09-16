@@ -1,6 +1,5 @@
 from django.urls import path
-from document import views
-from document import mkdirDocs
+from document import views, mkdirDocs, clickMenu, nav
 
 urlpatterns = [
     # 主页面
@@ -98,8 +97,8 @@ urlpatterns = [
     path('uploadexist/', views.uploadexist),
     # 协作编辑
     path('cooperation_edite/', views.cooperation_edite),
-    #Excel
-    path('excel/',views.showrxcel),
+    # Excel
+    path('excel/', views.showrxcel),
     # 还原
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
@@ -107,8 +106,14 @@ urlpatterns = [
     # 创建文件
     path('createDocs/', mkdirDocs.createDocs),
     # 判断表格名称是否重复
-    path('excelNameExist/',views.excelNameExist),
-    #保存个人excel
-    path('saveuserExcel/',views.saveuserExcel)
+    path('excelNameExist/', views.excelNameExist),
+    # 保存个人excel
+    path('saveuserExcel/', views.saveuserExcel),
+    # 收藏文件
+    path('collectionFiles/', clickMenu.collectionFiles),
+    # 查询文件是否已收藏
+    path('selCollectionFiles/', clickMenu.selCollectionFiles),
+    # 打开我的收藏
+    path('openMyCollection/', nav.openMyCollection),
 
 ]

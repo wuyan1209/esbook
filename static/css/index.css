@@ -111,20 +111,31 @@
 .search-show {
     margin-left: 25px;
 }
+
 #search-results-show img {
     margin-right: 5px;
 }
 
-#box2 h2{
+#box2 h2 {
     margin: 5% 0 2% 2%
 }
-.fenye{
+
+.fenye {
     margin-left: 40%;
 }
+
 .fenye > ul > li > a {
     font-size: 20px;
-    display:block;
+    display: block;
     text-align: center;
     border: 1px solid;
     width: 80px;
+}
+
+.liHover {
+    background: #e0e2e2;
+}
+
+.collection {
+    color: red;
 }

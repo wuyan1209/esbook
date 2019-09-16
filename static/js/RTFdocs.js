@@ -74,7 +74,7 @@ $(function () {
         }
     });
 
-     // excel
+    // excel
     $("#sure_excel").on("click", function () {
         var excel_name = $("#excel_name").val();
         var excelflag = false
@@ -97,14 +97,14 @@ $(function () {
                 excelName: excel_name,
                 saveState: saveState,
                 teamId: teamId,
-              },
+            },
             dataType: "json",
             success: function (data) {
                 if (data.Exist == "YES") {
                     $("#excelNameExist").text("文件名已存在，请重新输入")
                     $("#excel_name").val("")
                 }
-                 if (data.Exist == "No"){
+                if (data.Exist == "No") {
                     $("#excelNameExist").text("");
                     excelflag = true;
                 }
@@ -164,7 +164,7 @@ $(function () {
         $("#doc_name").val("")
     })
 
-     // 关闭模态框清空文档名称
+    // 关闭模态框清空文档名称
     $('#createExcel').on('hide.bs.modal', function () {
         $("#excel_name").val("")
     })
@@ -302,6 +302,22 @@ $(function () {
             var file_id = $(this).attr("file_id");
             var team_name = $(this).attr("teamname");
             var fileState = $(this).attr("fileState");
+            $.ajax({
+                url: "/selCollectionFiles/",
+                type: "POST",
+                data: {file_id: file_id},
+                dataType: "json",
+                success: function (data) {
+                    if (data.state == "exist") {
+                        $("#flag").text("取消收藏");
+                        $("#btnColImg").attr("src", "../static/assets/images/已收藏.png")
+                    } else {
+                        $("#flag").text("收藏");
+                        $("#btnColImg").attr("src", "../static/assets/images/未收藏.png")
+                    }
+                }
+            });
+
             $("#clickMenu").attr("file_id", file_id);
             $("#clickMenu").attr("team_name", team_name);
             $("#clickMenu").attr("fileState", fileState);
@@ -326,6 +342,35 @@ $(function () {
     $("body").on("click", function () {
         $("#clickMenu").css("display", "none");
     });
+
+    // 右键菜单鼠标悬浮阴影
+    $("#clickMenu li").hover(function () {
+        $(this).addClass("liHover");
+    }, function () {
+        $(this).removeClass("liHover");
+    });
+
+    // 收藏文档
+    $("#btnCollection").parent().on("click", function () {
+        var text = $("#flag").text();
+        var file_id = $("#clickMenu").attr("file_id");
+        $.ajax({
+            url: "/collectionFiles/",
+            data: {text: text, file_id: file_id},
+            type: "POST",
+            dataType: "",
+            success: function (data) {
+                if (data.flag == "success") {
+                    if (text != "收藏") {
+                        if (saveState == "my_collection") {
+                            myCollectionFiles()
+                        }
+                    }
+                }
+            }
+        })
+
+    })
 });
 
 // 打开已存在文档
