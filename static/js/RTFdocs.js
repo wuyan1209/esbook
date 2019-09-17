@@ -74,99 +74,16 @@ $(function () {
         }
     });
 
-    // excel
-    $("#sure_excel").on("click", function () {
-        var excel_name = $("#excel_name").val();
-        var excelflag = false
-        // 判断文档名称是否为空
-        if (excel_name == "" || excel_name == null) {
-            alert("请输入文件名")
-            return;
-        }
-
-        // 判断文档名称是否重复
-        var teamId = 0
-        if (saveState != "my_doc") {
-            teamId = saveState;
-        }
-        $.ajax({
-            url: "/excelNameExist/",
-            type: "POST",
-            async: false,
-            data: {
-                excelName: excel_name,
-                saveState: saveState,
-                teamId: teamId,
-            },
-            dataType: "json",
-            success: function (data) {
-                if (data.Exist == "YES") {
-                    $("#excelNameExist").text("文件名已存在，请重新输入")
-                    $("#excel_name").val("")
-                }
-                if (data.Exist == "No") {
-                    $("#excelNameExist").text("");
-                    excelflag = true;
-                }
-            }
-        });
-        // 文件名不重复，可以创建文档
-        if (excelflag) {
-            $("#excel_name").val("");
-            if (saveState == "my_doc") {
-                $.ajax({
-                    url: "/saveuserExcel/",
-                    type: "POST",
-                    data: {
-                        excel_title: excel_name,
-                        excel_content: "",
-                    },
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.saveStatus == "success") {
-                            toExcel(excel_name, data.userId, data.fileId)
-                        }
-                    }
-                })
-            } else {
-                $.ajax({
-                    url: "/saveTeamExcel/",
-                    type: "POST",
-                    data: {
-                        doc_title: excel_name,
-                        doc_content: "",
-                        teamId: saveState
-                    },
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.saveStatus == "success") {
-                            sendWebsocket(saveState, data.fileId)
-                            toExcel(excel_name, 0, data.fileId)
-                        }
-                    }
-                })
-            }
-        }
-    });
 
     // 输入框获得焦点清除提示内容
     $("#doc_name").focus(function () {
         $("#docNameExist").text("")
     });
 
-    // 输入框获得焦点清除提示内容
-    $("#excel_name").focus(function () {
-        $("#excelNameExist").text("")
-    });
 
     // 关闭模态框清空文档名称
     $('#createDocs').on('hide.bs.modal', function () {
         $("#doc_name").val("")
-    })
-
-    // 关闭模态框清空文档名称
-    $('#createExcel').on('hide.bs.modal', function () {
-        $("#excel_name").val("")
     })
 
     // 判断用户名是否重复
@@ -183,7 +100,6 @@ $(function () {
     // 删除文件
     $("#btnDel").on("click", function () {
         var file_id = $("#clickMenu").attr("file_id");
-        alert(file_id)
         var team_name = $("#clickMenu").attr("team_name");
         $.ajax({
             url: "/delFiles/",
@@ -207,7 +123,6 @@ $(function () {
     //重命名文件
     $("#confirmRename").on("click", function () {
         var file_id = $("#clickMenu").attr("file_id");
-        alert(file_id)
         var fileName = $("#renameFile").val();
         var team_name = $("#clickMenu").attr("team_name")
         var modify_flag = false
