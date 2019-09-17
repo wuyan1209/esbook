@@ -98,8 +98,8 @@ urlpatterns = [
     path('uploadexist/', views.uploadexist),
     # 协作编辑
     path('cooperation_edite/', views.cooperation_edite),
-    #Excel
-    path('excel/',views.showrxcel),
+    # Excel
+    path('excel/', views.showrxcel),
     # 还原
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
@@ -107,8 +107,12 @@ urlpatterns = [
     # 创建文件
     path('createDocs/', mkdirDocs.createDocs),
     # 判断表格名称是否重复
-    path('excelNameExist/',views.excelNameExist),
-    #保存个人excel
-    path('saveuserExcel/',views.saveuserExcel)
+    path('excelNameExist/', views.excelNameExist),
+    # 保存个人excel
+    path('saveuserExcel/', views.saveuserExcel),
+    # 跳转到excel页面
+    path('excelModify/', views.excelModify),
+    #保存excel内容
+    path('saveExcel/',views.saveExcel),
 
 ]
