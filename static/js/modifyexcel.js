@@ -64,8 +64,7 @@ $("#sure_excel").on("click", function () {
                 dataType: "json",
                 success: function (data) {
                     if (data.saveStatus == "success") {
-                        sendWebsocket(saveState, data.fileId)
-                        toExcel(excel_name, 0, data.fileId,data.roleName)
+                        toExcel(excel_name,data.userId, data.fileId,data.roleName)
                     }
                 }
             })
@@ -102,7 +101,7 @@ function toExcel(excel_name, userId, fileId,roleName) {
         var a=getTableData();
         //将数组转换为字符串格式
         excel_content=getExcelcontent(a)
-        console.log(excel_content)
+
         //将数据保存到数据库中
         $.ajax({
             type: 'POST',
@@ -161,3 +160,16 @@ function getExcelcontent(objarr) {
     tree+="]";
     return tree;
 }
+
+
+getTableData11();
+function getTableData11() {
+    //children获取该元素的下级元素  find获取该元素的下级所有元素
+    for (var i = 1; i <11; i++) {
+        for (var j = 1; j < 11; j++) {
+            $("#tab>tbody").children("tr").eq(i).find("td").eq(j).text("123");
+            console.log($("#tab>tbody").children("tr").eq(i).find("td").eq(j).text())
+        }
+    }
+}
+

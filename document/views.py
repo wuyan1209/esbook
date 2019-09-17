@@ -1311,3 +1311,43 @@ def saveExcel(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+
+#保存团队的excel文件
+def saveTeamExcel(request):
+    excel_content = request.POST.get('excel_content')  # 文档内容
+    excel_name = request.POST.get('excel_name')  # 文档标题
+    teamId = request.POST.get('teamId')  # 团队ID
+
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    userId = request.session.get("userId")
+    return_param = {}
+    sid = transaction.savepoint()
+    try:
+        # 数据库更新
+        cursor = connection.cursor()
+        # 向file表中插入文件数据
+        cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,1)",
+                       [excel_name, excel_content, formatTime])
+        # 获取文件id
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [excel_name])
+        file_id = cursor.fetchone()[0]
+
+        # 获取团队成员id
+        cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [userId, teamId])
+        team_mem_id = cursor.fetchone()
+
+        # 保存团队文件
+        cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
+        return_param['saveStatus'] = "success"
+        return_param['fileId'] = file_id
+        return_param['teamId'] = teamId
+        return_param['userId'] = userId
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))

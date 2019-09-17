@@ -175,7 +175,7 @@
 
                             <div class="modal-footer">
                                 <span style="color: red;" id="docNameExist"></span>
-                                <button id="sure_doc" type="button" class="btn btn-primary" onclick="addFile()">
+                                <button id="sure_doc" type="button" class="btn btn-primary">
                                     确定
                                 </button>
 
@@ -199,7 +199,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="excel_title"
+                                <input style="border: 0;width: 480px" type="text" placeholder="请输入文件名" id="excel_name"
                                        onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">
                             </div>
 
@@ -650,7 +650,7 @@
                         var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*excel*/
-                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"toExcel(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +
+                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"toExcel(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*ppt*/
                         var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +

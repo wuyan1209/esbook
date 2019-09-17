@@ -294,11 +294,6 @@ function toModify(doc_name, userId, fileId) {
         "&user_id=" + userId + "&fileId=" + fileId;
 }
 
-function toExcel(doc_name, userId, fileId) {
-    window.location.href = "/excelModify/?saveState=" + saveState + "&file_name=" + doc_name +
-        "&user_id=" + userId + "&fileId=" + fileId;
-}
-
 
 function socketInit() {
     ws = new WebSocket("ws://47.105.172.29:9001/");
