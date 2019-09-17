@@ -115,7 +115,6 @@ def Register(request):
     # 手机注册
     if phone!=' ':
         try:
-            
             cursor.execute("insert into user (user_name, password, phone, cre_date) values (%s,%s,%s,%s)",
                            [name, pwd, phone, formatTime])
             return HttpResponseRedirect("/login/")
@@ -212,6 +211,62 @@ def uploadImg(request):
 def getUser(request):
     userId = request.session['userId']
     cursor = connection.cursor()
-    cursor.execute('select user_id, user_name, email, phone, icon, cre_date from user where user_id=%s', [userId])
+    cursor.execute('select user_id, password,user_name, email, phone, icon, cre_date from user where user_id=%s', [userId])
     result = cursor.fetchone()
     return JsonResponse({"result": result})
+
+
+# 查看密码是否正确
+def conpwd(request):
+    password=request.POST['password']
+    userId = request.session['userId']
+    cursor = connection.cursor()
+    cursor.execute('select password from user where user_id=%s',[userId])
+    result = cursor.fetchone()[0]
+    # 判断密码是否正确
+    ret = check_password(password, result)
+    if ret:
+        return JsonResponse({"status":200})
+    else:
+        return JsonResponse({"status":2001,"message":"密码错误"})
+
+
+#修改密码
+def modifyPwd(request):
+    npwd = request.POST['npassword']
+    userId = request.session['userId']
+    # 密码加密
+    npwd = make_password(npwd, 'a')
+    # 修改
+    cursor = connection.cursor()
+    try:
+        cursor.execute('update user set password=%s where user_id=%s',[npwd,userId])
+        return JsonResponse({"status":200,"message":"修改成功"})
+    except:
+        return JsonResponse({"status":2003,"message":"修改失败"})
+
+# 重置密码页面
+def resetPassword(request):
+    return render(request, 'resetPassword.html');
+
+# 重置密码
+def updatePwd(request):
+    pwd=request.POST['pwd']
+    email = request.POST['email']
+    userId = request.session['userId']
+    # 密码加密
+    pwd = make_password(pwd, 'a')
+    # 修改
+    cursor = connection.cursor()
+    # 查找该用户是否通绑定邮箱
+    cursor.execute('select user_id from user where email=%s and user_id=%s',[email,userId])
+    user=cursor.fetchone()
+    print(user)
+    if user:
+        try:
+            cursor.execute('update user set password=%s where user_id=%s', [pwd, userId])
+            return JsonResponse({"status": 200, "message": "修改成功"})
+        except:
+            return JsonResponse({"status": 2003, "message": "修改失败"})
+    else:
+        return JsonResponse({"status": 2001, "message": "用户不存在"})
