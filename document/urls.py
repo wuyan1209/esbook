@@ -1,10 +1,14 @@
 from django.urls import path
-from document import views
+
+from document import views, login
 from document import mkdirDocs
+
+from document import views, mkdirDocs, clickMenu, nav
+
 
 urlpatterns = [
     # 主页面
-    path('index/', views.index),
+    path('index/', login.index),
     # 新增docs
     path('RTFdocs/', views.RTFdocs),
     # 添加协作空间
@@ -52,7 +56,7 @@ urlpatterns = [
     # 保存版本
     path('saveEdition/', views.saveEdition),
     # 登录页面
-    path('login/', views.login),
+    path('login/', login.login),
     # 查看团队版本
     path('getTeamEdition/', views.getTeamEdition),
     # 保存团队版本
@@ -72,23 +76,25 @@ urlpatterns = [
     # 打开搜索到的文件
     path('serachRTFdoc/', views.serachRTFdoc),
     # 跳转注册页面
-    path('register/', views.register),
+    path('register/', login.register),
     # 删除文件
     path('delFiles/', views.delFiles),
     # 校验用户名
-    path('valiName/', views.valiName),
+    path('valiName/', login.valiName),
     # 校验手机号
-    path('valiPhone/', views.valiPhone),
+    path('valiPhone/', login.valiPhone),
     # 校验邮箱号
-    path('valiEmail/', views.valiEmail),
+    path('valiEmail/', login.valiEmail),
+    # 邮箱验证码
+    path('postEmail/',login.postEmail),
     # 注册
-    path('Register/', views.Register),
+    path('Register/', login.Register),
     # 登录
-    path('userLogin/', views.userLogin),
+    path('userLogin/', login.userLogin),
     # 退出登录
-    path('logout/', views.logout),
+    path('logout/', login.logout),
     # 个人中心
-    path('personal/', views.personal),
+    path('personal/', login.personal),
 
     # 个人文件上传
     path("user_upload_file/", views.user_upload_file),
@@ -104,15 +110,21 @@ urlpatterns = [
     path('getoldEdition/', views.getoldEdition),
     # 重命名文件
     path('renameFiles/', views.renameFiles),
+    # 上传图片
+    path('uploadImg/', login.uploadImg),
+    # 获取个人信息
+    path('getUser/',login.getUser),
     # 创建文件
     path('createDocs/', mkdirDocs.createDocs),
     # 判断表格名称是否重复
     path('excelNameExist/', views.excelNameExist),
     # 保存个人excel
     path('saveuserExcel/', views.saveuserExcel),
-    # 跳转到excel页面
-    path('excelModify/', views.excelModify),
-    #保存excel内容
-    path('saveExcel/',views.saveExcel),
+    # 收藏文件
+    path('collectionFiles/', clickMenu.collectionFiles),
+    # 查询文件是否已收藏
+    path('selCollectionFiles/', clickMenu.selCollectionFiles),
+    # 打开我的收藏
+    path('openMyCollection/', nav.openMyCollection),
 
 ]

@@ -31,11 +31,33 @@
                 <span id="phone" style="color: red"></span>
             </div>
         </div>
+        <div class="form-group" id="phoneCode">
+            <label for="inputPhoneCode" class="control-label">输入验证码</label>
+            <div>
+                <input type="text" class="form-control" id="inputPhoneCode" maxlength="4" autocomplete="off"
+                       placeholder="请输入验证码" style="width: 58%;display: inline-block" name="code">
+                <button type="button" class="form-control" onclick="phoneCode()" id="phoneCodeBtn"
+                        style="width: 40%;display: inline-block;background-color: silver">获取验证码
+                </button>
+                <span id="pCode" style="color: red"></span>
+            </div>
+        </div>
         <div class="form-group" style="display: none" id="myEmail">
             <label for="inputEmail" class="control-label">输入邮箱</label>
             <div>
                 <input type="email" class="form-control" id="inputEmail" name="email" autocomplete="off" maxlength="50">
-                <span id="email" style="color: red"></span>
+                <span id="email" style="color: red" readonly="readonly"></span>
+            </div>
+        </div>
+        <div class="form-group" style="display: none" id="emailCode">
+            <label for="inputEmailCode" class="control-label">输入验证码</label>
+            <div>
+                <input type="text" class="form-control" id="inputEmailCode" maxlength="4" autocomplete="off"
+                       placeholder="请输入验证码" style="width: 58%;display: inline-block" name="code">
+                <button type="button" class="form-control" onclick="emailCode()" id="emailCodeBtn"
+                        style="width: 40%;display: inline-block;background-color: silver">获取验证码
+                </button>
+                <span id="eCode" style="color: red"></span><span id="msg" hidden></span>
             </div>
         </div>
         <div class="form-group">
@@ -44,17 +66,9 @@
                 <input type="password" required class="form-control" id="inputPassword" name="password" minlength="6" autocomplete="off" maxlength="20">
             </div>
         </div>
-        {% comment %}<div class="form-group" id="code">
-            <label for="inputCode" class="control-label">输入验证码</label>
-            <div>
-                <input type="text"  class="form-control" id="inputCode" maxlength="4" autocomplete="off"
-                placeholder="请输入验证码" style="width: 58%;display: inline-block" name="code">
-                <button type="button" class="form-control" style="width: 40%;display: inline-block;background-color: silver">获取验证码</button>
-            </div>
-        </div>{% endcomment %}
         <div><a class="switch" href="javascript:void(0)" onclick="Switch()">使用邮箱注册</a></div>
         <div class="form-group">
-            <button type="submit" class="form-control btn Btn" onclick="Register()">注册</button>
+            <button type="submit" class="form-control btn Btn">注册</button>
         </div>
         <span id="msg" style="color: red"></span>
     </form>
@@ -62,5 +76,5 @@
 </body>
 <script src="../static/assets/plugins/jquery/jquery.min.js"></script>
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="../static/js/Register.js"></script>
+<script src="../static/js/register.js"></script>
 </html>

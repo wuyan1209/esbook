@@ -19,9 +19,30 @@
     <span>账号设置</span>
 </div>
 <div class="body">
+    <span id="span"></span>
     <div class="div">
-        <div class="left">1213</div>
-        <div class="right">32156</div>
+        <div class="left">
+            <form name="form" action="/uploadImg/" method="post" enctype="multipart/form-data">
+                <input type="file" accept="image/*" class="input" name="pic" title="修改头像"/>
+                <input type="submit" value="上传" hidden>
+            </form>
+            <img src=" " class="img"/><br/><br/>
+            <p>帐号信息</p>
+        </div>
+        <div class="right">
+            <label class="control-label">用户名</label>
+            <input type="text"  class="form-control" autocomplete="off" maxlength="50"/>
+            <br><br>
+            <label  class="control-label">密&nbsp;&nbsp;&nbsp;码</label>
+            <input type="password"  class="form-control" autocomplete="off" maxlength="20" readonly/>
+            <br><br>
+            <label  class="control-label">手&nbsp;&nbsp;&nbsp;机</label>
+            <input type="text" onkeyup="this.value=this.value.replace(/[^\d]/g,'');"  class="form-control"
+                    autocomplete="off" maxlength="11"/>
+            <br><br>
+            <label  class="control-label">邮&nbsp;&nbsp;&nbsp;箱</label>
+            <input type="email"  class="form-control"  autocomplete="off" maxlength="50"/>
+        </div>
     </div>
 </div>
 </body>

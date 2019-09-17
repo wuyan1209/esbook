@@ -1,20 +1,13 @@
 import docx
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.db import connection, transaction
-from django.contrib.auth.hashers import make_password, check_password
-from document.models import User
 import time  # 引入time模块
 import json  # 引入json模块
 import os
 from itertools import chain
-
-# 跳转到主页面
 from esbook.settings import BASE_DIR
 
-
-def index(request):
-    return render(request, 'index.html')
 
 
 # 新建docs
@@ -598,10 +591,6 @@ def teamfile(request):
     return JsonResponse({'status': 2001, 'message': '暂无数据'})
 
 
-# 登录页面
-def login(requset):
-    return render(requset, "login.html")
-
 
 # 我的回收站
 def myBin(request):
@@ -928,11 +917,6 @@ def getTeamEdition(request):
     return JsonResponse({'status': 200, "list": list})
 
 
-# 跳转到注册页面
-def register(request):
-    return render(request, 'register.html');
-
-
 # 删除文件
 def delFiles(request):
     file_id = request.POST.get("file_id")
@@ -949,140 +933,6 @@ def delFiles(request):
     except Exception as e:
         return_param["flag"] = "fail"
     return HttpResponse(json.dumps(return_param))
-
-
-# 校验用户名
-def valiName(request):
-    name = request.POST['name'];  # 用户名
-    # 判断用户名是否存在
-    cursor = connection.cursor()
-    cursor.execute('select user_id from user where user_name=%s', [name])
-    userId = cursor.fetchone()
-    cursor.close()
-    if userId:
-        return JsonResponse({'status': 2001, 'message': "用户名已被占用"})
-    return JsonResponse({'status': 200, 'message': "ok"})
-
-
-# 校验手机号
-def valiPhone(request):
-    phone = request.POST['phone'];
-    # 判断用户名是否存在
-    cursor = connection.cursor()
-    cursor.execute('select user_id from user where phone=%s', [phone])
-    userId = cursor.fetchone()
-    cursor.close()
-    if userId:
-        return JsonResponse({'status': 2001, 'message': "手机号已被占用"})
-    return JsonResponse({'status': 200, 'message': "ok"})
-
-
-# 校验邮箱号
-def valiEmail(request):
-    email = request.POST['email'];
-    # 判断用户名是否存在
-    cursor = connection.cursor()
-    cursor.execute('select user_id from user where email=%s', [email])
-    userId = cursor.fetchone()
-    cursor.close()
-    if userId:
-        return JsonResponse({'status': 2001, 'message': "邮箱号已被占用"})
-    return JsonResponse({'status': 200, 'message': "ok"})
-
-
-# 注册
-def Register(request):
-    name = request.POST['name'];  # 用户名
-    email = request.POST['email'];  # 邮箱号
-    phone = request.POST['phone'];  # 手机号
-    password = request.POST['password'];  # 密码
-    localTime = time.localtime(time.time())  # 获取当前时间
-    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
-    # 密码加密
-    pwd = make_password(password, 'a')
-    cursor = connection.cursor()
-    # 判断是手机号注册还是邮箱注册
-    # 手机注册
-    if phone:
-        try:
-            cursor.execute("insert into user (user_name, password, phone, cre_date) values (%s,%s,%s,%s)",
-                           [name, pwd, phone, formatTime])
-            status = 200
-            message = "ok"
-        except:
-            status = 4001
-            message = "注册失败"
-        if status == 200:
-            return HttpResponseRedirect("/login/")
-        else:
-            return JsonResponse({'status': status, 'message': message})
-    # 邮箱注册
-    else:
-        try:
-            cursor.execute("insert into user (user_name, password, email, cre_date) values (%s,%s,%s,%s)",
-                           [name, pwd, email, formatTime])
-            status = 200
-            message = "ok"
-        except:
-            status = 4001
-            message = "注册失败"
-        if status == 200:
-            return HttpResponseRedirect("/login/")
-        else:
-            return JsonResponse({'status': status, 'message': message})
-
-
-# 登录
-def userLogin(request):
-    userName = request.POST['userName']
-    password = request.POST['password']
-    cursor = connection.cursor()
-    if userName.find("@") == -1:  # -1代表找不到  0代表找到
-        # 手机号登录
-        # 判断用户是否存在
-        cursor.execute('select user_id,user_name,password from user where phone=' + userName)
-        user = cursor.fetchone()
-        if user:
-            # 判断密码是否正确
-            ret = check_password(password, user[2])
-            if ret:
-                # 用户存session
-                request.session['username'] = user[1]
-                request.session['userId'] = user[0]
-                return HttpResponseRedirect('/index/')  # 跳转到主界面
-            else:
-                return render(request, 'login.html', {"error": "密码错误"})
-        else:
-            return render(request, 'login.html', {"error": "用户不存在"})
-    else:
-        # 邮箱登录
-        # 判断用户是否存在
-        cursor.execute('select user_id,user_name,password from user where email=%s', [userName])
-        user = cursor.fetchone()
-        if user:
-            # 判断密码是否正确
-            ret = check_password(password, user[2])
-            if ret:
-                # 用户存session
-                request.session['username'] = user[1]
-                request.session['userId'] = user[0]
-                return HttpResponseRedirect('/index/')  # 跳转到主界面
-            else:
-                return render(request, 'login.html', {"error": "密码错误"})
-        else:
-            return render(request, 'login.html', {"error": "用户不存在"})
-
-
-# 退出登录
-def logout(request):
-    # 清除sessoin
-    request.session.clear();
-    return HttpResponseRedirect('/login/')  # 跳转到登录页面
-
-
-# 个人中心
-def personal(request):
-    return render(request, 'personal.html');
 
 
 # 将本地文件写到项目中
@@ -1351,10 +1201,6 @@ def renameFiles(request):
     return HttpResponse(json.dumps(return_param))
 
 
-# 上传图片
-def uploadImg(request):
-    return 1
-
 #判断excel名字是否重复
 def excelNameExist(request):
     excelName = request.POST.get('excelName')  # 获取文档标题
@@ -1390,11 +1236,11 @@ def excelNameExist(request):
                 return_param['Exist'] = "No"
     return HttpResponse(json.dumps(return_param))
 
-#保存个人excel  空白内容
+#保存个人excel
 @transaction.atomic
 def saveuserExcel(request):
     excel_content = request.POST.get('excel_content')  # 文档内容
-    excel_name = request.POST.get('excel_name')  # 文档标题
+    excel_title = request.POST.get('excel_title')  # 文档标题
     userId = request.session.get("userId")
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
@@ -1405,13 +1251,16 @@ def saveuserExcel(request):
         # 数据库更新
         cursor = connection.cursor()
         cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,1)",
-                       [excel_name, excel_content, formatTime])
-        cursor.execute("select file_id from file order by cre_date desc limit 1")
-        fileId = cursor.fetchone()[0]
-        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, fileId])
+                       [excel_title, excel_content, formatTime])
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [excel_title])
+        file_id = cursor.fetchone()
+
+        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, file_id])
         return_param['saveStatus'] = "success"
         return_param['userId'] = userId
-        return_param['fileId'] = fileId
+        return_param['fileId'] = file_id[0]
         transaction.savepoint_commit(save_id)
     except Exception as e:
         # 数据库更新失败
@@ -1419,48 +1268,23 @@ def saveuserExcel(request):
         transaction.savepoint_rollback(save_id)
     return HttpResponse(json.dumps(return_param))
 
-# 打开excel  修改
+# 修改excel
 def excelModify(request):
     file_name = request.GET.get("file_name")  # 获取文件名称
     fileId = request.GET.get("fileId")  # 获取文件id
     saveState = request.GET.get("saveState")  # 获取文件状态
-    user_id = request.GET.get("user_id")  # 获取文件状态
     roleName = request.GET.get("roleName")  # 获取该用户对此文件的角色
+    user_id = request.GET.get("user_id")
 
     cursor = connection.cursor()
     cursor.execute('select content from file f '
                    'where f.file_id = %s',
                    [fileId])
     excel_content = cursor.fetchone()[0]
-
     request.session["file_name"] = file_name
     request.session["excel_content"] = excel_content
     request.session["file_id"] = fileId
     request.session["roleName"] = roleName
     return render(request, "excel.html", {"saveState": saveState})
 
-#保存excel内容
-def saveExcel(request):
-    excel_content = request.POST.get('excel_content')  # 文档内容
-    excel_name = request.POST.get('excel_name')  # 文档标题
-    fileId = request.POST.get("fileId")  # 获取文件id
 
-    localTime = time.localtime(time.time())  # 获取当前时间
-    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
-    return_param = {}
-    sid = transaction.savepoint()
-    cursor = connection.cursor()
-    try:
-        # 数据库更新
-        cursor.execute(
-            "update file f set f.file_name = %s , f.content = %s, f.cre_date = %s "
-            "where f.file_id = %s",
-            [excel_name, excel_content, formatTime, fileId]
-        )
-        return_param['saveStatus'] = "success"
-        transaction.savepoint_commit(sid)
-    except Exception as e:
-        # 数据库更新失败
-        return_param['saveStatus'] = "fail"
-        transaction.savepoint_rollback(sid)
-    return HttpResponse(json.dumps(return_param))
