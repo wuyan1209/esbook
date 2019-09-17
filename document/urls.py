@@ -1,9 +1,5 @@
 from django.urls import path
-
-from document import views, login
-from document import mkdirDocs
-
-from document import views, mkdirDocs, clickMenu, nav
+from document import views, mkdirDocs, clickMenu, nav,login
 
 
 urlpatterns = [
@@ -95,6 +91,14 @@ urlpatterns = [
     path('logout/', login.logout),
     # 个人中心
     path('personal/', login.personal),
+    # 查看密码是否正确
+    path('conpwd/',login.conpwd),
+    # 修改密码
+    path('modifyPwd/',login.modifyPwd),
+    # 重置密码页面
+    path('resetPassword/',login.resetPassword),
+    # 重置密码
+    path('updatePwd/',login.updatePwd),
 
     # 个人文件上传
     path("user_upload_file/", views.user_upload_file),

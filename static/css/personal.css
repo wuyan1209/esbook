@@ -60,4 +60,11 @@
     color: #353333;
     font-size: 17px;
 }
+.p{
+    display: inline-block;
+    margin-left: 8%;
+}
+.dis{
+    color: silver;
+}
 
