@@ -504,7 +504,7 @@
                         var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
                         /*excel*/
-                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"toExcel(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + data.list[i][4] + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
                         /*ppt*/
                         var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
@@ -650,7 +650,7 @@
                         var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*excel*/
-                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +
+                        var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"toExcel(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*ppt*/
                         var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\'\'' + data.roleName + '\')\"' +
@@ -1176,7 +1176,7 @@
 <script src="../static/js/modifyRTFdocs.js"></script>
 <script src="{% static 'js/search.js' %}"></script>
 <script src="{% static 'js/RTFdocs.js' %}"></script>
-
+<script src="../static/js/modifyexcel.js"></script>
 </body>
 </html>
 

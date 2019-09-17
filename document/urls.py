@@ -126,5 +126,9 @@ urlpatterns = [
     path('selCollectionFiles/', clickMenu.selCollectionFiles),
     # 打开我的收藏
     path('openMyCollection/', nav.openMyCollection),
+    # 跳转到excel页面
+    path('excelModify/', views.excelModify),
+    #保存excel内容
+    path('saveExcel/',views.saveExcel),
 
 ]
