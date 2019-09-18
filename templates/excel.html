@@ -174,13 +174,16 @@
 <input type="hidden" id="fileId" value="{{ request.session.file_id }}">
 <input type="hidden" id="teamId" value="{{ saveState }}">
 
-<div class="wyb-excel" style="width:99%;margin: 0 auto;">
+<div id="aa" class="wyb-excel" style="width:99%;margin: 0 auto;">
 </div>
-<div class="aaaaa"></div>
+<div id="aaaa" class="aaaaa wyb-excel-table"style="width:99%;margin: 0 auto;" ></div>
 
 </body>
 
 <style type="text/css">
+    .abc{
+        display: none;
+    }
 
     .wyb-excel-table table {
       table-layout: auto;
@@ -221,7 +224,7 @@
 <script type="text/javascript" src="../static/excel/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="../static/excel/js/excel.min.js"></script>
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-{#<script src="../static/js/modifyexcel.js"></script>#}
+<script src="../static/js/modifyexcel.js"></script>
 <script>
     $(function (){
         {#$(".aaaaa").setExcelHtml("" +#}
@@ -344,22 +347,52 @@
     var a=$("#get_excel_content").val()
     //将字符串转换为数组
     var str=eval(a);
+    //隐藏
+    if (a!=""){
+        document.getElementById("aa").className = 'abc';
+    }
+    //选择单元格时，添加class  td-chosen-css  contenteditable=true
+
+
+
+    //将数据显示到页面  但是不能进行修改，只能看
+    var tableTitle = "<table width='100%' class='tab'>" +
+        "</table>"
+    $(".aaaaa").append(tableTitle);
     var html = '';
     for (var i = 0; i < str.length; i++) {
+        if (i==0){
+           html += '     "<tr style=\'height: 38px;\'>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td> +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>A</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>B</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>C</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>D</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>E</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>F</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 134px;text-align: center;\'>G</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>H</td> +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>I</td> +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>J</td> +\n' +
+               '            "</tr>" +';
+        }
         html += '<tr style=\'height: 38px;\'>';
         for (var j = 0; j < str[0].length; j++) {
-            html += '<td style=\'width: 135px;\'>' + str[i][j] + '</td>';
+            if (j==0){
+                html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(i+1)+'</td>';
+            }
+            if (str[i][j]=='null'){
+                    html += '<td  style=\'width: 135px;text-align: center;\'></td>';
+                }else {
+                    html += '<td  style=\'width: 135px;text-align: center;\'>' + str[i][j] + '</td>';
+                }
         }
         html += '</tr>';
     }
-    $(".aaaaa").append(html)
+    $(".tab").append("<tbody>" + html + "</tbody>");
 
 
-    var table = document.getElementById("tab");    // table 的 id
-    var tr = table.rows;  //所有tr
-    for(var i = 0; i<tr.length; i++ ){
-        var id = tr[i].children;
-        console.log(id)
-    }
+
+
 </script>
 </html>
