@@ -1,5 +1,5 @@
 from django.urls import path
-from document import views, mkdirDocs, clickMenu, nav,login
+from document import views, clickMenu, nav,login
 
 
 urlpatterns = [
@@ -95,10 +95,13 @@ urlpatterns = [
     path('conpwd/',login.conpwd),
     # 修改密码
     path('modifyPwd/',login.modifyPwd),
-    # 重置密码页面
+    # 个人中心的重置密码页面
     path('resetPassword/',login.resetPassword),
+    # 登录的重置密码页面
+    path('resetPwd/',login.resetPwd),
     # 重置密码
     path('updatePwd/',login.updatePwd),
+
 
     # 个人文件上传
     path("user_upload_file/", views.user_upload_file),
@@ -119,7 +122,7 @@ urlpatterns = [
     # 获取个人信息
     path('getUser/',login.getUser),
     # 创建文件
-    path('createDocs/', mkdirDocs.createDocs),
+    path('createDocs/', clickMenu.createDocs),
     # 判断表格名称是否重复
     path('excelNameExist/', views.excelNameExist),
     # 保存个人excel

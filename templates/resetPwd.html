@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+    <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css" rel="stylesheet">
+    <link href="../static/css/register.css" rel="stylesheet">
+</head>
+<body>
+<div class="head">
+    <a href=" " class="esbook">esbook</a>
+    <button style="margin-left: 70%;"><a href="/login/" style="color: black">登录</a></button>
+    <button><a href="/register/" style="color: black">注册</a></button>
+</div>
+<div class="title">重置密码</div>
+<div class="content">
+    <span id="msg0" style="color: red"></span>
+    <form class="form-horizontal" action=" " method="post" onsubmit="return false">
+        <div class="form-group" id="myPhone">
+            <label for="inputPhone" class="control-label">输入手机号</label>
+            <div>
+                <input type="text" onkeyup="this.value=this.value.replace(/[^\d]/g,'');" maxlength="11" autocomplete="off"
+                       required class="form-control" id="inputPhone" placeholder="暂不支持非中国大陆地区手机号">
+                <span id="phone" style="color: red"></span>
+            </div>
+        </div>
+        <div class="form-group" id="phoneCode">
+            <label for="inputPhoneCode" class="control-label">输入验证码</label>
+            <div>
+                <input type="text" class="form-control" id="inputPhoneCode" maxlength="4" autocomplete="off"
+                       placeholder="请输入验证码" style="width: 58%;display: inline-block">
+                <button type="button" class="form-control" onclick="phoneCode()" id="phoneCodeBtn"
+                        style="width: 40%;display: inline-block;background-color: silver">获取验证码
+                </button>
+                <span id="pCode" style="color: red"></span>
+            </div>
+        </div>
+        <div class="form-group" style="display: none" id="myEmail">
+            <label for="inputEmail" class="control-label">输入邮箱</label>
+            <div>
+                <input type="email" class="form-control" id="inputEmail" autocomplete="off" maxlength="50">
+                <span id="email" style="color: red" readonly="readonly"></span>
+            </div>
+        </div>
+        <div class="form-group" style="display: none" id="emailCode">
+            <label for="inputEmailCode" class="control-label">输入验证码</label>
+            <div>
+                <input type="text" class="form-control" id="inputEmailCode" maxlength="4" autocomplete="off"
+                       placeholder="请输入验证码" style="width: 58%;display: inline-block">
+                <button type="button" class="form-control" onclick="emailCode()" id="emailCodeBtn"
+                        style="width: 40%;display: inline-block;background-color: silver" disabled="disabled">获取验证码
+                </button>
+                <span id="eCode" style="color: red"></span><span id="msg" hidden></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword" class="control-label">设置新密码</label>
+            <div>
+                <input type="password" required class="form-control" id="inputPassword"  minlength="6" autocomplete="off" maxlength="20">
+            </div>
+        </div>
+        <div><a class="switch" href="javascript:void(0)" onclick="Switch()">使用邮箱找回</a></div>
+        <div class="form-group">
+            <button type="submit" class="form-control btn Btn" onclick="checkForm()">提交</button>
+        </div>
+    </form>
+</div>
+</body>
+<script src="../static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="../static/js/resetPassword.js"></script>
+</html>
