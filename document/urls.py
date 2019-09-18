@@ -1,5 +1,5 @@
 from django.urls import path
-from document import views, mkdirDocs, clickMenu, nav,login
+from document import views, clickMenu, nav,login
 
 
 urlpatterns = [
@@ -122,7 +122,7 @@ urlpatterns = [
     # 获取个人信息
     path('getUser/',login.getUser),
     # 创建文件
-    path('createDocs/', mkdirDocs.createDocs),
+    path('createDocs/', clickMenu.createDocs),
     # 判断表格名称是否重复
     path('excelNameExist/', views.excelNameExist),
     # 保存个人excel
