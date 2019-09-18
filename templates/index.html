@@ -566,7 +566,7 @@
                             },
                             onPageClicked: function (event, originalEvent, type, page) {//分页按钮点击事件
                                 $.ajax({//根据page去后台加载数据
-                                    url: "/filelist/",
+                                    url: "/openMyCollection/",
                                     type: "post",
                                     dataType: "json",
                                     data: {"page": page},
