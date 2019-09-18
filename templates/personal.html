@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <title>账号设置</title>
     <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css" rel="stylesheet">
+    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"
+          rel="stylesheet">
     <link href="../static/css/register.css" rel="stylesheet">
     <link href="../static/css/personal.css" rel="stylesheet">
 </head>
 <body>
 <div class="head">
     <a href="/index/" class="esbook">esbook</a>
-    <a href="/logout/" class="none"  title="Logout">退出登录</a>
+    <a href="/logout/" class="none" title="Logout">退出登录</a>
 </div>
 <div class="tit">
     <a href="/index/">桌面</a>
@@ -31,17 +32,52 @@
         </div>
         <div class="right">
             <label class="control-label">用户名</label>
-            <input type="text"  class="form-control" autocomplete="off" maxlength="50"/>
+            <input type="text" class="form-control" id="name" autocomplete="off" minlength="1" maxlength="50" required style="width: 50%"
+                   onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"/>
             <br><br>
-            <label  class="control-label">密&nbsp;&nbsp;&nbsp;码</label>
-            <input type="password"  class="form-control" autocomplete="off" maxlength="20" readonly/>
+            <label class="control-label">密&nbsp;&nbsp;&nbsp;码</label>
+            <input type="password" class="form-control" readonly  style="width: 50%" id="password"/>
+            <!-- 密码修改-->
+            <button class="btn" data-toggle="modal" data-target="#editorPassword" style="display: inline-block;margin-left: 4%">
+                修改
+            </button>
+            <!-- 密码修改模态框 -->
+            <div class="modal fade" id="editorPassword" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog-centered modal-dialog " role="document">
+                    <form action=" " method="post" onsubmit="return false">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalCenterTitle">修改密码</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <span id="msg0" style="color: red;margin-left: 8%"></span><br>
+                                <input type="password" class="form-control" required style="width: 48%" maxlength="20"
+                                       id="pwd" placeholder="当前密码" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"/>
+                                <a class="btn btn-secondary" style="display: inline-block;" href="/resetPassword/">忘记密码</a>
+                                <br><span id="msg1" style="color: red;margin-left: 8%"></span><br>
+                                <input type="password" class="form-control" required placeholder="新密码" maxlength="20"
+                                       id="npwd" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"/>
+                                <br><span id="msg2" style="color: red;margin-left: 8%"></span><br>
+                                <input type="password" class="form-control" required placeholder="确认新密码" maxlength="20"
+                                       id="npwd2" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"/><br><br>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" onclick="modifyPwd()">提交</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">暂不修改</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
             <br><br>
-            <label  class="control-label">手&nbsp;&nbsp;&nbsp;机</label>
-            <input type="text" onkeyup="this.value=this.value.replace(/[^\d]/g,'');"  class="form-control"
-                    autocomplete="off" maxlength="11"/>
+            <label class="control-label">手&nbsp;&nbsp;&nbsp;机</label>
+            <p class="p" id="phone"></p>
             <br><br>
-            <label  class="control-label">邮&nbsp;&nbsp;&nbsp;箱</label>
-            <input type="email"  class="form-control"  autocomplete="off" maxlength="50"/>
+            <label class="control-label">邮&nbsp;&nbsp;&nbsp;箱</label>
+            <p class="p" id="email"></p>
         </div>
     </div>
 </div>

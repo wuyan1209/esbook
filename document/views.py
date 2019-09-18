@@ -1236,11 +1236,11 @@ def excelNameExist(request):
                 return_param['Exist'] = "No"
     return HttpResponse(json.dumps(return_param))
 
-#保存个人excel
+#保存个人excel  空白内容
 @transaction.atomic
 def saveuserExcel(request):
     excel_content = request.POST.get('excel_content')  # 文档内容
-    excel_title = request.POST.get('excel_title')  # 文档标题
+    excel_name = request.POST.get('excel_name')  # 文档标题
     userId = request.session.get("userId")
     localTime = time.localtime(time.time())  # 获取当前时间
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
@@ -1251,16 +1251,13 @@ def saveuserExcel(request):
         # 数据库更新
         cursor = connection.cursor()
         cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,1)",
-                       [excel_title, excel_content, formatTime])
-        cursor.execute(
-            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
-            [excel_title])
-        file_id = cursor.fetchone()
-
-        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, file_id])
+                       [excel_name, excel_content, formatTime])
+        cursor.execute("select file_id from file order by cre_date desc limit 1")
+        fileId = cursor.fetchone()[0]
+        cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userId, fileId])
         return_param['saveStatus'] = "success"
         return_param['userId'] = userId
-        return_param['fileId'] = file_id[0]
+        return_param['fileId'] = fileId
         transaction.savepoint_commit(save_id)
     except Exception as e:
         # 数据库更新失败
@@ -1268,23 +1265,89 @@ def saveuserExcel(request):
         transaction.savepoint_rollback(save_id)
     return HttpResponse(json.dumps(return_param))
 
-# 修改excel
+
+# 打开excel  修改
 def excelModify(request):
     file_name = request.GET.get("file_name")  # 获取文件名称
     fileId = request.GET.get("fileId")  # 获取文件id
     saveState = request.GET.get("saveState")  # 获取文件状态
+    user_id = request.GET.get("user_id")  # 获取文件状态
     roleName = request.GET.get("roleName")  # 获取该用户对此文件的角色
-    user_id = request.GET.get("user_id")
 
     cursor = connection.cursor()
     cursor.execute('select content from file f '
                    'where f.file_id = %s',
                    [fileId])
     excel_content = cursor.fetchone()[0]
+
     request.session["file_name"] = file_name
     request.session["excel_content"] = excel_content
     request.session["file_id"] = fileId
     request.session["roleName"] = roleName
     return render(request, "excel.html", {"saveState": saveState})
 
+#保存excel内容
+def saveExcel(request):
+    excel_content = request.POST.get('excel_content')  # 文档内容
+    excel_name = request.POST.get('excel_name')  # 文档标题
+    fileId = request.POST.get("fileId")  # 获取文件id
 
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    return_param = {}
+    sid = transaction.savepoint()
+    cursor = connection.cursor()
+    try:
+        # 数据库更新
+        cursor.execute(
+            "update file f set f.file_name = %s , f.content = %s, f.cre_date = %s "
+            "where f.file_id = %s",
+            [excel_name, excel_content, formatTime, fileId]
+        )
+        return_param['saveStatus'] = "success"
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))
+
+#保存团队的excel文件
+def saveTeamExcel(request):
+    excel_content = request.POST.get('excel_content')  # 文档内容
+    excel_name = request.POST.get('excel_name')  # 文档标题
+    teamId = request.POST.get('teamId')  # 团队ID
+
+    localTime = time.localtime(time.time())  # 获取当前时间
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)  # 格式化当前日期 ‘年-月-日 时：分：秒’
+    userId = request.session.get("userId")
+    return_param = {}
+    sid = transaction.savepoint()
+    try:
+        # 数据库更新
+        cursor = connection.cursor()
+        # 向file表中插入文件数据
+        cursor.execute("insert into file(file_name,content,cre_date,type) values(%s,%s,%s,1)",
+                       [excel_name, excel_content, formatTime])
+        # 获取文件id
+        cursor.execute(
+            "select f.file_id from file f where f.file_name = %s order by cre_date desc limit 1",
+            [excel_name])
+        file_id = cursor.fetchone()[0]
+
+        # 获取团队成员id
+        cursor.execute("select team_mem_id from team_member where user_id=%s and team_id = %s;", [userId, teamId])
+        team_mem_id = cursor.fetchone()
+
+        # 保存团队文件
+        cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)", [team_mem_id, file_id])
+        return_param['saveStatus'] = "success"
+        return_param['fileId'] = file_id
+        return_param['teamId'] = teamId
+        return_param['userId'] = userId
+        transaction.savepoint_commit(sid)
+    except Exception as e:
+        # 数据库更新失败
+        return_param['saveStatus'] = "fail"
+        transaction.savepoint_rollback(sid)
+    return HttpResponse(json.dumps(return_param))

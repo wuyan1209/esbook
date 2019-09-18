@@ -1,9 +1,5 @@
 from django.urls import path
-
-from document import views, login
-from document import mkdirDocs
-
-from document import views, mkdirDocs, clickMenu, nav
+from document import views, mkdirDocs, clickMenu, nav,login
 
 
 urlpatterns = [
@@ -95,6 +91,17 @@ urlpatterns = [
     path('logout/', login.logout),
     # 个人中心
     path('personal/', login.personal),
+    # 查看密码是否正确
+    path('conpwd/',login.conpwd),
+    # 修改密码
+    path('modifyPwd/',login.modifyPwd),
+    # 个人中心的重置密码页面
+    path('resetPassword/',login.resetPassword),
+    # 登录的重置密码页面
+    path('resetPwd/',login.resetPwd),
+    # 重置密码
+    path('updatePwd/',login.updatePwd),
+
 
     # 个人文件上传
     path("user_upload_file/", views.user_upload_file),
@@ -126,5 +133,10 @@ urlpatterns = [
     path('selCollectionFiles/', clickMenu.selCollectionFiles),
     # 打开我的收藏
     path('openMyCollection/', nav.openMyCollection),
-
+    # 跳转到excel页面
+    path('excelModify/', views.excelModify),
+    #保存excel内容
+    path('saveExcel/',views.saveExcel),
+    #保存团队的excel文件
+    path('saveTeamExcel/', views.saveTeamExcel),
 ]

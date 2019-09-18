@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel</title>
+    <link rel="stylesheet" type="text/css" href="../static/excel/css/font-awesome.4.6.0.css">
+    <link href="../static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/excel/css/excel.css"/>
+</head>
+<body>
+<header style="background-color: #fafafa;height: 50px;z-index: 0">
+    <nav class="navbar top-navbar navbar-toggleable-sm navbar-light">
+
+        <div class="navbar-collapse">
+            <!-- ============================================================== -->
+            <a href="javascript:history.go(-1)" style="margin-left: 30px">
+                <b>
+                    <img src="../static/assets/images/返回.png" width="26" height="25" alt="goback">
+                </b>
+            </a>
+
+            <!-- 分割线 -->
+            <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
+                 class="light-logo">
+
+            <!-- 保存按钮 -->
+            <a id="CKEditor_data_modify" href="javascript:void(0);" style="margin-right: 10px">
+                <b>
+                    <img src="../static/assets/images/Excel/保存.png" width="26" height="25" alt="goback">
+                </b>
+            </a>
+            <!-- toggle and nav items -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav mr-auto mt-md-0">
+                <!-- This is  -->
+                <li class="nav-item"><a class="nav-link nav-toggler hidden-md-up text-muted waves-effect waves-dark"
+                                        href="javascript:void(0)"><i class="mdi mdi-menu"></i></a></li>
+                <input type="text" id="excel_title" class="form-control" autocomplete="off" placeholder="无标题文档"
+                       value="{{ request.session.file_name }}"
+                       placeholder="无标题文档">
+
+                <!-- 下拉按钮 -->
+            </ul>
+            <div class="dropdown" style="margin-left: 10px">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    版本
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a id="saveedi" class="dropdown-item" href="javascript:void(0);">保存</a>
+                    <a id="showEditor" class="dropdown-item" href="javascript:void(0);">查看</a>
+                </div>
+            </div>
+
+            <div class="dropdown" style="margin-left: 10px">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    分享
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="javascript:void(0);">通过链接分享</a>
+                </div>
+            </div>
+
+            <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
+                 class="light-logo">
+
+            <img src="../static/assets/images/users/1.jpg" style="height: 30px; width: 30px;border-radius: 15px;"
+                 alt="user" class="profile-pic m-r-10"><span
+                style="color: black;margin-top: 2px;">{{ request.session.username }}</span>
+        </div>
+    </nav>
+</header>
+{#导航栏#}
+<div class="meue">
+    <div class="box1">
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/撤销.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">撤销</span></div>
+        </div>
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/重做.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">重做</span></div>
+        </div>
+    </div>
+
+    <div class="box1" style="width: 126px">
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/粘贴.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">粘贴</span></div>
+        </div>
+        <div class="daohang" style="width: 70px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/橡皮擦.png"
+                                           style="margin-left: 18px"/></span></div>
+            <div><span class="span12">清除样式</span></div>
+        </div>
+    </div>
+
+    <div class="box1" style="width: 380px">
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/标题.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">标题</span></div>
+        </div>
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/加粗.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">加粗</span></div>
+        </div>
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/斜体.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">斜体</span></div>
+        </div>
+        <div class="daohang" style="width: 60px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/下划线.png"
+                                           style="margin-left: 10px"/></span></div>
+            <div><span class="span12">下划线</span></div>
+        </div>
+        <div class="daohang" style="width: 70px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/字体颜色.png"
+                                           style="margin-left: 18px"/></span></div>
+            <div><span class="span12">字体颜色</span></div>
+        </div>
+        <div class="daohang" style="width: 70px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/背景颜色.png"
+                                           style="margin-left: 18px"/></span></div>
+            <div><span class="span12">背景颜色</span></div>
+        </div>
+    </div>
+    <div class="box1" style="width: 260px">
+        <div class="daohang" style="width: 60px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/左对齐.png"
+                                           style="margin-left: 10px"/></span></div>
+            <div><span class="span12">左对齐</span></div>
+        </div>
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/居中.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">居中</span></div>
+        </div>
+        <div class="daohang" style="width: 60px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/右对齐.png"
+                                           style="margin-left: 10px"/></span></div>
+            <div><span class="span12">右对齐</span></div>
+        </div>
+        <div class="daohang" style="width: 70px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/垂直对齐.jpg"
+                                           style="margin-left: 18px"/></span></div>
+            <div><span class="span12">垂直对齐</span></div>
+        </div>
+    </div>
+    <div class="box1" style="width: 136px">
+        <div class="daohang" style="width: 80px">
+            <div><span class="span11"><img src="../static/assets/images/Excel/合并单元格.png"
+                                           style="margin-left: 25px"/></span></div>
+            <div><span class="span12">合并单元格</span></div>
+        </div>
+        <div class="daohang">
+            <div><span class="span11"><img src="../static/assets/images/Excel/更多.png" style="margin-left: 2px"/></span>
+            </div>
+            <div><span class="span12">更多</span></div>
+        </div>
+    </div>
+
+</div>
+<input type="hidden" id="roleName" value="{{ request.session.roleName }}">
+<input type="hidden" id="get_excel_content" value="{{ request.session.excel_content }}">
+<input type="hidden" id="excel_save_state" value="{{ saveState }}">
+<input type="hidden" id="userId" value="{{ request.session.userId }}">
+<input type="hidden" id="fileId" value="{{ request.session.file_id }}">
+<input type="hidden" id="teamId" value="{{ saveState }}">
+
+<div id="aa" class="wyb-excel" style="width:99%;margin: 0 auto;">
+</div>
+<div id="aaaa" class="aaaaa wyb-excel-table"style="width:99%;margin: 0 auto;" ></div>
+
+</body>
+
+<style type="text/css">
+    .abc{
+        display: none;
+    }
+
+    .wyb-excel-table table {
+      table-layout: auto;
+    }
+    .wtSpreader tr, th {
+        height: 26px;
+    }
+    .daohang {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+    }
+    .span11 {
+        margin-left: 5px;
+        width: 60px;
+        height: 50px;
+    }
+    .span12 {
+        margin-left: 5px;
+        width: 50px;
+        height: 50px;
+        font-size: 13px;
+    }
+    #dropdownMenuButton {
+        padding: 6px 12px;
+    }
+    .box1 {
+        border-right: 1px solid lightgrey;
+        display: inline-block;
+        width: 107px;
+        margin-top: 2px;
+    }
+    img {
+        width: 22px;
+        height: 18px;
+    }
+</style>
+<script type="text/javascript" src="../static/excel/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="../static/excel/js/excel.min.js"></script>
+<script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="../static/js/modifyexcel.js"></script>
+<script>
+    $(function (){
+        {#$(".aaaaa").setExcelHtml("" +#}
+        {#    "<table width='99%'>" +#}
+        {#    "<tbody>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {# "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#   "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#   "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "<tr style='height: 38px;'>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 133px;'></td>" +#}
+        {#    "<td style='width: 134px;'></td>" +#}
+        {#    "<td style='width: 135px;'></td><" +#}
+        {#    "td style='width: 135px;'></td>" +#}
+        {#    "</tr>" +#}
+        {#    "</tbody>" +#}
+        {#    "</table>");#}
+        $(".wyb-excel").wybExcel();
+    });
+    var a=$("#get_excel_content").val()
+    //将字符串转换为数组
+    var str=eval(a);
+    //隐藏
+    if (a!=""){
+        document.getElementById("aa").className = 'abc';
+    }
+    //选择单元格时，添加class  td-chosen-css  contenteditable=true
+
+
+
+    //将数据显示到页面  但是不能进行修改，只能看
+    var tableTitle = "<table width='100%' class='tab'>" +
+        "</table>"
+    $(".aaaaa").append(tableTitle);
+    var html = '';
+    for (var i = 0; i < str.length; i++) {
+        if (i==0){
+           html += '     "<tr style=\'height: 38px;\'>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td> +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>A</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>B</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>C</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>D</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>E</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>F</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 134px;text-align: center;\'>G</td>" +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>H</td> +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>I</td> +\n' +
+               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>J</td> +\n' +
+               '            "</tr>" +';
+        }
+        html += '<tr style=\'height: 38px;\'>';
+        for (var j = 0; j < str[0].length; j++) {
+            if (j==0){
+                html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(i+1)+'</td>';
+            }
+            if (str[i][j]=='null'){
+                    html += '<td  style=\'width: 135px;text-align: center;\'></td>';
+                }else {
+                    html += '<td  style=\'width: 135px;text-align: center;\'>' + str[i][j] + '</td>';
+                }
+        }
+        html += '</tr>';
+    }
+    $(".tab").append("<tbody>" + html + "</tbody>");
+
+
+
+
+</script>
+</html>
