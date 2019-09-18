@@ -126,6 +126,7 @@ function toExcel(excel_name, userId, fileId,roleName) {
 //获取表格中的数据
 function getTableData() {
     var a=[];
+    //var trList = $('#aa').find('tbody').children("tr");
     var trList = $("tbody").children("tr");
     for (var i = 1; i < trList.length; i++) {
         var tdArr = trList.eq(i).find("td");
@@ -162,14 +163,5 @@ function getExcelcontent(objarr) {
 }
 
 
-getTableData11();
-function getTableData11() {
-    //children获取该元素的下级元素  find获取该元素的下级所有元素
-    for (var i = 1; i <11; i++) {
-        for (var j = 1; j < 11; j++) {
-            $("#tab>tbody").children("tr").eq(i).find("td").eq(j).text("123");
-            console.log($("#tab>tbody").children("tr").eq(i).find("td").eq(j).text())
-        }
-    }
-}
+
 
