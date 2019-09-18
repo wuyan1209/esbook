@@ -245,9 +245,13 @@ def modifyPwd(request):
     except:
         return JsonResponse({"status":2003,"message":"修改失败"})
 
-# 重置密码页面
+# 个人中心的重置密码页面
 def resetPassword(request):
     return render(request, 'resetPassword.html');
+
+# 登录的重置密码页面
+def resetPwd(request):
+    return render(request, 'resetPwd.html');
 
 # 重置密码
 def updatePwd(request):

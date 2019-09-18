@@ -95,10 +95,13 @@ urlpatterns = [
     path('conpwd/',login.conpwd),
     # 修改密码
     path('modifyPwd/',login.modifyPwd),
-    # 重置密码页面
+    # 个人中心的重置密码页面
     path('resetPassword/',login.resetPassword),
+    # 登录的重置密码页面
+    path('resetPwd/',login.resetPwd),
     # 重置密码
     path('updatePwd/',login.updatePwd),
+
 
     # 个人文件上传
     path("user_upload_file/", views.user_upload_file),

@@ -144,7 +144,7 @@ body a, form li, input[type="submit"], input[type="text"], .sixth-login input[ty
 h1 {
     font-family: 'Exo 2', sans-serif;
     text-align: center;
-    padding-top: 4em;
+    padding-top: 1em;
     font-weight: 400;
     color: #2B2B36;
     font-size: 2em;
@@ -211,7 +211,7 @@ input[type="password"] {
     border: none;
     font-weight: 100;
     border-bottom: 1px solid #484856;
-    margin-bottom: 3em;
+    margin-bottom: 1em;
 }
 
 input[type="submit"] {
@@ -444,6 +444,12 @@ label.lbl-3 {
         font-size: 28px;
         padding: 10px 0;
     }
+}
+.backPwd{
+    color: #9199aa;
+    display:block;
+    margin-bottom: 1em;
+    padding-left: 60%
 }
 
 /*--end-responsive-design--*/
