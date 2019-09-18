@@ -41,6 +41,7 @@
 
                 <!-- 下拉按钮 -->
             </ul>
+
             <div class="dropdown" style="margin-left: 10px">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -343,52 +344,46 @@
         {#    "</tbody>" +#}
         {#    "</table>");#}
         $(".wyb-excel").wybExcel();
+
     });
+
+
     var a=$("#get_excel_content").val()
     //将字符串转换为数组
     var str=eval(a);
     //隐藏
     if (a!=""){
         document.getElementById("aa").className = 'abc';
-    }
-    //选择单元格时，添加class  td-chosen-css  contenteditable=true
-
-
+     }
 
     //将数据显示到页面  但是不能进行修改，只能看
     var tableTitle = "<table width='100%' class='tab'>" +
         "</table>"
     $(".aaaaa").append(tableTitle);
     var html = '';
+    var charass=String.fromCodePoint(65)
     for (var i = 0; i < str.length; i++) {
         if (i==0){
-           html += '     "<tr style=\'height: 38px;\'>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td> +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>A</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>B</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>C</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>D</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>E</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 133px;text-align: center;\'>F</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 134px;text-align: center;\'>G</td>" +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>H</td> +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>I</td> +\n' +
-               '            "<td class="drug-ele-td" style=\'width: 135px;text-align: center;\'>J</td> +\n' +
-               '            "</tr>" +';
-        }
+                html+= '<tr style=\'height: 38px;\'><td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td>';
+                for (var n = 0; n < str[0].length; n++){
+                    html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(String.fromCodePoint(n+65))+'</td>';
+                }
+
+             }
         html += '<tr style=\'height: 38px;\'>';
         for (var j = 0; j < str[0].length; j++) {
+
             if (j==0){
                 html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(i+1)+'</td>';
             }
             if (str[i][j]=='null'){
-                    html += '<td  style=\'width: 135px;text-align: center;\'></td>';
+                    html += '<td  style=\'width: 135px;\' contenteditable="true"></td>';
                 }else {
-                    html += '<td  style=\'width: 135px;text-align: center;\'>' + str[i][j] + '</td>';
+                    html += '<td  style=\'width: 135px;\' contenteditable="true">' + str[i][j] + '</td>';
                 }
         }
         html += '</tr>';
-    }
+     }
     $(".tab").append("<tbody>" + html + "</tbody>");
 
 
