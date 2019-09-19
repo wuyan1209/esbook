@@ -274,3 +274,16 @@ def updatePwd(request):
             return JsonResponse({"status": 2003, "message": "修改失败"})
     else:
         return JsonResponse({"status": 2001, "message": "用户不存在"})
+
+
+# 绑定邮箱
+def bindEmail(request):
+    email = request.POST['email']
+    userId = request.session['userId']
+    # 修改
+    cursor = connection.cursor()
+    try:
+        cursor.execute('update user set email=%s where user_id=%s', [email, userId])
+        return JsonResponse({"status": 200, "message": "绑定成功"})
+    except:
+        return JsonResponse({"status": 2003, "message": "绑定失败"})
