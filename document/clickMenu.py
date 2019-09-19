@@ -20,9 +20,11 @@ def collectionFiles(request):
     cursor = connection.cursor()
     try:
         if text == "收藏":
+            # 添加收藏
             cursor.execute("insert into collection (user_id,file_id) values (%s,%s)", [userId, fileId])
             returnParam["flag"] = "success"
         else:
+            # 取消收藏
             cursor.execute("delete from collection where file_id = %s and user_id = %s", [fileId, userId])
             returnParam["flag"] = "success"
     except Exception as e:
@@ -45,7 +47,7 @@ def selCollectionFiles(request):
         return_param["state"] = "notExist"
     return JsonResponse(return_param)
 
-
+# 导出文件
 def createDocs(request):
     path = os.path.join(BASE_DIR, "static/docs")
     if not os.path.exists(path):
