@@ -242,14 +242,22 @@ $(function () {
             $("#clickMenu").css("left", e.clientX - 250);
             $("#clickMenu").css("top", e.clientY - 50);
         }
+
         if ($("#roleName").val() == '只读') {
-            $("#btnDel").attr("disabled", "disabled")
-            $("#btnRename").attr("disabled", "disabled")
-            $("#btnExport").attr("disabled", "disabled")
+            // 只读用户限制不能导出，删除，重命名
+            $("#btnDel").attr("disabled", "disabled");
+            $("#btnRename").attr("disabled", "disabled");
+            $("#btnExport").attr("disabled", "disabled");
+        } else if (saveState == "my_collection") {
+            // 非只读用户但是在我的收藏页面，不能删除和重命名，但是可以导出
+            $("#btnDel").attr("disabled", "disabled");
+            $("#btnRename").attr("disabled", "disabled");
+            $("#btnExport").removeAttr("disabled");
         } else {
-            $("#btnDel").removeAttr("disabled")
-            $("#btnRename").removeAttr("disabled")
-            $("#btnExport").removeAttr("disabled")
+            //非只读用户不在我的收藏页面，没有限制
+            $("#btnDel").removeAttr("disabled");
+            $("#btnRename").removeAttr("disabled");
+            $("#btnExport").removeAttr("disabled");
         }
     });
 
