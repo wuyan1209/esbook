@@ -33,4 +33,56 @@
     cursor:e-resize
 }
 .row-height-panel div{
-    height:8px;position:absolute;cursor:n-resize}.drug-ele-td{background-color:#f0f0f0!important;cursor:pointer}.rightmouse-panel-div{background-color:#fff;border:1px solid #bbd8e5;border-radius:4px}.rightmouse-panel-div .wb{line-height:30px;letter-spacing:1px;font-size:14px;padding-left:7px;cursor:pointer}.rightmouse-panel-div .wb:hover{background-color:#f0f8ff}.panel-div-left,.panel-div-right{float:left}.panel-div-left{border-right:1px solid #bbd8e5}.excel-rightmomuse-icon-css{display:inline-block;width:20px}.excel-rightmomuse-icon-next-css{margin-left:33px;font-size:18px;color:#795548}.setting .setting-text{color:#e91e63}.setting .setting-input{margin-left:4px}.setting .setting-item{margin-right:7px}.setting input{width:35px}.chosen-area-p{background-color:#03a9f4}.chosen-area-p-drug{cursor:crosshair}
+    height:8px;position:absolute;cursor:n-resize
+}
+.drug-ele-td{
+    background-color:#f0f0f0!important;cursor:pointer
+}
+.rightmouse-panel-div{
+    background-color:#fff;
+    border:1px solid #bbd8e5;
+    border-radius:4px
+}
+.rightmouse-panel-div .wb{
+    line-height:30px;
+    letter-spacing:1px;
+    font-size:14px;
+    padding-left:7px;
+    cursor:pointer
+}
+.rightmouse-panel-div .wb:hover{
+    background-color:#f0f8ff
+}
+.panel-div-left,.panel-div-right{
+    float:left
+}
+.panel-div-left{
+    border-right:1px solid #bbd8e5
+}
+.excel-rightmomuse-icon-css{
+    display:inline-block;
+    width:20px
+}
+.excel-rightmomuse-icon-next-css{
+    margin-left:33px;
+    font-size:18px;
+    color:#795548
+}
+.setting .setting-text{
+    color:#e91e63
+}
+.setting .setting-input{
+    margin-left:4px
+}
+.setting .setting-item{
+    margin-right:7px
+}
+.setting input{
+    width:35px
+}
+.chosen-area-p{
+    background-color:#03a9f4
+}
+.chosen-area-p-drug{
+    cursor:crosshair
+}

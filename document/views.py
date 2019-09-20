@@ -1351,3 +1351,5 @@ def saveTeamExcel(request):
         return_param['saveStatus'] = "fail"
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
+def test(request):
+    return render(request,"test.html")

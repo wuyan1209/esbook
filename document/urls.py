@@ -139,4 +139,5 @@ urlpatterns = [
     path('saveExcel/',views.saveExcel),
     #保存团队的excel文件
     path('saveTeamExcel/', views.saveTeamExcel),
+    path('test/',views.test),
 ]

@@ -66,9 +66,8 @@
             <img src="../static/assets/images/按键分割线.png" width="30" height="30" alt="goback"
                  class="light-logo">
 
-            <img src="../static/assets/images/users/1.jpg" style="height: 30px; width: 30px;border-radius: 15px;"
-                 alt="user" class="profile-pic m-r-10"><span
-                style="color: black;margin-top: 2px;">{{ request.session.username }}</span>
+            <a href="/personal/"><img src="../static/assets/images/users/{{request.session.icon}}" style="height: 30px; width: 30px;border-radius: 15px;margin-right: 10px"
+                 alt="user" class="profile-pic m-r-10"><span style="color: black;margin-top: 2px;">{{request.session.username}}</span></a>
         </div>
     </nav>
 </header>
@@ -179,13 +178,130 @@
 </div>
 <div id="aaaa" class="aaaaa wyb-excel-table"style="width:99%;margin: 0 auto;" ></div>
 
+<div id="youji" class="rightmouse-panel-div" style="left: 686px;top: 251px;"  >
+    <div class="panel-div-left" style="width: 200px">
+        <div class="wb duiqifangshi">
+            <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/对齐.png" style="width: 22px;height: 18px;margin-left: 2px">
+            </span>
+            <span class="excel-rightmomuse-text-css">对齐方式</span>
+            <span class="excel-rightmomuse-icon-css excel-rightmomuse-icon-next-css">
+                <img src="../static/assets/images/Excel/三角下标.png">
+            </span>
+        </div>
+        <div class="wb hebingdanyuange">
+            <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/合并单元格.png" style="width: 22px;height: 18px">
+            </span>
+            <span class="excel-rightmomuse-text-css">合并单元格</span>
+        </div>
+        <div class="wb shangchayihang">
+             <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/上.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">上方插入一行</span>
+        </div>
+        <div class="wb xiachayihang">
+             <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/下.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">下方插入一行</span>
+        </div>
+        <div class="wb zuochayilie">
+             <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/左.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">左方插入一行</span>
+        </div>
+        <div class="wb youchayilie">
+             <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/右.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">右方插入一行</span>
+        </div>
+        <div class="wb shanchuhang">
+             <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/删除行.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">删除行</span>
+        </div>
+        <div class="wb sahngchulie">
+             <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/删除列.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">删除列</span>
+        </div>
+    </div>
+    <div class="panel-div-right" style="width: 130px">
+        <div class="wb juzhong">
+            <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/居中.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">居中</span>
+        </div>
+        <div class="wb zuoduiqi">
+            <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/左对齐.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">左对齐</span>
+        </div>
+        <div class="wb youduiqi">
+            <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/右对齐.png">
+            </span>
+            <span class="excel-rightmomuse-text-css">右对齐</span>
+        </div>
+        <div class="wb chuizhijuzhong">
+            <span class="excel-rightmomuse-icon-css">
+                <img src="../static/assets/images/Excel/垂直对齐.jpg">
+            </span>
+            <span class="excel-rightmomuse-text-css">垂直居中</span>
+        </div>
+    </div>
+</div>
+
+{# 查看版本 #}
+<div id="myEditor" class="topbar">
+    <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
+</div>
+<!-- 预览模态框 -->
+<div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="margin: 35px 0 0 290px">
+        <div class="modal-content" style="width:850px;height:750px">
+            <div class="modal-header">
+                <h3 class="modal-title" id="myModalLabel"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" style="table-layout: fixed">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
 </body>
 
 <style type="text/css">
+    #myEditor{
+        position: absolute;
+        top: 65px;
+        left: 80%;
+        display: inline-block;
+        border: black 1px solid;
+        height: 600px;
+        width: 18%;
+    }
     .abc{
         display: none;
     }
 
+    .abcd{
+        display: block;
+    }
     .wyb-excel-table table {
       table-layout: auto;
     }
@@ -227,126 +343,12 @@
 <script src="../static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="../static/js/modifyexcel.js"></script>
 <script>
+
     $(function (){
-        {#$(".aaaaa").setExcelHtml("" +#}
-        {#    "<table width='99%'>" +#}
-        {#    "<tbody>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {# "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#   "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#   "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "<tr style='height: 38px;'>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 133px;'></td>" +#}
-        {#    "<td style='width: 134px;'></td>" +#}
-        {#    "<td style='width: 135px;'></td><" +#}
-        {#    "td style='width: 135px;'></td>" +#}
-        {#    "</tr>" +#}
-        {#    "</tbody>" +#}
-        {#    "</table>");#}
+          //隐藏右击出现的div
+        $("#youji").attr("style","display:none;")
         $(".wyb-excel").wybExcel();
-
     });
-
 
     var a=$("#get_excel_content").val()
     //将字符串转换为数组
@@ -355,39 +357,38 @@
     if (a!=""){
         document.getElementById("aa").className = 'abc';
      }
-
-    //将数据显示到页面  但是不能进行修改，只能看
-    var tableTitle = "<table width='100%' class='tab'>" +
-        "</table>"
-    $(".aaaaa").append(tableTitle);
-    var html = '';
-    var charass=String.fromCodePoint(65)
-    for (var i = 0; i < str.length; i++) {
-        if (i==0){
-                html+= '<tr style=\'height: 38px;\'><td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td>';
-                for (var n = 0; n < str[0].length; n++){
-                    html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(String.fromCodePoint(n+65))+'</td>';
+    showdata()
+    function showdata() {
+        $(".rightmouse-panel-div").css("display", "block");
+        if (a!=""){
+            //将数据显示到页面
+            var tableTitle = "<table width='100%' class='tab'>" +
+                "</table>"
+            $(".aaaaa").append(tableTitle);
+            var html = '';
+            for (var i = 0; i < str.length; i++) {
+                if (i==0){
+                    html+= '<tr style=\'height: 38px;\'><td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td>';
+                    for (var n = 0; n < str[0].length; n++){
+                        html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(String.fromCodePoint(n+65))+'</td>';
+                    }
                 }
+                html += '<tr style=\'height: 38px;\'>';
+                for (var j = 0; j < str[0].length; j++) {
 
-             }
-        html += '<tr style=\'height: 38px;\'>';
-        for (var j = 0; j < str[0].length; j++) {
-
-            if (j==0){
-                html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(i+1)+'</td>';
+                    if (j==0){
+                        html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(i+1)+'</td>';
+                    }
+                    if (str[i][j]=='null'){
+                        html += '<td   style=\'width: 135px;\' contenteditable="true"></td>';
+                    }else {
+                        html += '<td   style=\'width: 135px;\'  contenteditable="true">' + str[i][j] + '</td>';
+                    }
+                }
+                html += '</tr>';
             }
-            if (str[i][j]=='null'){
-                    html += '<td  style=\'width: 135px;\' contenteditable="true"></td>';
-                }else {
-                    html += '<td  style=\'width: 135px;\' contenteditable="true">' + str[i][j] + '</td>';
-                }
+            $(".tab").append("<tbody>" + html + "</tbody>");
         }
-        html += '</tr>';
-     }
-    $(".tab").append("<tbody>" + html + "</tbody>");
-
-
-
-
+    }
 </script>
 </html>

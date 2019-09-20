@@ -163,5 +163,256 @@ function getExcelcontent(objarr) {
 }
 
 
+  // 加载时获取文档标题
+    var excel_save_state = $("#excel_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
+    var userId = $("#userId").val();    // 用户的id
+    var teamId = $("#teamId").val();    // 团队的id
+    content = $("#get_excel_content").html();  // 页面加载时获取的文档内容
+    fileName = $("#excel_title").val();  // 页面加载时获取的文档标题
+    var fileId = $("#fileId").val()
+
+//点击保存版本
+    $("#saveedi").on("click", function () {
+        if (saveState == "my_doc") {
+            // 保存个人版本
+            saveEdition();
+        } else {
+            // 保存团队的版本
+            saveTeamEditor(teamId, fileId);
+        }
+    });
+
+ // 点击查看版本
+    $("#showEditor").on("click", function () {
+        $("#myEditor").show()
+        if (doc_save_state == "my_doc") {
+            //查看个人版本
+            getEdition();
+        } else {
+            // 查看团队的版本
+            getTeamEditor(teamId, fileId);
+        }
+    });
+
+    // 关闭版本框
+    $("#closeEditor").click(function () {
+        $("#myEditor").hide()
+    })
+
+    // 页面加载时隐藏版本框
+    $("#myEditor").hide()
+
+
+//阻止浏览器默认右击点击事件
+    $("#aaaa").on("contextmenu", "tr", function () {
+        return false;
+    });
+
+
+// 保存个人版本
+function saveEdition() {
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //获取当前版本内容
+    var now_doc_title = $("#docs_title").val();  //取得当前文档标题
+    var fileId = $("#fileId").val()
+
+    //判断版本是否存在
+    $.ajax({
+        type: 'POST',
+        url: '/editionExits/',
+        dataType: "json",
+        data: {
+            content: doc_content,
+        },
+        success: function (data) {
+            if (data.Exist == "YES") {
+                alert("已成功创建内容，不需重复创建")
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/saveEdition/',
+                    dataType: "json",
+                    data: {
+                        content: doc_content,
+                        filename: now_doc_title,
+                        fileId:fileId,
+                    },
+                    success: function (data) {
+                        if (data.status == 200) {
+                            // 保存成功
+                            alert(data.message);
+                        } else {
+                            // 保存失败
+                            alert(data.message);
+                        }
+                    }
+                })
+            }
+        }
+    })
+}
+
+//保存团队版本
+function saveTeamEditor(teamId, fileId) {
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //取得html格式的内容
+    var now_doc_title = $("#docs_title").val();  //取得文档标题
+
+    //判断版本是否存在
+    $.ajax({
+        type: 'POST',
+        url: '/editionExits/',
+        dataType: "json",
+        data: {
+            content: doc_content,
+        },
+        success: function (data) {
+            if (data.Exist == "YES") {
+                alert("已成功创建版本，不需重复创建")
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/saveTeamEdition/',
+                    dataType: "json",
+                    data: {
+                        content: doc_content,
+                        fileId: fileId,
+                        // teanid:teamId,
+                    },
+                    success: function (data) {
+                        if (data.status == 200) {
+                            // 保存成功
+                            alert(data.message);
+                        } else {
+                            // 保存失败
+                            alert(data.message);
+                        }
+                    }
+                })
+            }
+        }
+    })
+
+}
+
+//查看个人版本
+function getEdition() {
+    var now_doc_title = $("#docs_title").val();  //取得文档标题
+    $.ajax({
+        type: 'POST',
+        url: '/getuseredition/',
+        dataType: "json",
+        data: {
+            filename: now_doc_title,
+        },
+        success: function (data) {
+            if (data.status == 200) {
+                $("#myEditor div").remove()
+                //查看成功
+
+                for (var i = 0; i < data.list.length; i++) {
+                    //处理字符串中包含字符串
+                    contents = data.list[i][3];
+                    var str = " '" + data.list[i][3] + "'";
+                    var reg = /\"/g;
+                    str = str.replace(reg, '&quot;');//双引号 //&apos;单引号
+
+                    time = data.list[i][2];
+                    updatetime = time.substring(0, 10) + "  " + time.substring(11);
+                    html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px;\">\n" +
+                        " <span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
+                        "<span style='display:block'>" +
+                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + str + ")\">预览</button>" +
+                        "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
+                        "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][4] + ")'>删除</button></span></span>\n" +
+                        " </div>"
+                    $("#myEditor").append(html);
+                }
+            } else {
+                // 失败
+                alert("查看失败了");
+            }
+        }
+    })
+}
+
+//查看团队版本
+function getTeamEditor(teamId, fileId) {
+    var now_doc_title = $("#docs_title").val();  //取得文档标题
+    var doc_content = document.getElementById("editor"); //取得纯文本
+    doc_content = doc_content.innerHTML;    //取得html格式的内容
+    $.ajax({
+        type: 'POST',
+        url: '/getTeamEdition/',
+        dataType: "json",
+        data: {
+            fileId: fileId,
+            teamid: teamId,
+        },
+        success: function (data) {
+            if (data.status == 200) {
+                $("#myEditor div").remove()
+                //查看成功
+                for (var i = 0; i < data.list.length; i++) {
+                    //处理字符串中包含字符串
+                    contents = data.list[i][4];
+                    var str = " '" + data.list[i][4] + "'";
+                    var reg = /\"/g;
+                    str = str.replace(reg, '&quot;');//双引号 //&apos;单引号
+
+                    time = data.list[i][3];
+                    updatetime = time.substring(0, 10) + "  " + time.substring(11);
+                    html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
+                        "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
+                        "<span style='display:block'>" +
+                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][6] + "','" + updatetime + "'," + str + ")\">预览</button>" +
+                        "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
+                        "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</button></span></span>\n" +
+                        "</div>"
+                    $("#myEditor").append(html);
+                }
+                if ($("#roleName").val() == '只读') {
+                    $(".reduction").attr("disabled", true);
+                    $(".del").attr("disabled", true);
+                }
+            } else {
+                // 失败
+                alert("查看失败了");
+            }
+        }
+    })
+}
+
+//删除版本
+function delectEdition(ediId) {
+    var saveState = $("#doc_save_state").val();
+    var userId = $("#userId").val();
+    var fileId = $("#fileId").val();
+
+    if (window.confirm("您确定要删除该版本吗？删除之后将无法还原！")) {
+
+        window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
+            "&user_id=" + userId + "&fileId=" + fileId + "&ediId=" + ediId;
+
+    }
+}
+
+//版本预览 给模态框传值
+function passName(filename, time, content) {
+    $("#myModalLabel").html(filename + '&emsp;&emsp;&emsp;' + time)
+    $(".modal-body").html(content)
+}
+
+//还原版本
+function getoldEdition(content) {
+    if (window.confirm("您确定要还原到该版本吗？")) {
+        EDITOR.setData(content)
+    }
+}
+
+
 
 
