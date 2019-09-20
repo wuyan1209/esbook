@@ -87,8 +87,10 @@
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="/personal/">
-                            <img src="../static/assets/images/users/{{request.session.icon}}" alt="user" style="width: 30px;height:30px;margin-right:10px;border-radius:50%;object-fit:cover"
-                                 /><span id="user" userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
+                            <img src="../static/assets/images/users/{{ request.session.icon }}" alt="user"
+                                 style="width: 30px;height:30px;margin-right:10px;border-radius:50%;object-fit:cover"
+                            /><span id="user"
+                                    userId="{{ request.session.userId }}">{{ request.session.username }}</span></a>
                         <a href="/logout/" class="link" data-toggle="tooltip" title="Logout"><i
                                 class="mdi mdi-power"></i>退出登录</a>
                     </li>
@@ -227,7 +229,7 @@
             <div id="box2">
                 <div style="margin-top: 2%">
                     <h2 id="h2" style="margin-left: 1.5%">我的文档</h2>
-                    <input type="hidden" id="roleName"/>
+                    <input hidden id="roleName"/>
                     <table id="tab" class="table table-hover">
                     </table>
                     <div id="clickMenu" style="display: none;position:absolute;">
@@ -521,16 +523,16 @@
                             '</tr>';
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
-                    if (saveState == "my_doc") {
-                        $("#dropdownMenuButton").attr("disabled", false);
-                        $("#inputfiles").removeAttr("disabled");
-                        $("#daoru").removeAttr("disabled");
-                    } else {
-                        $("#dropdownMenuButton").attr("disabled", true);
-                        $("#inputfiles").attr("disabled", true);
-                        $("#daoru").attr("disabled", true)
-                    }
-
+                }
+                //收藏夹不能导入和新建
+                if (saveState == "my_doc") {
+                    $("#dropdownMenuButton").attr("disabled", false);
+                    $("#inputfiles").removeAttr("disabled");
+                    $("#daoru").removeAttr("disabled");
+                } else {
+                    $("#dropdownMenuButton").attr("disabled", true);
+                    $("#inputfiles").attr("disabled", true);
+                    $("#daoru").attr("disabled", true)
                 }
 
             }
@@ -582,7 +584,6 @@
             }
 
             //团队文档列表
-
             function team_file(teamName) {
                 //点击查询清空之前的数据
                 $("#bin").html("");
@@ -593,6 +594,7 @@
                     data: {"teamName": teamName, "page": 1},
                     dataType: "json",
                     success: function (data) {
+                        console.log(data)
                         //处理第一页的数据
                         appendTable(data);
                         var options = {//根据后台返回的分页相关信息，设置插件参数
@@ -667,28 +669,18 @@
                             '</tr>';
                     }
                     $("#tab").append("<tbody>" + html + "</tbody>");
-
-                    //只读角色不能导入
-                    if ("只读" == data.roleName) {
-                        $("#inputfiles").attr("disabled", true);
-                        $("#daoru").attr("disabled", true)
-                    } else {
-                        $("#inputfiles").removeAttr("disabled");
-                        $("#daoru").removeAttr("disabled")
-                    }
                 }
-
-            }
-
-            //只读角色不能新建
-            $("#dropdownMenuButton").on("click", function () {
-                var roleName = $("#roleName").val();
-                if (roleName == '只读') {
-                    $(".Setup").attr("disabled", true);
+                //只读角色不能导入和新建
+                if ("只读" == data.roleName) {
+                    $("#dropdownMenuButton").attr("disabled", true);
+                    $("#inputfiles").attr("disabled", true);
+                    $("#daoru").attr("disabled", true)
                 } else {
-                    $(".Setup").removeAttr("disabled");
+                    $("#dropdownMenuButton").removeAttr("disabled");
+                    $("#inputfiles").removeAttr("disabled");
+                    $("#daoru").removeAttr("disabled")
                 }
-            })
+            }
 
             // 改变保存状态的值
             function changeSaveState(teamId, teamName) {

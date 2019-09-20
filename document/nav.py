@@ -53,3 +53,25 @@ def openMyCollection(request):
         return JsonResponse(
             {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": collectionlist})
     return JsonResponse({'status': 2001, 'message': '暂无数据'})
+
+# 通过文件id查找用户在团队的角色
+def getRoleName(request):
+    fileId=request.POST['fileId']
+    userId=request.session['userId']
+    # 判断是自己文件还是团队文件
+    cursor=connection.cursor()
+    cursor.execute('select f.file_id from file f,user u,user_file uf '
+                   'where f.file_id=uf.file_id and u.user_id=uf.user_id and f.file_id= '+fileId)
+    result=cursor.fetchone()
+    # 个人文件
+    if result:
+        return JsonResponse({'roleName': '超级管理员'})
+    # 团队文件
+    else:
+        # 查找用户在此文件存在的团队内的角色
+        cursor.execute('select r.role_name from team_member tm,member_role mr,role r '
+                       'where tm.team_mem_id=mr.team_mem_id and mr.role_id=r.role_id '
+                       'and tm.user_id=%s and tm.team_id=(select tm.team_id  from team_member tm,member_file mf,file f '
+                       'where tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id and f.file_id=%s)',[userId,fileId])
+        roleName=cursor.fetchone()[0]
+        return JsonResponse({'roleName':roleName})

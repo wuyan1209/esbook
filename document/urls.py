@@ -136,6 +136,8 @@ urlpatterns = [
     path('selCollectionFiles/', clickMenu.selCollectionFiles),
     # 打开我的收藏
     path('openMyCollection/', nav.openMyCollection),
+    # 通过文件id查找用户在团队的角色
+    path('getRoleName/',nav.getRoleName),
     # 跳转到excel页面
     path('excelModify/', views.excelModify),
     #保存excel内容

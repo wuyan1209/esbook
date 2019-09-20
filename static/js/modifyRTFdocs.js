@@ -43,6 +43,25 @@ $(function () {
     fileName = $("#docs_title").val();  // 页面加载时获取的文档标题
     var fileId = $("#fileId").val()
 
+    //获取用户在团队中的角色
+    $.ajax({
+        url: '/getRoleName/',
+        type: 'post',
+        data: {
+            "fileId":fileId
+        },
+        dataType: 'json',
+        success: function (data) {
+            $("#roleName").val(data.roleName);
+            if (data.roleName=="只读"){
+                $("#docs_title").attr("readOnly", true); //文件名不能修改
+                $("#editor").attr("contenteditable", false);     //编辑器内容不能修改
+                $("#saveedi").attr("disabled", true);    // 版本保存按钮不可点击
+            }
+        }
+    });
+
+
 
     // 用户角色为只读时，不能对文件进行修改，不能保存、删除、还原版本
     var roleName = $("#roleName").val()
