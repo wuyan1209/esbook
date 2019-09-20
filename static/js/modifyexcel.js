@@ -162,58 +162,51 @@ function getExcelcontent(objarr) {
     return tree;
 }
 
+//阻止浏览器默认右击点击事件
+$("#aaaa").on("contextmenu", "tr", function () {
+    return false;
+});
 
-  // 加载时获取文档标题
-    var excel_save_state = $("#excel_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
-    var userId = $("#userId").val();    // 用户的id
-    var teamId = $("#teamId").val();    // 团队的id
-    content = $("#get_excel_content").html();  // 页面加载时获取的文档内容
-    fileName = $("#excel_title").val();  // 页面加载时获取的文档标题
-    var fileId = $("#fileId").val()
+
 
 //点击保存版本
-    $("#saveedi").on("click", function () {
-        if (saveState == "my_doc") {
-            // 保存个人版本
-            saveEdition();
-        } else {
-            // 保存团队的版本
-            saveTeamEditor(teamId, fileId);
-        }
-    });
+$("#saveedi").on("click", function () {
+    if (excel_save_state == "my_doc") {
+        // 保存个人版本
+        saveExcelEdition();
+    } else {
+        // 保存团队的版本
+        saveExcelTeamEditor(teamId, fileId);
+    }
+});
 
- // 点击查看版本
-    $("#showEditor").on("click", function () {
-        $("#myEditor").show()
-        if (doc_save_state == "my_doc") {
-            //查看个人版本
-            getEdition();
-        } else {
-            // 查看团队的版本
-            getTeamEditor(teamId, fileId);
-        }
-    });
+// 点击查看版本
+$("#showEditor").on("click", function () {
+    $("#myEditor").show()
+    if (excel_save_state == "my_doc") {
+        //查看个人版本
+        getExcelEdition();
+    } else {
+        // 查看团队的版本
+        getExcelTeamEditor(teamId, fileId);
+    }
+});
 
-    // 关闭版本框
-    $("#closeEditor").click(function () {
-        $("#myEditor").hide()
-    })
-
-    // 页面加载时隐藏版本框
+// 关闭版本框
+$("#closeEditor").click(function () {
     $("#myEditor").hide()
+})
 
-
-//阻止浏览器默认右击点击事件
-    $("#aaaa").on("contextmenu", "tr", function () {
-        return false;
-    });
-
+// 页面加载时隐藏版本框
+$("#myEditor").hide()
 
 // 保存个人版本
-function saveEdition() {
-    var doc_content = document.getElementById("editor"); //取得纯文本
-    doc_content = doc_content.innerHTML;    //获取当前版本内容
-    var now_doc_title = $("#docs_title").val();  //取得当前文档标题
+function saveExcelEdition() {
+    //表格数据为二维数据
+    var a=getTableData();
+    //将数组转换为字符串格式
+    excel_content=getExcelcontent(a)
+    var excel_title = $("#excel_title").val();  //取得当前文档标题
     var fileId = $("#fileId").val()
 
     //判断版本是否存在
@@ -222,7 +215,7 @@ function saveEdition() {
         url: '/editionExits/',
         dataType: "json",
         data: {
-            content: doc_content,
+            content: excel_content,
         },
         success: function (data) {
             if (data.Exist == "YES") {
@@ -233,8 +226,8 @@ function saveEdition() {
                     url: '/saveEdition/',
                     dataType: "json",
                     data: {
-                        content: doc_content,
-                        filename: now_doc_title,
+                        content: excel_content,
+                        filename: excel_title,
                         fileId:fileId,
                     },
                     success: function (data) {
@@ -253,10 +246,12 @@ function saveEdition() {
 }
 
 //保存团队版本
-function saveTeamEditor(teamId, fileId) {
-    var doc_content = document.getElementById("editor"); //取得纯文本
-    doc_content = doc_content.innerHTML;    //取得html格式的内容
-    var now_doc_title = $("#docs_title").val();  //取得文档标题
+function saveExcelTeamEditor(teamId, fileId) {
+   //表格数据为二维数据
+    var a=getTableData();
+    //将数组转换为字符串格式
+    excel_content=getExcelcontent(a)
+    var excel_title = $("#excel_title").val();  //取得当前文档标题
 
     //判断版本是否存在
     $.ajax({
@@ -264,7 +259,7 @@ function saveTeamEditor(teamId, fileId) {
         url: '/editionExits/',
         dataType: "json",
         data: {
-            content: doc_content,
+            content: excel_content,
         },
         success: function (data) {
             if (data.Exist == "YES") {
@@ -275,9 +270,9 @@ function saveTeamEditor(teamId, fileId) {
                     url: '/saveTeamEdition/',
                     dataType: "json",
                     data: {
-                        content: doc_content,
+                        content: excel_content,
+                        filename: excel_title,
                         fileId: fileId,
-                        // teanid:teamId,
                     },
                     success: function (data) {
                         if (data.status == 200) {
@@ -296,7 +291,7 @@ function saveTeamEditor(teamId, fileId) {
 }
 
 //查看个人版本
-function getEdition() {
+function getExcelEdition() {
     var now_doc_title = $("#docs_title").val();  //取得文档标题
     $.ajax({
         type: 'POST',
@@ -338,7 +333,7 @@ function getEdition() {
 }
 
 //查看团队版本
-function getTeamEditor(teamId, fileId) {
+function getExcelTeamEditor(teamId, fileId) {
     var now_doc_title = $("#docs_title").val();  //取得文档标题
     var doc_content = document.getElementById("editor"); //取得纯文本
     doc_content = doc_content.innerHTML;    //取得html格式的内容

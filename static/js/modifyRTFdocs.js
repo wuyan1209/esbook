@@ -368,6 +368,7 @@ function saveTeamEditor(teamId, fileId) {
                     data: {
                         content: doc_content,
                         fileId: fileId,
+                        filename:now_doc_title,
                         // teanid:teamId,
                     },
                     success: function (data) {
@@ -457,7 +458,7 @@ function getTeamEditor(teamId, fileId) {
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
                         "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
                         "<span style='display:block'>" +
-                        "<span class='sspan' title='" + data.list[i][1] + "'>" + data.list[i][1] + "保存</span><span class='sspan1'>" +
+                        "<span class='sspan' title='" + data.list[i][7] + "'>" + data.list[i][7] + "保存</span><span class='sspan1'>" +
 
                         "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][6] + "','" + updatetime + "'," + str + ")\">预览</button>" +
                         "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +

@@ -867,18 +867,16 @@ def saveTeamEdition(request):
     member = request.session.get('username')
     content = request.POST.get('content')
     fileId = request.POST.get('fileId')
+    edi_name=request.POST.get('filename')
     # 获取当前时间
     localTime = time.localtime(time.time())
     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
     sid = transaction.savepoint()
     try:
         cursor = connection.cursor()
-        # 获取userid和fileid
-        cursor.execute('select user_id from user where user_name="' + member + '"')
-        userid = cursor.fetchone()
 
         # 保存版本
-        cursor.execute('insert into edition (save_date,content) values(% s, % s)', [formatTime, content])
+        cursor.execute('insert into edition (save_date,content,save_name,edi_name) values(%s,%s,%s,%s)', [formatTime, content,member,edi_name])
         cursor.execute('select edi_id from edition order by edi_id desc limit 1')
         edi_id = cursor.fetchone()
         # 获取团队文件表id
@@ -895,7 +893,6 @@ def saveTeamEdition(request):
         status = 2001
         message = '团队版本保存失败'
         transaction.savepoint_rollback(sid)
-        transaction.savepoint_rollback(sid)
     return JsonResponse({'status': 200, "message": message})
 
 
@@ -908,7 +905,7 @@ def getTeamEdition(request):
     teamname = cursor.fetchone()
     fileId = request.POST.get('fileId')
     cursor.execute(
-        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name '
+        'select t.team_name,u.user_name,f.file_name,e.save_date,e.content,e.edi_id,e.edi_name,e.save_name '
         'from team t,team_member tm,member_file mf,member_edition me,user u ,file f,edition e '
         'where t.team_id=tm.team_id and tm.user_id=u.user_id and tm.team_mem_id=mf.team_mem_id and  mf.file_id=f.file_id and mf.mem_file_id=me.mem_file_id and me.edi_id=e.edi_id '
         'and t.team_name = %s and f.file_id = %s and e.edi_state=0 order by e.save_date desc', [teamname, fileId])

@@ -135,6 +135,7 @@ class Edition(models.Model):
     content = models.TextField(blank=True, null=True)
     url = models.CharField(max_length=150, blank=True, null=True)
     edi_name= models.CharField(max_length=50, blank=True, null=True)
+    save_name = models.CharField(max_length=50, blank=True, null=True)
     edi_state = models.IntegerField()
 
     class Meta:
