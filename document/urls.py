@@ -5,6 +5,7 @@ from document import views, clickMenu, nav,login
 urlpatterns = [
     # 主页面
     path('', login.index),
+    path('index/', login.index),
     # 新增docs
     path('RTFdocs/', views.RTFdocs),
     # 添加协作空间
