@@ -101,6 +101,8 @@ urlpatterns = [
     path('resetPwd/',login.resetPwd),
     # 重置密码
     path('updatePwd/',login.updatePwd),
+    # 绑定邮箱
+    path('bindEmail/',login.bindEmail),
 
 
     # 个人文件上传
