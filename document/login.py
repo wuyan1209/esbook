@@ -8,7 +8,7 @@ from email.header import Header
 from django.db import connection
 from django.contrib.auth.hashers import check_password, make_password
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from esbook.settings import MEDIA_ROOT
 
 # 第三方 SMTP 服务
@@ -22,7 +22,11 @@ sender = 's_wuyan@126.com'  # 发送者邮箱
 
 # 跳转到主页面
 def index(request):
-    return render(request, 'index.html')
+    userId = request.session.get("userId")
+    if userId:
+        return render(request, 'index.html')
+    else:
+        return redirect("login/")
 
 
 # 跳转到登录页面
@@ -274,3 +278,16 @@ def updatePwd(request):
             return JsonResponse({"status": 2003, "message": "修改失败"})
     else:
         return JsonResponse({"status": 2001, "message": "用户不存在"})
+
+
+# 绑定邮箱
+def bindEmail(request):
+    email = request.POST['email']
+    userId = request.session['userId']
+    # 修改
+    cursor = connection.cursor()
+    try:
+        cursor.execute('update user set email=%s where user_id=%s', [email, userId])
+        return JsonResponse({"status": 200, "message": "绑定成功"})
+    except:
+        return JsonResponse({"status": 2003, "message": "绑定失败"})

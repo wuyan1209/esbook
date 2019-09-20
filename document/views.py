@@ -588,7 +588,7 @@ def teamfile(request):
         return JsonResponse(
             {'status': 200, "page": int(page), "pageSize": pageSize, "totalPage": totalPage, "list": list,
              "roleName": roleName})
-    return JsonResponse({'status': 2001, 'message': '暂无数据'})
+    return JsonResponse({'status': 2001, 'message': '暂无数据',"roleName": roleName})
 
 
 

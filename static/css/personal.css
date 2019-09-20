@@ -1,6 +1,6 @@
 .tit {
     font-size: 15px;
-    padding-left: 27.5%;
+    padding-left: 22.5%;
 }
 .body{
     border: #C3C3C3  1px;
@@ -21,7 +21,7 @@
     height: 400px;
     float: left;
     border-right: 1px #e8e4e4 solid;
-    padding-top: 15%;
+    padding-top: 12%;
     text-align: center;
     position: relative;
 }
@@ -30,7 +30,7 @@
     float: right;
     height: 400px;
     padding-left: 7%;
-    padding-top: 9%;
+    padding-top: 7%;
 }
 .img{
     width: 70px;
@@ -63,8 +63,10 @@
 .p{
     display: inline-block;
     margin-left: 8%;
+    width: 50%;
 }
 .dis{
     color: silver;
+    width: 50%;
 }
 

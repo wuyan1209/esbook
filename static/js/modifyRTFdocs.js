@@ -43,6 +43,25 @@ $(function () {
     fileName = $("#docs_title").val();  // 页面加载时获取的文档标题
     var fileId = $("#fileId").val()
 
+    //获取用户在团队中的角色
+    $.ajax({
+        url: '/getRoleName/',
+        type: 'post',
+        data: {
+            "fileId":fileId
+        },
+        dataType: 'json',
+        success: function (data) {
+            $("#roleName").val(data.roleName);
+            if (data.roleName=="只读"){
+                $("#docs_title").attr("readOnly", true); //文件名不能修改
+                $("#editor").attr("contenteditable", false);     //编辑器内容不能修改
+                $("#saveedi").attr("disabled", true);    // 版本保存按钮不可点击
+            }
+        }
+    });
+
+
 
     // 用户角色为只读时，不能对文件进行修改，不能保存、删除、还原版本
     var roleName = $("#roleName").val()
@@ -80,7 +99,7 @@ $(function () {
     // 修改文档名称不能重复
     $("#docs_title").change(function () {
         var docsName = $(this).val();
-        if (docsName == old_doc_title){
+        if (docsName == old_doc_title) {
             return
         }
         $.ajax({
@@ -307,7 +326,7 @@ function saveEdition() {
                     data: {
                         content: doc_content,
                         filename: now_doc_title,
-                        fileId:fileId,
+                        fileId: fileId,
                     },
                     success: function (data) {
                         if (data.status == 200) {
@@ -394,7 +413,7 @@ function getEdition() {
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px;\">\n" +
                         " <span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
                         "<span style='display:block'>" +
-                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+                        "<span class='sspan' title='" + data.list[i][1] + "'>" + data.list[i][1] + "保存</span><span class='sspan1'>" +
                         "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + str + ")\">预览</button>" +
                         "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
                         "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][4] + ")'>删除</button></span></span>\n" +
@@ -438,7 +457,7 @@ function getTeamEditor(teamId, fileId) {
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
                         "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
                         "<span style='display:block'>" +
-                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+                        "<span class='sspan' title='" + data.list[i][1] + "'>" + data.list[i][1] + "保存</span><span class='sspan1'>" +
 
                         "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][6] + "','" + updatetime + "'," + str + ")\">预览</button>" +
                         "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
@@ -470,20 +489,6 @@ function delectEdition(ediId) {
             "&user_id=" + userId + "&fileId=" + fileId + "&ediId=" + ediId;
 
     }
-    // if (window.confirm("您确定要删除该版本吗？")) {
-    //     $.ajax({
-    //         url: "/delectEdition/",
-    //         type: "POST",
-    //         dataType: "json",
-    //         data: {
-    //             "ediId": ediId,
-    //         },
-    //         success: function (data) {
-    //             alert(data.message);
-    //
-    //         },
-    //     });
-    // }
 }
 
 //版本预览 给模态框传值
@@ -497,4 +502,20 @@ function getoldEdition(content) {
     if (window.confirm("您确定要还原到该版本吗？")) {
         EDITOR.setData(content)
     }
+}
+
+// 监听页面关闭或刷新
+window.onbeforeunload = function () {
+
+    var n = window.event.screenX - window.screenLeft;
+    var b = n > document.documentElement.scrollWidth - 20;
+
+    if (b && window.event.clientY < 0 || window.event.altKey) { 
+        //页面关闭,保存版本
+        alert("页面关闭了")
+    } else {
+        // 页面刷新   
+
+    }
+
 }
