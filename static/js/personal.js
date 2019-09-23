@@ -28,28 +28,10 @@ $(function () {
                 $(".bind").attr("hidden",true);
             }
         }
-    })
-
+    });
 });
 
-// 图片改变时
-$('.input').bind("change", function () {
-    var res = $(".input").val()
-    if (res == null || res == " ") {
-        $("#span").text("请选择图片");
-        Time();
-    } else {
-        var extStart = res.lastIndexOf(".");
-        var ext = res.substring(extStart, res.length).toUpperCase();
-        if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") {
-            $("#span").text("图片限于png,gif,jpeg,jpg格式");
-            Time();
-        } else {
-            /*提交表单*/
-            document.form.submit();
-        }
-    }
-});
+
 
 //密码模态框隐藏时清空input
 $('#editorPassword').on('hide.bs.modal', function () {
@@ -61,6 +43,7 @@ $('#editorPassword').on('hide.bs.modal', function () {
 function Time() {
     window.setTimeout(function () {
         $("#span").text(" ");
+        document.getElementById("sInput").innerHTML="<input type=\"file\" accept=\"image/*\" class=\"input\" name=\"pic\" title=\"修改头像\"/>";
     }, 1000);
      window.setTimeout(function () {
         $("#msg0").text(" ");

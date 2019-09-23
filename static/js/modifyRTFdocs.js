@@ -48,19 +48,18 @@ $(function () {
         url: '/getRoleName/',
         type: 'post',
         data: {
-            "fileId":fileId
+            "fileId": fileId
         },
         dataType: 'json',
         success: function (data) {
             $("#roleName").val(data.roleName);
-            if (data.roleName=="只读"){
+            if (data.roleName == "只读") {
                 $("#docs_title").attr("readOnly", true); //文件名不能修改
                 $("#editor").attr("contenteditable", false);     //编辑器内容不能修改
                 $("#saveedi").attr("disabled", true);    // 版本保存按钮不可点击
             }
         }
     });
-
 
 
     // 用户角色为只读时，不能对文件进行修改，不能保存、删除、还原版本
@@ -130,14 +129,38 @@ $(function () {
 
     // 点击查看版本
     $("#showEditor").on("click", function () {
-        $("#myEditor").show()
-        if (doc_save_state == "my_doc") {
-            //查看个人版本
-            getEdition();
+        if (doc_save_state == "my_collection") {
+            $.ajax({
+                url: "/docs/getDocsSaveState/",
+                type: "post",
+                data: {fileId: fileId},
+                dataType: "json",
+                success: function (data) {
+                    if (data.saveState != "") {
+                        doc_save_state = data.saveState;
+                        teamId = data.saveState;
+                        $("#myEditor").show()
+                        if (doc_save_state == "my_doc") {
+                            //查看个人版本
+                            getEdition();
+                        } else {
+                            // 查看团队的版本
+                            getTeamEditor(teamId, fileId);
+                        }
+                    }
+                }
+            })
         } else {
-            // 查看团队的版本
-            getTeamEditor(teamId, fileId);
+            $("#myEditor").show()
+            if (doc_save_state == "my_doc") {
+                //查看个人版本
+                getEdition();
+            } else {
+                // 查看团队的版本
+                getTeamEditor(teamId, fileId);
+            }
         }
+
     });
 
     // 关闭版本框
@@ -368,7 +391,7 @@ function saveTeamEditor(teamId, fileId) {
                     data: {
                         content: doc_content,
                         fileId: fileId,
-                        filename:now_doc_title,
+                        filename: now_doc_title,
                         // teanid:teamId,
                     },
                     success: function (data) {
@@ -386,6 +409,7 @@ function saveTeamEditor(teamId, fileId) {
     })
 
 }
+
 
 //查看个人版本
 function getEdition() {
@@ -511,7 +535,7 @@ window.onbeforeunload = function () {
     var n = window.event.screenX - window.screenLeft;
     var b = n > document.documentElement.scrollWidth - 20;
 
-    if (b && window.event.clientY < 0 || window.event.altKey) { 
+    if (b && window.event.clientY < 0 || window.event.altKey) {
         //页面关闭,保存版本
         alert("页面关闭了")
     } else {

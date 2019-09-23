@@ -50,6 +50,7 @@
 #span{
     display:block;
     margin-left: 35%;
+    color: red;
 }
 .form-control{
     display: inline-block;
