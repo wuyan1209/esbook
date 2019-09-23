@@ -335,6 +335,7 @@ function saveEdition() {
         type: 'POST',
         url: '/editionExits/',
         dataType: "json",
+        async: false,
         data: {
             content: doc_content,
         },
@@ -346,6 +347,7 @@ function saveEdition() {
                     type: 'POST',
                     url: '/saveEdition/',
                     dataType: "json",
+                    async: false,
                     data: {
                         content: doc_content,
                         filename: now_doc_title,
@@ -377,6 +379,7 @@ function saveTeamEditor(teamId, fileId) {
         type: 'POST',
         url: '/editionExits/',
         dataType: "json",
+        async: false,
         data: {
             content: doc_content,
         },
@@ -388,6 +391,7 @@ function saveTeamEditor(teamId, fileId) {
                     type: 'POST',
                     url: '/saveTeamEdition/',
                     dataType: "json",
+                    async: false,
                     data: {
                         content: doc_content,
                         fileId: fileId,
@@ -530,17 +534,15 @@ function getoldEdition(content) {
 }
 
 // 监听页面关闭或刷新
-window.onbeforeunload = function () {
-
-    var n = window.event.screenX - window.screenLeft;
-    var b = n > document.documentElement.scrollWidth - 20;
-
-    if (b && window.event.clientY < 0 || window.event.altKey) {
-        //页面关闭,保存版本
-        alert("页面关闭了")
+function checkLeave() {
+    var doc_save_state = $("#doc_save_state").val();
+    var fileId = $("#fileId").val();
+    var teamId = $("#teamId").val();
+    if (doc_save_state == "my_doc") {
+        // 保存个人版本
+        saveEdition();
     } else {
-        // 页面刷新   
-
+        // 保存团队的版本
+        saveTeamEditor(teamId, fileId);
     }
-
 }
