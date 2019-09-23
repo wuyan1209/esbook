@@ -9,8 +9,8 @@
     <!-- chartist CSS -->
     {#    <link href="../static/assets/plugins/chartist-js/dist/chartist.min.css" rel="stylesheet">#}
     {#    <link href="../static/assets/plugins/chartist-js/dist/chartist-init.css" rel="stylesheet">#}
-{#    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"#}
-{#          rel="stylesheet">#}
+    {#    <link href="../static/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css"#}
+    {#          rel="stylesheet">#}
     <link href="../static/css/modify_RTFdocs.css" rel="stylesheet">
     <!--This page css - Morris CSS -->
     <link href="../static/assets/plugins/c3-master/c3.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
     <!-- You can change the theme colors from here -->
     <link href="../static/css/colors/blue.css" id="theme" rel="stylesheet">
 </head>
-<body onload="init()">
+<body onload="init()" onbeforeunload="checkLeave()">
 <header style="background-color: #fafafa;height: 40px;z-index: 0">
     <nav class="navbar top-navbar navbar-toggleable-sm navbar-light">
 
@@ -94,9 +94,10 @@
                  class="light-logo">
 
 
-            <a href="/personal/"><img src="../static/assets/images/users/{{request.session.icon}}" style="height: 30px; width: 30px;border-radius: 15px;"
-                 alt="user" class="profile-pic m-r-10"><span
-                style="color: black;margin-top: 2px;">{{request.session.username}}</span></a>
+            <a href="/personal/"><img src="../static/assets/images/users/{{ request.session.icon }}"
+                                      style="height: 30px; width: 30px;border-radius: 15px;"
+                                      alt="user" class="profile-pic m-r-10"><span
+                    style="color: black;margin-top: 2px;">{{ request.session.username }}</span></a>
         </div>
     </nav>
 </header>
@@ -117,7 +118,7 @@
     <a href="javascript:void(0)" id="closeEditor" class="close">&times;</a>
 </div>
 <style>
-    .btn0{
+    .btn0 {
         width: 50px;
         display: inline-block;
         text-align: center;
@@ -126,8 +127,9 @@
         color: #0275d8;
         margin-top: 2px;
     }
-    .sspan{
-        display:inline-block;
+
+    .sspan {
+        display: inline-block;
         width: 62px;
         overflow: hidden;
         white-space: nowrap;
@@ -135,8 +137,9 @@
         vertical-align: middle;
         padding-top: 4px;
     }
-    .sspan1{
-       vertical-align: middle;
+
+    .sspan1 {
+        vertical-align: middle;
     }
 </style>
 <!-- 预览模态框 -->
