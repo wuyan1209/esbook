@@ -75,3 +75,4 @@ def getRoleName(request):
                        'where tm.team_mem_id=mf.team_mem_id and mf.file_id=f.file_id and f.file_id=%s)',[userId,fileId])
         roleName=cursor.fetchone()[0]
         return JsonResponse({'roleName':roleName})
+
