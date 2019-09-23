@@ -36,6 +36,7 @@ $("#sure_excel").on("click", function () {
     });
     // 文件名不重复，可以创建文档
     if (excelflag) {
+        $("#excel_name").val("");
         if (saveState == "my_doc") {
             $.ajax({
                 url: "/saveuserExcel/",
@@ -90,7 +91,7 @@ function toExcel(excel_name, userId, fileId,roleName) {
 
 //点击保存按钮 进行数据保存
 
-    $("#CKEditor_data_modify").on("click", function () {
+$("#CKEditor_data_modify").on("click", function () {
         var excel_name = $("#excel_title").val();
         var fileId = $("#fileId").val()
         if (excel_name == null || excel_name == "") {
@@ -99,6 +100,7 @@ function toExcel(excel_name, userId, fileId,roleName) {
         }
         //表格数据为二维数据
         var a=getTableData();
+        console.log(a)
         //将数组转换为字符串格式
         excel_content=getExcelcontent(a)
 
@@ -126,8 +128,8 @@ function toExcel(excel_name, userId, fileId,roleName) {
 //获取表格中的数据
 function getTableData() {
     var a=[];
-    //var trList = $('#aa').find('tbody').children("tr");
-    var trList = $("tbody").children("tr");
+    var trList = $('#aa').find('tbody').children("tr");
+    //var trList = $("tbody").children("tr");
     for (var i = 1; i < trList.length; i++) {
         var tdArr = trList.eq(i).find("td");
         var b=[];
@@ -168,37 +170,45 @@ $("#aaaa").on("contextmenu", "tr", function () {
 });
 
 
-
-//点击保存版本
-$("#saveedi").on("click", function () {
-    if (excel_save_state == "my_doc") {
-        // 保存个人版本
-        saveExcelEdition();
-    } else {
-        // 保存团队的版本
-        saveExcelTeamEditor(teamId, fileId);
-    }
-});
+$(function () {
+    var excel_save_state = $("#excel_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
+    var teamId = $("#teamId").val();    // 团队的id
+    var fileId = $("#fileId").val()
+    //点击保存版本
+    $("#saveedi").on("click", function () {
+        if (excel_save_state == "my_doc") {
+            // 保存个人版本
+            saveExcelEdition();
+        } else {
+            // 保存团队的版本
+            saveExcelTeamEditor(teamId, fileId);
+        }
+    });
 
 // 点击查看版本
-$("#showEditor").on("click", function () {
-    $("#myEditor").show()
-    if (excel_save_state == "my_doc") {
-        //查看个人版本
-        getExcelEdition();
-    } else {
-        // 查看团队的版本
-        getExcelTeamEditor(teamId, fileId);
-    }
-});
+    $("#showEditor").on("click", function () {
+        $("#myEditor").show()
+        if (excel_save_state == "my_doc") {
+            //查看个人版本
+            getExcelEdition();
+        } else {
+            // 查看团队的版本
+            getExcelTeamEditor(teamId, fileId);
+        }
+    });
 
 // 关闭版本框
-$("#closeEditor").click(function () {
-    $("#myEditor").hide()
-})
+    $("#closeEditor").click(function () {
+        $("#myEditor").hide()
+    })
 
 // 页面加载时隐藏版本框
-$("#myEditor").hide()
+    $("#myEditor").hide()
+
+})
+
+
+
 
 // 保存个人版本
 function saveExcelEdition() {
@@ -292,13 +302,13 @@ function saveExcelTeamEditor(teamId, fileId) {
 
 //查看个人版本
 function getExcelEdition() {
-    var now_doc_title = $("#docs_title").val();  //取得文档标题
+    var excel_title = $("#excel_title").val();  //取得文档标题
     $.ajax({
         type: 'POST',
         url: '/getuseredition/',
         dataType: "json",
         data: {
-            filename: now_doc_title,
+            filename: excel_title,
         },
         success: function (data) {
             if (data.status == 200) {
@@ -308,18 +318,15 @@ function getExcelEdition() {
                 for (var i = 0; i < data.list.length; i++) {
                     //处理字符串中包含字符串
                     contents = data.list[i][3];
-                    var str = " '" + data.list[i][3] + "'";
-                    var reg = /\"/g;
-                    str = str.replace(reg, '&quot;');//双引号 //&apos;单引号
 
                     time = data.list[i][2];
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px;\">\n" +
-                        " <span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
+                        " <span style='display:block'>" + updatetime + "&nbsp;版本</span>\n" +
                         "<span style='display:block'>" +
-                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
-                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + str + ")\">预览</button>" +
-                        "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
+                        "<span class='sspan' title='"+ data.list[i][0] + "'>"+data.list[i][0]+"保存</span><span class='sspan1'>"+
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][5] + "','" + updatetime + "'," + contents + ")\">预览</button>" +
+                        "<button class=\"btn0 reduction\"  onclick=\"getExceloldEdition(" + contents + ")\">还原</button>" +
                         "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][4] + ")'>删除</button></span></span>\n" +
                         " </div>"
                     $("#myEditor").append(html);
@@ -334,9 +341,6 @@ function getExcelEdition() {
 
 //查看团队版本
 function getExcelTeamEditor(teamId, fileId) {
-    var now_doc_title = $("#docs_title").val();  //取得文档标题
-    var doc_content = document.getElementById("editor"); //取得纯文本
-    doc_content = doc_content.innerHTML;    //取得html格式的内容
     $.ajax({
         type: 'POST',
         url: '/getTeamEdition/',
@@ -352,19 +356,16 @@ function getExcelTeamEditor(teamId, fileId) {
                 for (var i = 0; i < data.list.length; i++) {
                     //处理字符串中包含字符串
                     contents = data.list[i][4];
-                    var str = " '" + data.list[i][4] + "'";
-                    var reg = /\"/g;
-                    str = str.replace(reg, '&quot;');//双引号 //&apos;单引号
 
                     time = data.list[i][3];
                     updatetime = time.substring(0, 10) + "  " + time.substring(11);
                     html = "<div  style=\"border: 1px gray solid;margin-top: 20px;height: 55px\">\n" +
-                        "<span style='display:block'>" + updatetime + "&nbsp;&nbsp;&nbsp;版本&nbsp;</span>\n" +
+                        "<span style='display:block'>" + updatetime + "&nbsp;版本</span>\n" +
                         "<span style='display:block'>" +
-                        "<span class='sspan' title='"+ data.list[i][1] + "'>"+data.list[i][1]+"保存</span><span class='sspan1'>"+
+                        "<span class='sspan' title='"+ data.list[i][7] + "'>"+data.list[i][7]+"保存</span><span class='sspan1'>"+
 
-                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][6] + "','" + updatetime + "'," + str + ")\">预览</button>" +
-                        "<button class=\"btn0 reduction\"  onclick=\"getoldEdition(" + str + ")\">还原</button>" +
+                        "<button class=\"btn0\" data-toggle=\'modal\' data-target=\'#selectModal\' onclick=\"passName('" + data.list[i][6] + "','" + updatetime + "'," + contents + ")\">预览</button>" +
+                        "<button class=\"btn0 reduction\"  onclick=\"getExceloldEdition(" +  contents + ")\">还原</button>" +
                         "<button class=\"btn0 del\" onclick='delectEdition(" + data.list[i][5] + ")'>删除</button></span></span>\n" +
                         "</div>"
                     $("#myEditor").append(html);
@@ -381,15 +382,15 @@ function getExcelTeamEditor(teamId, fileId) {
     })
 }
 
+
 //删除版本
 function delectEdition(ediId) {
-    var saveState = $("#doc_save_state").val();
+    var saveState = $("#excel_save_state").val();
     var userId = $("#userId").val();
     var fileId = $("#fileId").val();
 
     if (window.confirm("您确定要删除该版本吗？删除之后将无法还原！")) {
-
-        window.location.href = "/delectEdition/?saveState=" + saveState + "&content=" + content +
+        window.location.href = "/delectExcelEdition/?saveState=" + saveState +
             "&user_id=" + userId + "&fileId=" + fileId + "&ediId=" + ediId;
 
     }
@@ -402,7 +403,7 @@ function passName(filename, time, content) {
 }
 
 //还原版本
-function getoldEdition(content) {
+function getExceloldEdition(content) {
     if (window.confirm("您确定要还原到该版本吗？")) {
         EDITOR.setData(content)
     }
