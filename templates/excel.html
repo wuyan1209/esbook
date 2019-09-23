@@ -274,16 +274,6 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body">
-                <table style="width: 100%;border: 1px gray solid">
-                    <tr>
-                        <td>11</td>
-                        <td>12</td>
-                    </tr>
-                    <tr>
-                        <td>21</td>
-                        <td>22</td>
-                    </tr>
-                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" style="width: 120px;height: 48px">
@@ -392,9 +382,8 @@
     if (a!=""){
         document.getElementById("aa").className = 'abc';
      }
-    showdata()
+    showdata();
     function showdata() {
-        //$(".rightmouse-panel-div").css("display", "block");
         if (a!=""){
             //将数据显示到页面
             var tableTitle = "<table width='100%' class='tab'>" +

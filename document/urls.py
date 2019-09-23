@@ -146,4 +146,6 @@ urlpatterns = [
     path('saveTeamExcel/', views.saveTeamExcel),
     #删除excel版本
     path('delectExcelEdition/',views.delectExcelEdition),
+    #还原excel版本
+    path('getExceloldEdition/',views.getExceloldEdition),
 ]

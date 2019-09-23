@@ -804,7 +804,6 @@ def editionExits(request):
             return_param['Exist'] = "No"
     return HttpResponse(json.dumps(return_param))
 
-
 # 保存个人文件版本
 @transaction.atomic
 def saveEdition(request):
@@ -858,7 +857,6 @@ def getuseredition(request):
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
 
-
 # 保存团队文件版本
 @transaction.atomic
 def saveTeamEdition(request):
@@ -894,7 +892,6 @@ def saveTeamEdition(request):
         transaction.savepoint_rollback(sid)
     return JsonResponse({'status': 200, "message": message})
 
-
 # 查看团队版本
 def getTeamEdition(request):
     cursor = connection.cursor()
@@ -911,7 +908,6 @@ def getTeamEdition(request):
     list = cursor.fetchall()
     cursor.close()
     return JsonResponse({'status': 200, "list": list})
-
 
 # 删除文件
 def delFiles(request):
@@ -930,7 +926,6 @@ def delFiles(request):
         return_param["flag"] = "fail"
     return HttpResponse(json.dumps(return_param))
 
-
 # 将本地文件写到项目中
 def handle_uploaded_file(file_obj, ext):
     name = os.path.splitext(file_obj.name)[0]
@@ -940,7 +935,6 @@ def handle_uploaded_file(file_obj, ext):
     with open(file_path, 'wb+') as f:
         for chunk in file_obj.chunks():
             f.write(chunk)
-
 
 # 获取文档中的内容
 def getcontent(file_path):
@@ -979,7 +973,6 @@ def getcontent(file_path):
             content += "<p></p>"
 
     return content
-
 
 # 个人文件上传
 @transaction.atomic
@@ -1024,7 +1017,6 @@ def user_upload_file(request):
                 message = "文件上传失败"
                 transaction.savepoint_rollback(sid)
                 return JsonResponse({'status': status, 'message': message})
-
 
 # 团队文件上传
 @transaction.atomic
@@ -1079,7 +1071,6 @@ def team_upload_file(request):
                 transaction.savepoint_rollback(sid)
                 return JsonResponse({'status': status, 'message': message})
 
-
 # 判断导入的文件名是否重复
 @transaction.atomic
 def uploadexist(request):
@@ -1128,7 +1119,6 @@ def uploadexist(request):
                     message = "文件不存在，可以导入该文件"
             return JsonResponse({"status": status, "message": message})
 
-
 # 协作编辑
 def cooperation_edite(request):
     fileId = request.POST.get("fileId")
@@ -1137,10 +1127,8 @@ def cooperation_edite(request):
     doc_content = cursor.fetchone()[0]
     return JsonResponse({'doc_content': doc_content})
 
-
 def showrxcel(request):
     return render(request, "excel.html")
-
 
 # 还原版本
 def getoldEdition(request):
@@ -1160,7 +1148,6 @@ def getoldEdition(request):
     request.session["doc_content"] = content
     request.session["file_id"] = fileId
     return render(request, "modify_RTFdocs.html", {"saveState": saveState})
-
 
 # 删除docx版本
 def delectEdition(request):
@@ -1363,5 +1350,17 @@ def delectExcelEdition(request):
         cursor.execute('delete ue,e from user_edition ue,edition e where e.edi_id=ue.edi_id and e.edi_id=' + editionid)
     else:
         cursor.execute('delete me,e from member_edition me,edition e where e.edi_id=me.edi_id and e.edi_id=' + editionid)
-
     return render(request, "excel.html", {"saveState": saveState})
+
+
+# 还原版本
+def getExceloldEdition(request):
+    content = request.POST.get("content")
+    fileId = request.POST.get("fileId")
+    localTime = time.localtime(time.time())
+    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localTime)
+    cursor = connection.cursor()
+    cursor.execute("update file set content = %s,cre_date=%s where file_id = %s", [content,formatTime,fileId])
+    status=200
+    return JsonResponse({'status': status})
+

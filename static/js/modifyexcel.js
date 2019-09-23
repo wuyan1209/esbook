@@ -90,7 +90,6 @@ function toExcel(excel_name, userId, fileId,roleName) {
 }
 
 //点击保存按钮 进行数据保存
-
 $("#CKEditor_data_modify").on("click", function () {
         var excel_name = $("#excel_title").val();
         var fileId = $("#fileId").val()
@@ -100,7 +99,6 @@ $("#CKEditor_data_modify").on("click", function () {
         }
         //表格数据为二维数据
         var a=getTableData();
-        console.log(a)
         //将数组转换为字符串格式
         excel_content=getExcelcontent(a)
 
@@ -125,10 +123,11 @@ $("#CKEditor_data_modify").on("click", function () {
             }
         })
      });
+
 //获取表格中的数据
 function getTableData() {
     var a=[];
-    var trList = $('#aa').find('tbody').children("tr");
+    var trList = $('#aaaa').find('tbody').children("tr");
     //var trList = $("tbody").children("tr");
     for (var i = 1; i < trList.length; i++) {
         var tdArr = trList.eq(i).find("td");
@@ -141,6 +140,7 @@ function getTableData() {
     }
     return a;
 }
+
 //将数组转换成字符串
 function getExcelcontent(objarr) {
     var typeNO = objarr.length;
@@ -168,7 +168,6 @@ function getExcelcontent(objarr) {
 $("#aaaa").on("contextmenu", "tr", function () {
     return false;
 });
-
 
 $(function () {
     var excel_save_state = $("#excel_save_state").val();    // 文件状态 “my_doc”：个人  else：团队
@@ -207,15 +206,13 @@ $(function () {
 
 })
 
-
-
-
 // 保存个人版本
 function saveExcelEdition() {
     //表格数据为二维数据
     var a=getTableData();
     //将数组转换为字符串格式
     excel_content=getExcelcontent(a)
+    console.log(excel_content)
     var excel_title = $("#excel_title").val();  //取得当前文档标题
     var fileId = $("#fileId").val()
 
@@ -404,8 +401,67 @@ function passName(filename, time, content) {
 
 //还原版本
 function getExceloldEdition(content) {
+    var a=$("#get_excel_content").val()
+    var str=eval(content);
     if (window.confirm("您确定要还原到该版本吗？")) {
-        EDITOR.setData(content)
+        //隐藏
+        $("#aaaa").html("")
+        if (a!=""){
+           document.getElementById("aa").className = 'abc';
+        }
+        showdata()
+        function showdata() {
+            //将数据显示到页面
+            if (a!=""){
+                var tableTitle = "<table width='100%' class='tab'>" +
+                    "</table>"
+                $(".aaaaa").append(tableTitle);
+                var html = '';
+                for (var i = 0; i < str.length; i++) {
+                    if (i==0){
+                        html+= '<tr style=\'height: 38px;\'><td class="drug-ele-td" style=\'width: 54px;text-align: center;\'></td>';
+                        for (var n = 0; n < str[0].length; n++){
+                            html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(String.fromCodePoint(n+65))+'</td>';
+                        }
+                    }
+                    html += '<tr style=\'height: 38px;\'>';
+                    for (var j = 0; j < str[0].length; j++) {
+
+                        if (j==0){
+                            html += '<td class="drug-ele-td" style=\'width: 54px;text-align: center;\'>'+(i+1)+'</td>';
+                        }
+                        if (str[i][j]=='null'){
+                            html += '<td   style=\'width: 135px;\' contenteditable="true"></td>';
+                        }else {
+                            html += '<td   style=\'width: 135px;\'  contenteditable="true">' + str[i][j] + '</td>';
+                        }
+                    }
+                    html += '</tr>';
+                }
+                $(".tab").append("<tbody>" + html + "</tbody>");
+            }
+        }
+
+        //数据保存到数据库
+        var fileId = $("#fileId").val()
+        //表格数据为二维数据
+        var ab=getTableData();
+        //将数组转换为字符串格式
+        excel_content=getExcelcontent(ab)
+        $.ajax({
+            type: 'POST',
+            url: '/getExceloldEdition/',
+            dataType: "json",
+            data: {
+                content:excel_content,
+                fileId:fileId,
+            },
+            success: function (data) {
+               if (data.status==200){
+                   console.log("已经还原的数据保存到数据库中")
+               }
+            }
+        })
     }
 }
 
