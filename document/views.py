@@ -1348,7 +1348,7 @@ def saveTeamExcel(request):
         transaction.savepoint_rollback(sid)
     return HttpResponse(json.dumps(return_param))
 
-# 删除docx版本
+# 删除excel版本
 def delectExcelEdition(request):
     saveState = request.GET.get("saveState")
     fileId = request.GET.get("fileId")

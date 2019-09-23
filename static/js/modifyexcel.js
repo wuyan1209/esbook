@@ -36,6 +36,7 @@ $("#sure_excel").on("click", function () {
     });
     // 文件名不重复，可以创建文档
     if (excelflag) {
+        $("#excel_name").val("");
         if (saveState == "my_doc") {
             $.ajax({
                 url: "/saveuserExcel/",
@@ -90,7 +91,7 @@ function toExcel(excel_name, userId, fileId,roleName) {
 
 //点击保存按钮 进行数据保存
 
-    $("#CKEditor_data_modify").on("click", function () {
+$("#CKEditor_data_modify").on("click", function () {
         var excel_name = $("#excel_title").val();
         var fileId = $("#fileId").val()
         if (excel_name == null || excel_name == "") {
@@ -99,6 +100,7 @@ function toExcel(excel_name, userId, fileId,roleName) {
         }
         //表格数据为二维数据
         var a=getTableData();
+        console.log(a)
         //将数组转换为字符串格式
         excel_content=getExcelcontent(a)
 
@@ -126,8 +128,8 @@ function toExcel(excel_name, userId, fileId,roleName) {
 //获取表格中的数据
 function getTableData() {
     var a=[];
-    //var trList = $('#aa').find('tbody').children("tr");
-    var trList = $("tbody").children("tr");
+    var trList = $('#aa').find('tbody').children("tr");
+    //var trList = $("tbody").children("tr");
     for (var i = 1; i < trList.length; i++) {
         var tdArr = trList.eq(i).find("td");
         var b=[];
