@@ -291,3 +291,8 @@ def bindEmail(request):
         return JsonResponse({"status": 200, "message": "绑定成功"})
     except:
         return JsonResponse({"status": 2003, "message": "绑定失败"})
+
+
+
+def demo(request):
+    return render(request, '1.html')
