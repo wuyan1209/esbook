@@ -144,6 +144,13 @@ urlpatterns = [
     path('saveExcel/',views.saveExcel),
     #保存团队的excel文件
     path('saveTeamExcel/', views.saveTeamExcel),
+
     path('test/',views.test),
-    path('demo/',login.demo),
+
+
+    #删除excel版本
+    path('delectExcelEdition/',views.delectExcelEdition),
+    #还原excel版本
+    path('getExceloldEdition/',views.getExceloldEdition),
+
 ]
