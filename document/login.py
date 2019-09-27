@@ -204,6 +204,13 @@ def uploadImg(request):
     # 把头像路径添加到数据库
     cursor = connection.cursor()
     userId = request.session['userId']
+    # 获取当前数据库的头像路径
+    cursor.execute('select icon from user where user_id=%s',[userId])
+    img=cursor.fetchone()[0]
+    # 如果是默认的头像不删除直接替换，否则删除后再替换
+    path = MEDIA_ROOT
+    if img!="1.jpg":
+        os.remove(os.path.join(path, img))
     cursor.execute('update user set icon=%s where user_id=%s', [name, userId])
     cursor.close()
     request.session['icon'] = name;
@@ -292,7 +299,3 @@ def bindEmail(request):
     except:
         return JsonResponse({"status": 2003, "message": "绑定失败"})
 
-
-
-def demo(request):
-    return render(request, '1.html')

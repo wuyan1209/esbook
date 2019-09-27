@@ -118,8 +118,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+#filePath='D:/files',
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/assets/images/users').replace("\\","/") # media即为图片上传的根路径
+# MEDIA_ROOT = os.path.join(filePath, 'Photos/imgs').replace("\\","/") # media即为图片上传的根路径
