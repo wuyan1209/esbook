@@ -323,7 +323,6 @@ def docsModify(request):
     file_name = request.GET.get("file_name")  # 获取文件名称
     fileId = request.GET.get("fileId")  # 获取文件id
     saveState = request.GET.get("saveState")  # 获取文件状态
-    user_id = request.GET.get("user_id")  # 获取文件状态
     roleName = request.GET.get("roleName")  # 获取该用户对此文件的角色
 
     cursor = connection.cursor()
@@ -1056,8 +1055,6 @@ def user_upload_file(request):
                 file_id = cursor.fetchone()
                 cursor.execute("insert into user_file(user_id,file_id) values (%s,%s)", [userid, file_id])
                 cursor.close()
-                status = 200
-                message = "文件上传成功"
                 transaction.savepoint_commit(sid)
                 return redirect("/index/")
             except Exception as e:
@@ -1109,8 +1106,6 @@ def team_upload_file(request):
                 cursor.execute("insert into member_file(team_mem_id, file_id) values (%s,%s)",
                                [team_mem_id, file_id])
                 cursor.close()
-                status = 200
-                message = "文件上传成功"
                 transaction.savepoint_commit(sid)
                 return redirect("/index/")
             except Exception as e:
@@ -1157,7 +1152,6 @@ def uploadexist(request):
         if (fileNamas == ()):
             status = 2001
             message = "文件不存在，可以导入该文件"
-            return JsonResponse({"status": status, "message": message})
         else:
             for fileName in fileNamas:
                 if str(fileName[0]) == filename:
@@ -1167,7 +1161,7 @@ def uploadexist(request):
                 else:
                     status = 2001
                     message = "文件不存在，可以导入该文件"
-            return JsonResponse({"status": status, "message": message})
+        return JsonResponse({"status": status, "message": message})
 
 # 协作编辑
 def cooperation_edite(request):

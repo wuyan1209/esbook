@@ -8,6 +8,8 @@ $(function () {
         success: function (data) {
             // 填写个人信息
             var str = "../static/assets/images/users/" + data.result[5];
+            //var str = "../Photos/imgs/" + data.result[5];
+
             $(".img").attr("src", str);
             $("#name").val(data.result[2]);
             $("#password").val("1234567");
