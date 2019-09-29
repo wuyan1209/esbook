@@ -503,13 +503,14 @@
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
                         html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" fileState=\"' + data.list[i][5] + '\">\n';
                         /*word*/
-                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
-                            'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
+                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"seleteContent(\'' + saveState + '\',\'' + data.list[i][4] + '\',\'' + data.list[i][0] + '\')\"' +
+                        //var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                            'fileName=\"' + data.list[i][0] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
                         /*excel*/
                         var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"toExcel(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + data.list[i][4] + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
                         /*ppt*/
-                        var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
+                        var t3 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/ppt.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"seleteContent(\'' + data.list[i][0] + '\',\'' + data.list[i][3] + '\',\'' + saveState + '\',\'' + data.list[i][4] + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][0] + '</a></td>';
                         if (data.list[i][5] == 0) {
                             html = html + t1;
@@ -649,7 +650,7 @@
                         var mystr = text.substring(0, 10) + "  " + text.substring(11);
                         html += '<tr class=\"tr1\'\" file_id=\"' + data.list[i][4] + '\" teamName=\"' + data.list[i][1] + '\" fileState=\"' + data.list[i][8] + '\">\n'
                         /*word*/
-                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"docs_modify(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + saveState + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
+                        var t1 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/word.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);"onclick = \"seleteContent(\'' + saveState + '\',\'' + data.list[i][7] + '\',\'' + data.list[i][5] + '\')\"' +
                             'fileName=\"' + data.list[i][1] + '\" userId=\"' + data.list[i][3] + '\">' + data.list[i][5] + '</a></td>'
                         /*excel*/
                         var t2 = '<td><img style=\'width: 17px\' src=\'/static/assets/images/excel.png\'/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick = \"toExcel(\'' + data.list[i][5] + '\',\'' + data.list[i][0] + '\',\'' + data.list[i][7] + '\',\'' + data.roleName + '\')\"' +
@@ -687,6 +688,10 @@
                 saveState = teamId;
                 team_file(teamName);
             }
+            {#function seleteContent(savestatus,fileid,filename) {#}
+            {#    window.location.href = "/seleteContent/?savestatus=" + savestatus + "&fileId=" + fileid + "&filename=" + filename;#}
+            {# }#}
+
         </script>
     </div>
     <!-- 添加协作空间模态框（Modal） -->

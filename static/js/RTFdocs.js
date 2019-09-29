@@ -1,4 +1,5 @@
 $(function () {
+
     // 创建文档
     $("#sure_doc").on("click", function () {
 
@@ -48,7 +49,8 @@ $(function () {
                     dataType: "json",
                     success: function (data) {
                         if (data.saveStatus == "success") {
-                            toModify(doc_name, data.userId, data.fileId)
+                            //toModify(doc_name, data.userId, data.fileId)
+                            firstnew(saveState,data.fileId,doc_name)
                         }
                     }
                 })
@@ -66,7 +68,7 @@ $(function () {
                     success: function (data) {
                         if (data.saveStatus == "success") {
                             sendWebsocket(saveState, data.fileId)
-                            toModify(doc_name, 0, data.fileId)
+                            firstnew(saveState,data.fileId,doc_name)
                         }
                     }
                 })
@@ -297,9 +299,16 @@ $(function () {
 });
 
 // 打开已存在文档
-function toModify(doc_name, userId, fileId) {
-    window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + doc_name +
-        "&user_id=" + userId + "&fileId=" + fileId;
+// function toModify(doc_name, userId, fileId) {
+//     window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + doc_name +
+//         "&user_id=" + userId + "&fileId=" + fileId;
+// }
+function seleteContent(savestatus,fileid,filename) {
+    window.location.href = "/seleteContent/?savestatus=" + savestatus + "&fileId=" + fileid + "&filename=" + filename ;
+}
+
+function firstnew(savestatus,fileid,filename) {
+    window.location.href = "/firstnew/?savestatus=" + savestatus + "&fileId=" + fileid + "&filename=" + filename + "&para=" + 0;
 }
 
 

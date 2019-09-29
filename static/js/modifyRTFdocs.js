@@ -171,7 +171,7 @@ $(function () {
     // 页面加载时隐藏版本框
     $("#myEditor").hide()
 
-    // 文档改变即保存文档
+    //文档改变即保存文档
     $("#editor").bind("DOMSubtreeModified", function () {
         setTimeout(function () {
             var doc_content = $("#editor").html();
@@ -278,12 +278,15 @@ function doc_content() {
     $("#editor").html(doc_content)
 }
 
-// 打开已存在文档
-function docs_modify(name, id, saveState, fileId, roleName) {
-    window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + name +
-        "&user_id=" + id + "&fileId=" + fileId + "&roleName=" + roleName;
-}
+// // 打开已存在文档
+// function docs_modify(name, id, saveState, fileId, roleName) {
+//     window.location.href = "/docsModify/?saveState=" + saveState + "&file_name=" + name +
+//         "&user_id=" + id + "&fileId=" + fileId + "&roleName=" + roleName;
+// }
 
+function seleteContent(savestatus,fileid,filename) {
+    window.location.href = "/seleteContent/?savestatus=" + savestatus + "&fileId=" + fileid + "&filename=" + filename;
+}
 // 保存文档
 function modifyDocs() {
     var doc_content = document.getElementById("editor"); //取得纯文本
@@ -302,15 +305,12 @@ function modifyDocs() {
         data: {
             doc_content: doc_content,
             now_doc_title: now_doc_title,
-            fileId: fileId
+            fileId: fileId,
         },
         success: function (data) {
             if (data.saveStatus == "success") {
                 // 保存成功
                 var now = new Date();
-                // var hour = now.getHours();
-                // if (hour < 10){}
-                // var min = now.getMinutes();
                 var time = now.toLocaleTimeString()
                 $("#auto_save").attr("src", "../static/assets/images/完成.png");
                 $("#auto_save_span").text("最近保存 " + time);
